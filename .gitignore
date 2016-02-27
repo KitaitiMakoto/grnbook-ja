@@ -1,3 +1,5 @@
 web/
 *.re
+grnbook-ja.epub
+grnbook-ja.pdf
 !src/*.re
