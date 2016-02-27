@@ -13,3 +13,7 @@ guard :shell do
     `review-compile --target html #{src} > #{dest}`
   end
 end
+
+guard :livereload do
+  watch %r|#{DEST}/.+|
+end
