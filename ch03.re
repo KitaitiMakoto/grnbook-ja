@@ -23,5 +23,22 @@ Groongaは、全文検索エンジンであると同時にデータベースで�
 
 Microsoft ExcelやGroogle Spreadsheet、MySQLなどのRDBMS、CSV@<fn>{CSV}などでおなじみですね。
 
+このテーブルをGroongaに作成するには、HTTP経由で@<code>{table_create}というコマンドを実行する必要があります。HTTPなので、JavaScriptから@<code>{XMLHttpRequest}を使って操作することができます。
+
+データの準備に時間を掛けても飽きてしまうので、詳しい説明は後に回すことにして、ここでは実際にテーブルを作るまでを駆け足でやっていきたいと思います。
+
+=== 画面のデザイン
+
+テーブルの作成は一度行えば二度は必要ないので、後で作る検索アプリケーションとは分けたページにします。画面の構成要素はボタンひとつだけで、このボタンを押すとGroongaデータベースにPDFsというテーブルを作るようにします。一度テーブルを作った後は、ボタンを無効化します。
+
+（絵があったほうがよい？）
+
+init.htmlという名前で次の内容のHTMLファイルを作成してください。
+
+//list[init.html][init.html][html]{
+<!doctype html>
+<button>PDFsデータベースの作成</button>
+//}
+
 
 //footnote[CSV][Comma-Separated Values（カンマ区切りの値）。一行の中に、カンマで区切った色々な値を書いたテキストファイル。Excelなどのスプレッドシートアプリケーションは多くの場合CSVとしての保存機能を持つ。]
