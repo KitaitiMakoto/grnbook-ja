@@ -36,8 +36,8 @@ Microsoft ExcelやGroogle Spreadsheet、MySQLなどのRDBMS、CSV@<fn>{CSV}な�
 init.htmlという名前で次の内容のHTMLファイルを作成してください。
 
 //list[init.html][init.html][html]{
-<!doctype html>
-<button>PDFsデータベースの作成</button>
+#@mapfile(ch03/init.html)
+#@end
 //}
 
 
