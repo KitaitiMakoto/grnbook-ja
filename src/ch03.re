@@ -31,16 +31,23 @@ Microsoft ExcelやGroogle Spreadsheet、MySQLなどのRDBMS、CSV@<fn>{CSV}な�
 
 === 画面のデザイン
 
-テーブルの作成は一度行えば二度は必要ないので、後で作る検索アプリケーションとは分けたページにします。画面の構成要素はボタンひとつだけで、このボタンを押すとGroongaデータベースにPDFsというテーブルを作るようにします。一度テーブルを作った後は、ボタンを無効化します。
+テーブルの作成は一度行えば二度は必要ないので、後で作る検索アプリケーションとは分けたページにします。画面の構成要素はボタンひとつだけで、このボタンを押すとGroongaデータベースにDocumentsというテーブルを作るようにします。一度テーブルを作った後は、ボタンを無効化します。
 
 （絵があったほうがよい？）
 
-init.htmlという名前で次の内容のHTMLファイルを作成してください。
+init.html、init.css、init.jsいう名前のファイルを作成してください。内容はそれぞれ以下の通りです。
 
 //list[init.html][init.html][html]{
 #@mapfile(ch03/init.html)
 #@end
 //}
+
+//list[init.js][init.js][javascipt]{
+#@mapfile(ch03/init.js)
+#@end
+//}
+（Promiseは敷居が高いだろうか？　jQueryとかって今でも共通言語？）
+（テーブルの消し方）
 
 
 //footnote[CSV][Comma-Separated Values（カンマ区切りの値）。一行の中に、カンマで区切った色々な値を書いたテキストファイル。Excelなどのスプレッドシートアプリケーションは多くの場合CSVとしての保存機能を持つ。]
