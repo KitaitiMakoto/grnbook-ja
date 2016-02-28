@@ -20,6 +20,14 @@ guard :shell do
 
     `review-compile --target html #{src} > #{dest}`
   end
+
+  watch %r{\Aimages/.+\.(?:png|jpe?g|gif|webp)} do |m|
+    src = m[0]
+    dest = DEST/src
+    dest.dirname.mkpath unless dest.dirname.exist?
+
+    `cp #{src} #{dest}`
+  end
 end
 
 guard :livereload do
