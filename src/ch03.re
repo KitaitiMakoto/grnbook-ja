@@ -47,6 +47,19 @@ Groongaでテーブルを作成してこうしたカラム定義を行うには�
 //image[table-creation-existing][既にテーブルが存在している場合の表示]{
 //}
 
+=== API
+
+groonga-httpdは、JSON over HTTPで通信してデータの投入や検索といった操作を行います。いわゆるウェブAPIと言っていいと思います。
+
+ここではテーブルを作成し、カラムを定義するために、以下のAPIを使用します。
+
+: /d/table_list
+  テーブル一覧を取得します。
+: /d/table_create
+  テーブルを作成します。
+: /d/column_create
+  指定したテーブルにカラムを定義します。
+
 === 実装
 
 init.html、init.jsという名前のファイルを作成してください。内容はそれぞれ以下の通りです。
