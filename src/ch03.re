@@ -62,6 +62,14 @@ groonga-httpdは、JSON over HTTPで通信してデータの投入や検索と�
 
 === 実装
 
+では、これらのAPIを使用してテーブルを定義しましょう。PDFのコンテンツを検索可能にするため、以下のような@<code>{Documents}テーブルを作成します。
+
+//table[documentstable][Documentsテーブルの定義]{
+_key	title	content
+-------------------
+行（レコード）を特定するためのキーです。ここではコンピューター上の場所（ファイルパス）を用いることにします	ファイルのタイトルです	ファイルの内容です
+//}
+
 init.html、init.jsという名前のファイルを作成してください。内容はそれぞれ以下の通りです。
 
 //list[init.html][init.html][html]{
