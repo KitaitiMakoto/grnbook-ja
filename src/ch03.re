@@ -62,7 +62,7 @@ groonga-httpdは、JSON over HTTPで通信してデータの投入や検索と�
 
 === 実装
 
-では、これらのAPIを使用してテーブルを定義しましょう。PDFのコンテンツを検索可能にするため、以下のような@<code>{Documents}テーブルを作成します。
+では、これらのAPIを使用してテーブルを定義しましょう。PDFのコンテンツを保存するため、以下のような@<code>{Documents}テーブルを作成します。
 
 //table[documentstable][Documentsテーブルの定義]{
 _key	title	content
