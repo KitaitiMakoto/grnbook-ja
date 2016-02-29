@@ -32,7 +32,7 @@ function createTables() {
     return createDocumentsTable()
         .then(createTermsTable)
         .then(function() {
-            showMessage("必要なテーブル（" + CONTENT_TABLE + ", " + INDEX_TABLE + "）を作成しました");
+            showMessage("必要なテーブル（" + CONTENT_TABLE + ", " + INDEX_TABLE + "）を作成しました。");
         })
         .catch(function(error) {
             button.disabled = false;
@@ -48,8 +48,8 @@ function tableList() {
         .then(function(response) {
             var status = response.shift();
             var body = response.shift();
-            var scheme = body.shift();
-            var nameFieldIndex = scheme.findIndex(function(nameAndType) {
+            var schema = body.shift();
+            var nameFieldIndex = schema.findIndex(function(nameAndType) {
                 var fieldName = nameAndType[0];
                 var fieldType = nameAndType[1];
 
