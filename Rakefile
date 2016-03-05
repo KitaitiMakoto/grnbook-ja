@@ -31,10 +31,14 @@ CHAPS.each do |chap|
     sh "review-compile --yaml=config.yml --target=html --output-file=#{task.name} #{task.prerequisites.first}"
   end
 
-  file chap => [assets, SRC_DIR/chap] do |task|
+  file chap => SRC_DIR/chap do |task|
     sh "review-preproc #{task.prerequisites.first} > #{task.name}"
   end
 
-  # Exists to notify updates of timestamp
-  task assets unless assets.empty?
+  unless assets.empty?
+    file chap => assets
+
+    # Exists to notify updates of timestamp
+    task assets
+  end
 end
