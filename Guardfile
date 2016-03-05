@@ -10,8 +10,8 @@ catalog = YAML.load_file('catalog.yml')
 CHAPS = catalog['CHAPS']
 
 guard :shell do
-  watch %r{#{SRC}/(.+)\.re|(ch\d+)?/.+} do |m|
-    chap = m[1] || m[2]
+  watch %r{\A#{SRC}/(.+)\.re|\A(ch\d+)?/.+|\Aimages/(ch\d+)?/.+} do |m|
+    chap = m[1] || m[2] || m[3]
     `rake #{chap}`
   end
 
