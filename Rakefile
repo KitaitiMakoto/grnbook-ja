@@ -15,6 +15,21 @@ WEBS = SRCS.ext('html').collect {|web| web.gsub(SRC_DIR.to_path, WEB_DIR.to_path
 CLEAN.include CHAPS
 CLOBBER.include WEBS
 
+task :default => :book
+
+desc 'Build files of the book'
+task :book => [:epub, :pdf]
+
+desc 'Build EPUB file'
+task :epub => CHAPS.ext('') do
+  sh "review-epubmaker config.yml"
+end
+
+desc 'Build PDF file'
+task :pdf => CHAPS.ext('') do
+  sh "review-pdfmaker config.yml"
+end
+
 desc 'Build all HTML files'
 task :html => WEBS
 
