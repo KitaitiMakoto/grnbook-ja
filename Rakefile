@@ -8,7 +8,7 @@ directory SRC_DIR.to_path
 directory WEB_DIR.to_path
 
 catalog = YAML.load_file('catalog.yml')
-CHAPS = catalog['CHAPS']
+CHAPS = FileList[catalog['CHAPS']]
 SRCS = FileList[CHAPS.map {|chap| SRC_DIR/chap}]
 WEBS = SRCS.ext('html').collect {|web| web.gsub(SRC_DIR.to_path, WEB_DIR.to_path)}
 
