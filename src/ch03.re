@@ -118,7 +118,7 @@ http://localhost:3000/app/init.htmlにアクセスすると、「データベー
 : @<code>{CONTENT_TABLE}
   PDFの内容を保存するためのテーブルの名前です。既に別の目的で同名のテーブルを作成している場合などは書き換えてください。
 : @<code>{INDEX_TABLE}
-  検索用のインデックステーブル（後述）の名前です。@<cod>{CONTENT_TABLE}同様、既に使用済みの場合は変更してください。
+  検索用のインデックステーブル（後述）の名前です。@<code>{CONTENT_TABLE}同様、既に使用済みの場合は変更してください。
 
 （OS Xはlocalhostにならなかったかも）
 
