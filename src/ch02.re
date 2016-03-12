@@ -15,3 +15,50 @@ Mroongaは、MySQLのストレージエンジンの一つです@<fn>{mariadb}。
 Mroongaを全文検索システムの本番環境で使うには、公式マニュアルのインストールのページを参照してください。ここでは、本書で試す目的で、簡易に環境を準備する方法を紹介します。
 
 == Mroongaの環境の準備
+
+本書では、MySQL及びその他の環境の準備にDockerを使います。
+
+=== Dockerのインストール
+
+（後で書く）
+
+=== Dockerコンテナの起動
+
+本書用に必要なソフトウェアをインストールしたDockerイメージを作成してあります。ターミナルで以下のコマンドを実行してください。
+
+//list[docker run][Dockerイメージの取得とコンテナの起動]{
+% cd path/to/project
+% docker run --detach --name=grnbook --publish=8080:80 --volume=$PWD:/var/lib/grnbook kitaitimakoto/grnbook-mroonga
+//}
+
+@<code>{docker run}コマンドを実行すると、以下の二つのことが行われます。
+
+ 1. Dockerイメージの取得（もしシステム上に存在しない場合）
+ 2. 取得したDockerイメージを元にしたDockerコンテナの起動
+
+Dockerイメージの取得は一度行えば充分なので、コンテナの二度目以降の起動には別のコマンドを使用します。
+
+//emlist[Dockerコンテナの起動]{
+% docker start grnbook
+//}
+
+//emlist[Dockerコンテナの停止]{
+% docker stop grnbook
+//}
+
+コンテナの操作に使用している@<code>{grnbook}という名前は、@<list>{docker run}における@<code>{name}オプションで指定した物を使用します。
+
+=== 動作確認
+
+Dockerコンテナが実際に動作していることを確認しましょう。このイメージにはPHPが含まれているので、以下のようなファイルを作成することで動作確認ができます。
+
+//list[info.php][info.php][php]{
+<?php
+phpinfo();
+
+//}
+
+ブラウザーでhttp://localhost:8080/info.phpにアクセスしてください。以下のようにPHPの情報が表示されれば、環境の準備は成功しています。
+
+//image[phpinfo][phpinfo()の実行結果][scale=1]{
+//}
