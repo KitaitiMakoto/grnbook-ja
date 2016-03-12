@@ -1,0 +1,2 @@
+deb http://packages.groonga.org/debian/ jessie main
+deb-src http://packages.groonga.org/debian/ jessie main
