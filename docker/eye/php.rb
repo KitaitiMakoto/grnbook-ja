@@ -3,5 +3,6 @@ Eye.application 'web' do
   process :php do
     pid_file 'php.pid'
     start_command 'php -S 0.0.0.0:80'
+    daemonize true
   end
 end
