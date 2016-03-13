@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $result = $dbh->query('SHOW DATABASES')->fetchAll();
 $databases = array_map(function($row) {
-    return $row['Database'];
+    return $row[0];
 }, $result);
 ?>
 <!doctype html>
