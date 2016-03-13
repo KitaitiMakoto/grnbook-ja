@@ -73,3 +73,79 @@ phpinfo();
 //}
 
 ありがちな間違いとして、Dockerコンテナと@<code>{docker}コマンドを実行している（OS Xなどの）ホストマシンとで共有するディレクトリーをうまく設定できないことがあります。@<list>{docker run}で@<code>{volume}オプションに@<code>{$PWD}を使用していますが、これは現在のディレクトリーを意味します。そのため、このコマンドを実行した時のディレクトリーが、PHPファイルを措くべき場所として使用されます。事前にプロジェクトのディレクトリーに移動してから実行するようにしましょう。
+
+== 作成する全文検索システムの概要
+
+それでは、PHPとMroongaを使って、全文検索システムを作っていきましょう。以下のようなシステムを作ることにします。
+
+: 概要
+  登録済みのPDFファイルを全文検索するシステムである
+: できること
+  検索対象となる文書をウェブUIで登録することができる@<br>{}
+  ウェブUI上のテキストフィールドを使って検索することができる
+: 実装方針
+  ウェブUIはPHPを使用して作成する@<br>{}
+  全文検索用のデータはMySQLに格納する@<br>{}
+  PDFからテキストを抜き出す処理は本書では扱わない（Dockerイメージ付属のツールを使う）
+
+== データベースの作成
+
+まず、PHPを使って、MySQLにデータベースを作成します。作成の手順は通常のMySQLでのデータベース作成と同様です。
+
+ソースコードは以下のようになります。@<fn>{loosephp}
+
+//list[create-database.php][create-database.php][php]{
+#@mapfile(ch02/create-database.php)
+#@end
+//}
+
+通常のMySQLに於けるデータベースと全く同じ手順でデータベースを作成すればOKです。
+
+//footnote[loosephp][限定された状況での一度きりの処理のため、褒められない書き方をしている箇所もあります。実際のアプリケーションで使用する場合には、フレームワークなどのやり方に則った適切な方法でデータベースを操作してください。]
+
+うまくできたら、実際に画面上のボタンを押してデータベースを作成してみましょう。「現在のデータベース一覧」に「pdfsearch」というデータベースが加わるはずです。
+
+==[column] PHPのデバッグ
+
+PHPが期待通りに動作しない場合や画面が真っ白になって何が悪いか分からない場合は、@<code>{docker logs}コマンドでログを確認することができます。
+
+//list[docker logs][docker logsでPHPのログを確認]{
+% docker log pdfsearch
+13.03.2016 09:41:25 INFO  -- [web:php] switch :starting [:unmonitored => :starting] (reason: monitor by user)
+160313 09:41:26 mysqld_safe Can't log to error log and syslog at the same time.  Remove all --log-error configuration options for --syslog to take effect.
+160313 09:41:26 mysqld_safe Logging to '/var/log/mysql/error.log'.
+160313 09:41:27 mysqld_safe Starting mysqld daemon with databases from /var/lib/mysql
+[Sun Mar 13 09:41:54 2016] 172.17.0.1:58804 [200]: /create-database.php
+[Sun Mar 13 09:41:55 2016] 172.17.0.1:58808 [404]: /favicon.ico - No such file or directory
+[Sun Mar 13 09:42:01 2016] PHP Parse error:  syntax error, unexpected '$databases' (T_VARIABLE) in /var/lib/pdfsearch/create-database.php on line 14
+[Sun Mar 13 09:42:01 2016] 172.17.0.1:58812 [500]: /create-database.php - syntax error, unexpected '$databases' (T_VARIABLE) in /var/lib/pdfsearch/create-database.php on line 14
+//}
+
+@<code>{-f}オプションを付け
+
+//emlist[]{
+% docker logs -f pdfsearch
+//}
+
+と実行すると、ログが出力する度にそのログが表示されます。Dockerコンテナの中では@<href>{http://php.net/manual/ja/features.commandline.webserver.php, PHPのビルトインサーバー}が動作しているため、ログの内容もそれに準じます。
+
+また、ブラウザーでエラー内容を確認したい場合には、PHPファイルの冒頭で
+
+//emlist[][php]{
+<?php
+ini_set('dispaly_errors', 'stdout');
+//}
+
+と設定するとよいでしょう。
+
+== テーブルの作成
+
+データベースが出来たので、以下のカラム持つ@<code>{pdfs}テーブル作りましょう。
+
+//table[pdfsearch][作成するpdfsテーブル]{
+カラム	内容
+------------
+path	システム内のパス（場所）
+title	PDF文書のタイトル
+content	PDF内のテキスト
+//}
