@@ -28,7 +28,8 @@ Mroongaを全文検索システムの本番環境で使うには、公式マニ�
 
 //list[docker run][Dockerイメージの取得とコンテナの起動]{
 % cd path/to/project
-% docker run --detach --name=grnbook --publish=8080:80 --volume=$PWD:/var/lib/grnbook kitaitimakoto/grnbook-mroonga
+% docker run --detach --name=pdfsearch --publish=8080:80 \
+    --volume=$PWD:/var/lib/pdfsearch kitaitimakoto/grnbook-mroonga
 //}
 
 @<code>{docker run}コマンドを実行すると、以下の二つのことが行われます。
