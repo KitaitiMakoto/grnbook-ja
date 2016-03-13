@@ -41,9 +41,9 @@ $tables = array_map(function($row) {
     <?php endif; ?>
     <h2>現在のテーブル一覧</h2>
     <ul>
-      <?php foreach ($tables as $table): ?>
-        <li><?php echo htmlspecialchars($table, ENT_QUOTES, 'UTF-8') ?></li>
-      <?php endforeach; ?>
+    <?php foreach ($tables as $table): ?>
+      <li><?php echo htmlspecialchars($table, ENT_QUOTES, 'UTF-8') ?></li>
+    <?php endforeach; ?>
     </ul>
   </body>
 </html>
