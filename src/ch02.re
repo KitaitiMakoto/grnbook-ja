@@ -60,6 +60,7 @@ phpinfo();
 //}
 
 ブラウザーでhttp://localhost:8080/info.phpにアクセスしてください。以下のようにPHPの情報が表示されれば、環境の準備は成功しています。
+（Docker Toolbox使っている場合はlocalhostじゃなさそう）
 
 //image[phpinfo][phpinfo()の実行結果][scale=1]{
 //}
@@ -156,3 +157,5 @@ content	PDF内のテキスト	LONGTEXT	検索対象
 #@mapfile(ch02/create-table.php)
 #@end
 //}
+
+http://localhost:8080/create-table.phpにアクセスして@<code>{pdfs}テーブルを作成してみましょう。事前に@<code>{pdfsearch}テーブルを作っておかないとエラーになるので注意してください。
