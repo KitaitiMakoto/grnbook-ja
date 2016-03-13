@@ -143,9 +143,9 @@ ini_set('dispaly_errors', 'stdout');
 データベースが出来たので、以下のカラム持つ@<code>{pdfs}テーブル作りましょう。
 
 //table[pdfsearch][作成するpdfsテーブル]{
-カラム	内容
-------------
-path	システム内のパス（場所）
-title	PDF文書のタイトル
-content	PDF内のテキスト
+カラム	内容	データ型	備考
+----------------------
+path	システム内のパス（場所）	VARCHAR(255)	検索対象ではない
+title	PDF文書のタイトル	VARCHAR(255)	検索対象
+content	PDF内のテキスト	LONGTEXT	検索対象
 //}
