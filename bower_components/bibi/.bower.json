@@ -1,0 +1,38 @@
+{
+  "name": "bibi",
+  "version": "0.998.3",
+  "authors": [
+    "Satoru MATSUSHIMA"
+  ],
+  "description": "BiB/i | EPUB Reader on your website.",
+  "keywords": [
+    "EPUB",
+    "Reading System",
+    "Viewer",
+    "Books-in-Browsers"
+  ],
+  "license": "MIT",
+  "homepage": "http://bibi.epub.link/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/satorumurmur/bibi.git"
+  },
+  "main": "bib/i/index.html",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "0.998.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.998.3",
+    "commit": "9755f7e2b711a075982655f595795a539b6fb6d6"
+  },
+  "_source": "git://github.com/satorumurmur/bibi.git",
+  "_target": "^0.998.3",
+  "_originalSource": "bibi",
+  "_direct": true
+}

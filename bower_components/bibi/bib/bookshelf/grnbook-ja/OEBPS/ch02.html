@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ops="http://www.idpf.org/2007/ops" xml:lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+  <meta name="generator" content="Re:VIEW" />
+  <title>MySQLで作る全文検索システム</title>
+</head>
+<body>
+<h1><a id="h2"></a><span class="secno">第2章　</span>MySQLで作る全文検索システム</h1>
+<div class="lead">
+<p>Groongaは様々なソフトウェアに組み込み、全文検索機能を提供することができます。その一つ、MySQLに組み込むためのMroongaを使って、全文検索システムを作ってみましょう。</p>
+</div>
+
+<h2><a id="h2-1"></a><span class="secno">2.1　</span>Mroongaの概要</h2>
+<p>Mroongaは、MySQLのストレージエンジンの一つです<a id="fnb-mariadb" href="#fn-mariadb" class="noteref" epub:type="noteref">*1</a>。MySQLのストレージエンジンにはMyISAMやInnoDBなどがあり、聞いたことがある人も多いでしょう。それぞれにパフォーマンスや対障害性などに特徴があり、テーブルごとに使い分けることができます。</p>
+<div class="footnote" epub:type="footnote" id="fn-mariadb"><p class="footnote">[*1] MySQLから派生したMariaDBというデータベースシステムでも使用できます。最新のMariaDBでは始めからMroongaが組み込まれています。</p></div>
+<p>その一つとしてMroongaは、Groongaを組み込んで、高速かつ多機能な全文検索を可能にしたストレージエンジンです。これをMySQLに組み込んで使うことで、SQLを使って全文検索を行えるようになります。</p>
+<p>Mroongaを全文検索システムの本番環境で使うには、公式マニュアルのインストールのページを参照してください。ここでは、本書で試す目的で、簡易に環境を準備する方法を紹介します。</p>
+
+<h2><a id="h2-2"></a><span class="secno">2.2　</span>Mroongaの環境の準備</h2>
+<p>本書では、MySQL及びその他の環境の準備にDockerを使います。</p>
+
+<h3><a id="h2-2-1"></a>Dockerのインストール</h3>
+<p>（後で書く）</p>
+
+<h3><a id="h2-2-2"></a>Dockerコンテナの起動</h3>
+<p>本書用に必要なソフトウェアをインストールしたDockerイメージを作成してあります。ターミナルで以下のコマンドを実行してください。</p>
+<div class="caption-code">
+<p class="caption">リスト2.1: Dockerイメージの取得とコンテナの起動</p>
+<pre class="list">% cd path/to/project
+% docker run --detach --name=pdfsearch --publish=8080:80 \
+    --volume=$PWD:/var/lib/pdfsearch kitaitimakoto/grnbook-mroonga
+</pre>
+</div>
+<p><code class="inline-code tt">docker run</code>コマンドを実行すると、以下の二つのことが行われます。</p>
+<ol>
+<li>Dockerイメージの取得（もしシステム上に存在しない場合）</li>
+<li>取得したDockerイメージを元にしたDockerコンテナの起動</li>
+</ol>
+<p>Dockerイメージの取得は一度行えば充分なので、コンテナの二度目以降の起動には別のコマンドを使用します。</p>
+<div class="emlist-code">
+<p class="caption">Dockerコンテナの起動</p>
+<pre class="emlist">% docker start grnbook
+</pre>
+</div>
+<div class="emlist-code">
+<p class="caption">Dockerコンテナの停止</p>
+<pre class="emlist">% docker stop grnbook
+</pre>
+</div>
+<p>コンテナの操作に使用している<code class="inline-code tt">grnbook</code>という名前は、リスト2.1における<code class="inline-code tt">name</code>オプションで指定した物を使用します。</p>
+
+<h3><a id="h2-2-3"></a>動作確認</h3>
+<p>Dockerコンテナが実際に動作していることを確認しましょう。このイメージにはPHPが含まれているので、以下のようなファイルを作成することで動作確認ができます。</p>
+<div class="caption-code">
+<p class="caption">リスト2.2: info.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000">phpinfo</span>();
+</pre>
+</div>
+<p>ブラウザーでhttp://localhost:8080/info.phpにアクセスしてください。以下のようにPHPの情報が表示されれば、環境の準備は成功しています。（Docker Toolbox使っている場合はlocalhostじゃなさそう）</p>
+<div id="phpinfo" class="image">
+<img src="images/ch02/phpinfo.png" alt="phpinfo()の実行結果" width="100%" />
+<p class="caption">
+図2.1: phpinfo()の実行結果
+</p>
+</div>
+<p>「Not Found」の画面が表示されてしまう場合は、どこかで間違えてしまったようです。これまでの手順を見ながらやり直してみてください。</p>
+<p><code class="inline-code tt">docker run</code>をやり直すには、以下のコマンドを実行して一旦Dockerコンテナを削除する必要があります。</p>
+<div class="emlist-code">
+<p class="caption">Dockerコンテナの削除</p>
+<pre class="emlist">% docker rm grnbook
+</pre>
+</div>
+<p>ありがちな間違いとして、Dockerコンテナと<code class="inline-code tt">docker</code>コマンドを実行している（OS Xなどの）ホストマシンとで共有するディレクトリーをうまく設定できないことがあります。リスト2.1で<code class="inline-code tt">volume</code>オプションに<code class="inline-code tt">$PWD</code>を使用していますが、これは現在のディレクトリーを意味します。そのため、このコマンドを実行した時のディレクトリーが、PHPファイルを措くべき場所として使用されます。事前にプロジェクトのディレクトリーに移動してから実行するようにしましょう。</p>
+
+<h2><a id="h2-3"></a><span class="secno">2.3　</span>作成する全文検索システムの概要</h2>
+<p>それでは、PHPとMroongaを使って、全文検索システムを作っていきましょう。以下のようなシステムを作ることにします。</p>
+<dl>
+<dt>概要</dt>
+<dd>登録済みのPDFファイルを全文検索するシステムである</dd>
+<dt>できること</dt>
+<dd>検索対象となる文書をウェブUIで登録することができる<br />ウェブUI上のテキストフィールドを使って検索することができる</dd>
+<dt>実装方針</dt>
+<dd>ウェブUIはPHPを使用して作成する<br />全文検索用のデータはMySQLに格納する<br />PDFからテキストを抜き出す処理は本書では扱わない（Dockerイメージ付属のツールを使う）</dd>
+</dl>
+
+<h2><a id="h2-4"></a><span class="secno">2.4　</span>データベースの作成</h2>
+<p>まず、PHPを使って、MySQLにデータベースを作成します。作成の手順は通常のMySQLでのデータベース作成と同様です。Dockerコンテナ内では既にMySQLが動作しており、<code class="inline-code tt">root</code>ユーザーでパスワード無しでログインできます。</p>
+<p>ソースコードは以下のようになります。<a id="fnb-loosephp" href="#fn-loosephp" class="noteref" epub:type="noteref">*2</a></p>
+<div class="caption-code">
+<p class="caption">リスト2.3: create-database.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;DBNAME&#39;</span>, <span style="color: #BA2121">&#39;pdfsearch&#39;</span>);
+
+<span style="color: #19177C">$dbh</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> PDO(<span style="color: #BA2121">&#39;mysql:host=localhost;charset=utf8&#39;</span>, <span style="color: #BA2121">&#39;root&#39;</span>, <span style="color: #BA2121">&#39;&#39;</span>);
+
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span>) {
+    <span style="color: #19177C">$result</span> <span style="color: #666666">=</span> <span style="color: #19177C">$dbh</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">exec</span>(<span style="color: #BA2121">&#39;CREATE DATABASE &#39;</span> <span style="color: #666666">.</span> DBNAME);
+
+    <span style="color: #008000">header</span>(<span style="color: #BA2121">&quot;Location: </span><span style="color: #BB6688; font-weight: bold">{</span><span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_URI&#39;</span>]<span style="color: #BB6688; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>);
+}
+
+<span style="color: #19177C">$result</span> <span style="color: #666666">=</span> <span style="color: #19177C">$dbh</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">query</span>(<span style="color: #BA2121">&#39;SHOW DATABASES&#39;</span>)<span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+<span style="color: #19177C">$databases</span> <span style="color: #666666">=</span> <span style="color: #008000">array_map</span>(<span style="color: #008000; font-weight: bold">function</span>(<span style="color: #19177C">$row</span>) {
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$row</span>[<span style="color: #666666">0</span>];
+}, <span style="color: #19177C">$result</span>);
+<span style="color: #BC7A00">?&gt;</span>
+&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;データベースの作成&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;データベースの作成&lt;/h1&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> (<span style="color: #008000">in_array</span>(DBNAME, <span style="color: #19177C">$databases</span>)))<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+    &lt;form method=&quot;post&quot;&gt;
+      &lt;input type=&quot;submit&quot; value=&quot;pdfsearchデータベースの作成&quot;&gt;
+    &lt;/form&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endif</span>; <span style="color: #BC7A00">?&gt;</span>
+    &lt;h2&gt;現在のデータベース一覧&lt;/h2&gt;
+    &lt;ul&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$databases</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$database</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+      &lt;li&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> <span style="color: #008000">htmlspecialchars</span>(<span style="color: #19177C">$database</span>, ENT_QUOTES, <span style="color: #BA2121">&#39;UTF-8&#39;</span>); <span style="color: #BC7A00">?&gt;</span>&lt;/li&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+    &lt;/ul&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+</div>
+<p>通常のMySQLに於けるデータベースと全く同じ手順でデータベースを作成すればOKです。</p>
+<div class="footnote" epub:type="footnote" id="fn-loosephp"><p class="footnote">[*2] 限定された状況での一度きりの処理のため、褒められない書き方をしている箇所もあります。実際のアプリケーションで使用する場合には、フレームワークなどのやり方に則った適切な方法でデータベースを操作してください。</p></div>
+<p>うまくできたら、http://localhost:8080/create-database.phpを表示して、実際に画面上のボタンを押してデータベースを作成してみましょう。「現在のデータベース一覧」に「pdfsearch」というデータベースが加わるはずです。</p>
+<div class="column">
+
+<h2><a id="column-1"></a>PHPのデバッグ</h2>
+<p>PHPが期待通りに動作しない場合や画面が真っ白になって何が悪いか分からない場合は、<code class="inline-code tt">docker logs</code>コマンドでログを確認することができます。</p>
+<div class="caption-code">
+<p class="caption">リスト2.4: docker logsでPHPのログを確認</p>
+<pre class="list">% docker log pdfsearch
+13.03.2016 09:41:25 INFO  -- [web:php] switch :starting [:unmonitored =&gt; :starting] (reason: monitor by user)
+160313 09:41:26 mysqld_safe Can&#39;t log to error log and syslog at the same time.  Remove all --log-error configuration options for --syslog to take effect.
+160313 09:41:26 mysqld_safe Logging to &#39;/var/log/mysql/error.log&#39;.
+160313 09:41:27 mysqld_safe Starting mysqld daemon with databases from /var/lib/mysql
+[Sun Mar 13 09:41:54 2016] 172.17.0.1:58804 [200]: /create-database.php
+[Sun Mar 13 09:41:55 2016] 172.17.0.1:58808 [404]: /favicon.ico - No such file or directory
+[Sun Mar 13 09:42:01 2016] PHP Parse error:  syntax error, unexpected &#39;$databases&#39; (T_VARIABLE) in /var/lib/pdfsearch/create-database.php on line 14
+[Sun Mar 13 09:42:01 2016] 172.17.0.1:58812 [500]: /create-database.php - syntax error, unexpected &#39;$databases&#39; (T_VARIABLE) in /var/lib/pdfsearch/create-database.php on line 14
+</pre>
+</div>
+<p><code class="inline-code tt">-f</code>オプションを付け</p>
+<div class="emlist-code">
+<pre class="emlist">% docker logs -f pdfsearch
+</pre>
+</div>
+<p>と実行すると、ログが出力する度にそのログが表示されます。Dockerコンテナの中では<a href="http://php.net/manual/ja/features.commandline.webserver.php" class="link">PHPのビルトインサーバー</a>が動作しているため、ログの内容もそれに準じます。</p>
+<p>また、ブラウザーでエラー内容を確認したい場合には、PHPファイルの冒頭で</p>
+<div class="emlist-code">
+<pre class="emlist"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000">ini_set</span>(<span style="color: #BA2121">&#39;dispaly_errors&#39;</span>, <span style="color: #BA2121">&#39;stdout&#39;</span>);
+</pre>
+</div>
+<p>と設定するとよいでしょう。</p>
+</div>
+
+<h2><a id="h2-5"></a><span class="secno">2.5　</span>テーブルの作成</h2>
+<p>データベースが出来たので、以下のカラム持つ<code class="inline-code tt">pdfs</code>テーブル作りましょう。</p>
+<div id="pdfsearch" class="table">
+<p class="caption">表2.1: 作成するpdfsテーブル</p>
+<table>
+<tr><th>カラム</th><th>内容</th><th>データ型</th><th>備考</th></tr>
+<tr><td>path</td><td>システム内のパス（場所）</td><td>VARCHAR(255)</td><td>主キー。検索対象ではない</td></tr>
+<tr><td>title</td><td>PDF文書のタイトル</td><td>VARCHAR(255)</td><td>検索対象</td></tr>
+<tr><td>content</td><td>PDF内のテキスト</td><td>LONGTEXT</td><td>検索対象</td></tr>
+</table>
+</div>
+<p>やり方はデータベースの作成と同様です。</p>
+<div class="caption-code">
+<p class="caption">リスト2.5: create-table.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;DBNAME&#39;</span>, <span style="color: #BA2121">&#39;pdfsearch&#39;</span>);
+<span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;TABLE_NAME&#39;</span>, <span style="color: #BA2121">&#39;pdfs&#39;</span>);
+
+<span style="color: #19177C">$dsn</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;mysql:host=localhost;dbname=&#39;</span> <span style="color: #666666">.</span> DBNAME <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;;charset=utf8&#39;</span>;
+<span style="color: #19177C">$dbh</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> PDO(<span style="color: #19177C">$dsn</span>, <span style="color: #BA2121">&#39;root&#39;</span>, <span style="color: #BA2121">&#39;&#39;</span>);
+<span style="color: #19177C">$table</span> <span style="color: #666666">=</span> TABLE_NAME;
+
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span>) {
+    <span style="color: #19177C">$statement</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>STATEMENT
+CREATE TABLE <span style="color: #BA2121">`{$table}`</span> (
+    path    VARCHAR(<span style="color: #666666">255</span>) PRIMARY KEY,
+    title   VARCHAR(<span style="color: #666666">255</span>),
+    content LONGTEXT,
+    FULLTEXT INDEX (title),
+    FULLTEXT INDEX (content)
+) ENGINE <span style="color: #666666">=</span> Mroonga <span style="color: #008000; font-weight: bold">DEFAULT</span> CHARSET utf8;
+STATEMENT;
+    <span style="color: #19177C">$dbh</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">exec</span>(<span style="color: #19177C">$statement</span>);
+
+    <span style="color: #008000">header</span>(<span style="color: #BA2121">&quot;Location: </span><span style="color: #BB6688; font-weight: bold">{</span><span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_URI&#39;</span>]<span style="color: #BB6688; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>);
+}
+
+<span style="color: #19177C">$result</span> <span style="color: #666666">=</span> <span style="color: #19177C">$dbh</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">query</span>(<span style="color: #BA2121">&#39;SHOW TABLES&#39;</span>)<span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+<span style="color: #19177C">$tables</span> <span style="color: #666666">=</span> <span style="color: #008000">array_map</span>(<span style="color: #008000; font-weight: bold">function</span>(<span style="color: #19177C">$row</span>) {
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$row</span>[<span style="color: #666666">0</span>];
+}, <span style="color: #19177C">$result</span>);
+
+<span style="color: #BC7A00">?&gt;</span>
+&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;テーブルの作成&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;テーブルの作成&lt;/h1&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> (<span style="color: #008000">in_array</span>(TABLE_NAME, <span style="color: #19177C">$tables</span>)))<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+    &lt;form method=&quot;post&quot;&gt;
+      &lt;input type=&quot;submit&quot; value=&quot;pdfsテーブルの作成&quot;&gt;
+    &lt;/form&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endif</span>; <span style="color: #BC7A00">?&gt;</span>
+    &lt;h2&gt;現在のテーブル一覧&lt;/h2&gt;
+    &lt;ul&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$tables</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$table</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+      &lt;li&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> <span style="color: #008000">htmlspecialchars</span>(<span style="color: #19177C">$table</span>, ENT_QUOTES, <span style="color: #BA2121">&#39;UTF-8&#39;</span>) <span style="color: #BC7A00">?&gt;</span>&lt;/li&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+    &lt;/ul&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+</div>
+<p>http://localhost:8080/create-table.phpにアクセスして<code class="inline-code tt">pdfs</code>テーブルを作成してみましょう。事前に<code class="inline-code tt">pdfsearch</code>テーブルを作っておかないとエラーになるので注意してください。</p>
+<p>データベース作成時と違って、Mroongaを使ったテーブルを作る時にはいくつか注意点があります。</p>
+<p>一番大事なのは、<code class="inline-code tt">CREATE TABLE</code>文の最後に、ストレージエンジンとしてMroongaを指定することです。</p>
+<div class="emlist-code">
+<pre class="emlist"><span style="color: #008000; font-weight: bold">CREATE</span> <span style="color: #008000; font-weight: bold">TABLE</span> (
+<span style="color: #408080; font-style: italic">-- ...</span>
+) ENGINE <span style="color: #666666">=</span> Mroonga <span style="color: #008000; font-weight: bold">DEFAULT</span> CHARSET utf8;
+</pre>
+</div>
+<p>普段はInnoDBやMyISAMを指定しているところを切り替えるだけなので、難しいことはないでしょう。</p>
+<p>次に、インデックスの作成方法がInnoDBなどと異なります。PDFのタイトルや内容を完全一致で検索することはまずないでしょうから、通常のインデックスは貼る必要がありません。代わりに、全文検索のための特別なインデックスを作る、<code class="inline-code tt">FULLTEXT INDEX</code>構文を使用します。これは、MySQLに元々備わっている、全文検索機能のための構文です。Mroongaでも用途は同じなので、全く同じ構文で使用できます。</p>
+<p>それ以外は、通常のMySQL使い方と同じです。主キーにはパスといった意味のある物ではなく、ただレコードを識別するためだけのサロゲートキーを使う人もいることでしょう。それでも構いません。</p>
+</body>
+</html>

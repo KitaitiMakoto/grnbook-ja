@@ -1,0 +1,6 @@
+{
+  "name": "grnbook-ja",
+  "dependencies": {
+    "bibi": "^0.998.3"
+  }
+}
