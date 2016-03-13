@@ -9,7 +9,9 @@ RUN apt-get update && \
     { echo mysql-server mysql-server/root-password password ''; \
       echo mysql-server mysql-server/root_password_again password ''; \
     } | debconf-set-selections && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server-mroonga groonga-tokenizer-mecab php5-cli && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server-mroonga groonga-tokenizer-mecab php5-cli php5-mysqlnd && \
+    gem update --system && \
+    gem update && \
     gem install eye
 
 COPY eye.conf /etc/
