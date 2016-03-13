@@ -145,7 +145,14 @@ ini_set('dispaly_errors', 'stdout');
 //table[pdfsearch][作成するpdfsテーブル]{
 カラム	内容	データ型	備考
 ----------------------
-path	システム内のパス（場所）	VARCHAR(255)	検索対象ではない
+path	システム内のパス（場所）	VARCHAR(255)	主キー。検索対象ではない
 title	PDF文書のタイトル	VARCHAR(255)	検索対象
 content	PDF内のテキスト	LONGTEXT	検索対象
+//}
+
+やり方はデータベースの作成と同様です。
+
+//list[create-table.php][create-table.php][php]{
+#@mapfile(ch02/create-table.php)
+#@end
 //}
