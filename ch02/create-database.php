@@ -4,7 +4,6 @@ define('DBNAME', 'pdfsearch');
 $dbh = new PDO('mysql:host=localhost;charset=utf8', 'root', '');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $dbh = new PDO('mysql:host=localhost;charset=utf8', 'root', '');
     $result = $dbh->exec('CREATE DATABASE ' . DBNAME);
 
     header("Location: {$_SERVER['REQUEST_URI']}");
