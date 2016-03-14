@@ -34,7 +34,7 @@ Mroongaを全文検索システムの本番環境で使うには、公式マニ�
     --volume=$PWD:/var/lib/pdfsearch kitaitimakoto/grnbook-mroonga
 //}
 
-@<code>{docker run}コマンドを実行すると、以下の三つのことが行われます。
+@<code>{docker run}コマンドにより、以下の三つのことが行われます。
 
  1. Dockerイメージの取得（もしシステム上に存在しない場合）
  2. 取得したDockerイメージを元にしたDockerコンテナの作成
