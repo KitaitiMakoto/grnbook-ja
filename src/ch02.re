@@ -72,9 +72,10 @@ phpinfo();
 
 「Not Found」の画面が表示されてしまう場合は、どこかで間違えてしまったようです。これまでの手順を見ながらやり直してみてください。
 
-@<code>{docker run}をやり直すには、以下のコマンドを実行して一旦Dockerコンテナを削除する必要があります。
+@<code>{docker run}をやり直すには、以下のコマンドを実行して一旦Dockerコンテナを停止し、削除する必要があります。
 
-//emlist[Dockerコンテナの削除]{
+//emlist[Dockerコンテナの停止と削除]{
+% docker stop pdfsearch
 % docker rm pdfsearch
 //}
 
