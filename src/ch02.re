@@ -41,14 +41,14 @@ Mroongaを全文検索システムの本番環境で使うには、公式マニ�
 Dockerイメージの取得とコンテナの作成は一度行えば充分なので、コンテナの二度目以降の起動には別のコマンドを使用します。
 
 //emlist[Dockerコンテナの起動]{
-% docker start grnbook
+% docker start pdfsearch
 //}
 
 //emlist[Dockerコンテナの停止]{
-% docker stop grnbook
+% docker stop pdfsearch
 //}
 
-コンテナの操作に使用している@<code>{grnbook}という名前は、@<list>{docker run}における@<code>{name}オプションで指定した物を使用します。
+コンテナの操作に使用している@<code>{pdfsearch}という名前は、@<list>{docker run}における@<code>{name}オプションで指定した物を使用します。
 
 === 動作確認
 
@@ -71,7 +71,7 @@ phpinfo();
 @<code>{docker run}をやり直すには、以下のコマンドを実行して一旦Dockerコンテナを削除する必要があります。
 
 //emlist[Dockerコンテナの削除]{
-% docker rm grnbook
+% docker rm pdfsearch
 //}
 
 ありがちな間違いとして、Dockerコンテナと@<code>{docker}コマンドを実行している（OS Xなどの）ホストマシンとで共有するディレクトリーをうまく設定できないことがあります。@<list>{docker run}で@<code>{volume}オプションに@<code>{$PWD}を使用していますが、これは現在のディレクトリーを意味します。そのため、このコマンドを実行した時のディレクトリーが、PHPファイルを措くべき場所として使用されます。事前にプロジェクトのディレクトリーに移動してから実行するようにしましょう。
