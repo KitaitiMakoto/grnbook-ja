@@ -3,9 +3,9 @@
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
     <dc:title id="title">Groongaではじめる全文検索</dc:title>
     <dc:language id="language">ja</dc:language>
-    <dc:date id="date">2016-03-14</dc:date>
-    <meta property="dcterms:modified">2016-03-14T14:01:10Z</meta>
-    <dc:identifier id="BookId">urn:uid:c48ddf74-e9a1-11e5-8677-23fef640aac8</dc:identifier>
+    <dc:date id="date">2016-03-15</dc:date>
+    <meta property="dcterms:modified">2016-03-15T14:29:17Z</meta>
+    <dc:identifier id="BookId">urn:uid:dcc5d88a-ea6e-11e5-867f-23fef640aac8</dc:identifier>
   </metadata>
   <manifest>
     <item properties="nav" id="grnbook-ja-toc.html" href="grnbook-ja-toc.html" media-type="application/xhtml+xml"/>
