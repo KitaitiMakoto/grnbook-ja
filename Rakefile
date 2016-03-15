@@ -57,3 +57,22 @@ CHAPS.each do |chap|
     task assets
   end
 end
+
+GH_PAGES_WORKTREE = 'gh-pages'
+
+desc 'Publish GitHub Pages'
+task :gh_pages => [:gh_pages_worktree, :book] do
+  cp 'grnbook-ja.epub', GH_PAGES_WORKTREE
+  cp 'grnbook-ja.pdf', GH_PAGES_WORKTREE
+  Dir.chdir GH_PAGES_WORKTREE do
+    sh "bower update"
+    sh "unzip -o grnbook-ja.epub -d bower_components/bibi/bib/bookshelf/grnbook-ja"
+    sh "git add grnbook-ja.epub grnbook-ja.pdf bower_components"
+    sh "git commit -m 'Update book'"
+    sh "git push origin gh-pages"
+  end
+end
+
+task :gh_pages_worktree do
+  sh 'git worktree add gh-pages gh-ages' unless File.directory? GH_PAGES_WORKTREE
+end
