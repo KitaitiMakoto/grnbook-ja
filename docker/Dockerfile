@@ -8,8 +8,17 @@ RUN apt-get update && \
     apt-get update && \
     { echo mysql-server mysql-server/root-password password ''; \
       echo mysql-server mysql-server/root_password_again password ''; \
+      echo phpmyadmin phpmyadmin/dbconfig-install boolean false; \
+      echo phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2; \
+
+      echo phpmyadmin phpmyadmin/app-password-confirm password ''; \
+      echo phpmyadmin phpmyadmin/mysql/admin-pass password ''; \
+      echo phpmyadmin phpmyadmin/password-confirm password ''; \
+      echo phpmyadmin phpmyadmin/setup-password password ''; \
+      echo phpmyadmin phpmyadmin/database-type select mysql; \
+      echo phpmyadmin phpmyadmin/mysql/app-pass password ''; \
     } | debconf-set-selections && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server-mroonga groonga-tokenizer-mecab php5-cli php5-mysqlnd && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server-mroonga groonga-tokenizer-mecab phpmyadmin poppler-utils && \
     gem update --system && \
     gem update && \
     gem install eye
