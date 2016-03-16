@@ -5,3 +5,6 @@ epubversion: 3
 highlight:
   html: pygments
   latex: listings
+stylesheet: main.css
+params: --stylesheet=main.css
+texstyle: samplemacro
