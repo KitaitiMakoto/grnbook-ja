@@ -18,6 +18,11 @@ RUN mysqld & sleep 12 && mysql -uroot -e "INSTALL PLUGIN mroonga SONAME 'ha_mroo
 
 COPY eye.conf /etc/
 COPY eye /etc/eye/
+COPY 000-default.conf /etc/apache2/sites-available/
+COPY pdfsearch.conf /etc/apache2/sites-available/
+RUN ln -s /etc/apache2/sites-available/pdfsearch.conf /etc/apache2/sites-enabled/
+
+COPY config.inc.php /etc/phpmyadmin/config.inc.php
 
 EXPOSE 80
 
