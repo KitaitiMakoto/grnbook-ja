@@ -22,7 +22,7 @@ RUN apt-get update && \
     gem update --system && \
     gem update && \
     gem install eye
-RUN mysqld & sleep 3 && mysql -uroot -e "INSTALL PLUGIN mroonga SONAME 'ha_mroonga.so'" && mysqladmin -uroot shutdown
+RUN mysqld & sleep 12 && mysql -uroot -e "INSTALL PLUGIN mroonga SONAME 'ha_mroonga.so'" && mysqladmin -uroot shutdown
 
 COPY eye.conf /etc/
 COPY eye /etc/eye/
