@@ -181,9 +181,9 @@ CREATE TABLE (
 
 == データ入力機能の作成
 
-いよいよアプリケーションらしい箇所を作っていきます。始めから検索機能に着手したいところですが、データがないことには何もできないので、入力機能から作成します。
+いよいよアプリケーションらしい所を作っていきます。始めから検索機能に着手したいところですが、データがないことには何もできないので、入力機能から作成します。
 
-PDFファイルの内容をMySQLに登録するために、以下のようなステップを踏むことにします。
+PDFファイルの内容をMySQLに登録するために、以下のようなステップを踏むことになります。
 
  1. PHPによるウェブUIから一時ディレクトリーにアップロードする
  2. PDFファイルからタイトルと本文テキストを抽出する
@@ -213,3 +213,43 @@ PDFファイルの内容をMySQLに登録するために、以下のようなス
 紙幅を減らすため、細かな検証は省略しています。実際に運用するアプリケーションでは安全性やエラーのチェックなどをしっかりと行ってください。
 
 //footnote[multi-select][ファイル選択ダイアログでCtrlキーを押しながらファイルをクリックしていくことで、選んだファイルを同時にアップロードできます。また、Shiftを押しながら最初のファイルと最後のファイルをクリックすることで、その間にあるファイルをすべて選択状態にできます。]
+
+=== PDFからの情報の抽出
+
+次に、PDFファイルからタイトルと本文を抜き出す箇所を作ります。これを行うにはいくつか方法がありますが、ここでは@<href>{https://github.com/php-poppler/php-poppler, php-poppler}というライブラリーを使うことにします。php-popplerを使うとPDFを解析してタイトルや本文を抜き出すことができます@<fn>{poppler}。
+
+php-popplerは@<code>{Poppler}名前空間以下にいくつかのクラスを定義しており、以下のようにして使います。
+
+
+//list[php-poppler][php-popplerの基本的な使い方][php]{
+<?php
+
+$pdfinfo = \Poppler\Driver\Pdfinfo::create();
+$pdftotext = \Poppler\Driver\Pdftotext::create();
+$pdftohtml = \Poppler\Driver\Pdftohtml::create();
+
+$pdf = new \Poppler\Processer\Pdffile($pdfinfo, $pdftotet, $peftohtml);
+
+// PDFからタイトルや著者、作成日時などの情報を連想配列として抜き出す
+echo $pdf->getInfo('path/to/document.pdf');
+// PDFから本文テキストを抜き出す
+echo $pdf->toText('path/to/document.pdf');
+//}
+
+HTML関連の機能を使わないとしても、@<code>{\Poppler\Processer\Pdffile}のコンストラクターには@<code>{\Poppler\Driver\Pdftohtml}のインスタンスを渡す必要があるので注意してください。
+
+Dockerイメージの中には、既にPopplerとphp-popplerがインストール済みです。php-popplerはComposerでインストールしているので、@<code>{vendor/autoload.php}を読み込むことで、オートロードが有効になります。
+
+これを使って、先ほど作った@<code>{\PDFSearch\Upload}クラスにPDF関連の機能を追加します。
+
+//list[ch02/extract/upload.php][upload.php][php]{
+#@mapfile(ch02/extract/index.php)
+#@end
+//}
+
+実際にPDFファイルをアップロードして、タイトルなどの情報が取得できているか確認しましょう。
+
+//image[extract][PDF内の情報を取得]{
+//}
+
+//footnote[poppler][C製のPDFライブラリーでPopplerという物があり、PDFを扱う様々なコマンドラインツールの提供もしています。php-popplerはこれらのコマンド呼び出しをラップしてPHPから扱いやすくした物です。]
