@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ops="http://www.idpf.org/2007/ops" xml:lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+  <link rel="stylesheet" type="text/css" href="main.css" />
   <meta name="generator" content="Re:VIEW" />
   <title>MySQLで作る全文検索システム</title>
 </head>
@@ -63,13 +63,7 @@
 <span style="color: #008000">phpinfo</span>();
 </pre>
 </div>
-<p>ブラウザーでhttp://localhost:8080/info.phpにアクセスしてください。以下のようにPHPの情報が表示されれば、環境の準備は成功しています。（Docker Toolbox使っている場合はlocalhostじゃなさそう）</p>
-<div id="phpinfo" class="image">
-<img src="images/ch02/phpinfo.png" alt="phpinfo()の実行結果" width="100%" />
-<p class="caption">
-図2.1: phpinfo()の実行結果
-</p>
-</div>
+<p>ブラウザーでhttp://localhost:8080/info.phpにアクセスしてください。PHPの情報が表示されれば、環境の準備は成功しています。（Docker Toolbox使っている場合はlocalhostじゃなさそう）</p>
 <p>「Not Found」の画面が表示されてしまう場合は、どこかで間違えてしまったようです。これまでの手順を見ながらやり直してみてください。</p>
 <p><code class="inline-code tt">docker run</code>をやり直すには、以下のコマンドを実行して一旦Dockerコンテナを停止し、削除する必要があります。</p>
 <div class="emlist-code">
@@ -248,13 +242,92 @@ STATEMENT;
 <p>それ以外は、通常のMySQL使い方と同じです。主キーにはパスといった意味のある物ではなく、ただレコードを識別するためだけのサロゲートキーを使う人もいることでしょう。それでも構いません。</p>
 
 <h2><a id="h2-6"></a><span class="secno">2.6　</span>データ入力機能の作成</h2>
-<p>いよいよアプリケーションらしい箇所を作っていきます。始めから検索機能に着手したいところですが、データがないことには何もできないので、入力機能から作成します。</p>
-<p>（始めにいくらかデータを入れておいて、検索機能を作ったほうがよい？）</p>
-<p>PDFファイルの内容をMySQLに登録するために、以下のようなステップを踏むことにします。</p>
+<p>いよいよアプリケーションらしい所を作っていきます。始めから検索機能に着手したいところですが、データがないことには何もできないので、入力機能から作成します。</p>
+<p>PDFファイルの内容をMySQLに登録するために、以下のようなステップを踏むことになります。</p>
 <ol>
-<li>PDFファイルからタイトルと本文テキストをファイルとして抜き出す</li>
-<li>タイトルと本文テキストを、PHPによるウェブUIからアップロードする</li>
-<li>PHPで、受け取ったファイルからMySQLの適切なカラムにデータを挿入する</li>
+<li>PHPによるウェブUIから一時ディレクトリーにアップロードする</li>
+<li>PDFファイルからタイトルと本文テキストを抽出する</li>
+<li>タイトルと本文をMySQLの適切なカラムに挿入する</li>
 </ol>
+
+<h3><a id="h2-6-1"></a>PDFのアップロード機能を作る</h3>
+<p>まずはPDFのアップロード機能を作りましょう。PDFファイルその物は後で使うことはないので、一時ディレクトリーに置いたままで構いません。</p>
+<p>ユーザーが表示させる起点の画面をindex.php、そのファイルから呼び出すアップロード機能の部分をupload.phpとして実装することにします。</p>
+<div class="caption-code">
+<p class="caption">リスト2.6: index.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000; font-weight: bold">require_once</span> __DIR__ <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;/upload.php&#39;</span>;
+
+<span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">h</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span> <span style="color: #666666">=</span> ENT_QUOTES, <span style="color: #19177C">$encoding</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;UTF-8&#39;</span>)
+{
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">htmlspecialchars</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span>, <span style="color: #19177C">$encoding</span>);
+}
+
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span> <span style="color: #666666">&amp;&amp;</span> <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;pdf&#39;</span>, <span style="color: #19177C">$_FILES</span>)) {
+    <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> \PDFSearch\Upload<span style="color: #666666">::</span><span style="color: #7D9029">fromFilesInfo</span>(<span style="color: #19177C">$_FILES</span>[<span style="color: #BA2121">&#39;pdf&#39;</span>]);
+}
+
+<span style="color: #BC7A00">?&gt;</span>&lt;!doctype html&gt;
+&lt;title&gt;PDF Search&lt;/title&gt;
+&lt;h1&gt;PDF Search&lt;/h1&gt;
+
+&lt;h2&gt;アップロードされたファイル&lt;/h2&gt;
+<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #008000; font-weight: bold">empty</span>(<span style="color: #19177C">$uploads</span>))<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$uploads</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$upload</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+&lt;p&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getName</span>()); <span style="color: #BC7A00">?&gt;</span>&lt;/p&gt;
+<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endif</span>; <span style="color: #BC7A00">?&gt;</span>
+
+&lt;form enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
+  &lt;input name=&quot;pdf[]&quot; type=&quot;file&quot; multiple&gt;
+  &lt;input type=&quot;submit&quot;&gt;
+&lt;/form&gt;
+</pre>
+</div>
+<div class="caption-code">
+<p class="caption">リスト2.7: upload.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
+
+<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Upload</span>
+{
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$name</span>;
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$tmpName</span>;
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">static</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">fromFilesInfo</span>(<span style="color: #008000; font-weight: bold">array</span> <span style="color: #19177C">$info</span>)
+    {
+        <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">array</span>();
+        <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;name&#39;</span>] <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$number</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$name</span>) {
+            <span style="color: #19177C">$tmpName</span> <span style="color: #666666">=</span> <span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;tmp_name&#39;</span>][<span style="color: #19177C">$number</span>];
+            <span style="color: #19177C">$uploads</span>[] <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> Upload(<span style="color: #19177C">$name</span>, <span style="color: #19177C">$tmpName</span>);
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$uploads</span>;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$name</span>, <span style="color: #19177C">$tmpName</span>)
+    {
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">name</span> <span style="color: #666666">=</span> <span style="color: #19177C">$name</span>;
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">tmpName</span> <span style="color: #666666">=</span> <span style="color: #19177C">$tmpName</span>;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">getName</span>()
+    {
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">name</span>;
+    }
+}
+</pre>
+</div>
+<p>今の所、単にアップロードされたファイルの名前を表示しているだけです。後でその他の機能を実装していきます。複数のファイルをアップロードすると<a id="fnb-multi-select" href="#fn-multi-select" class="noteref" epub:type="noteref">*3</a>、全てが表示されることも確認してみてください。</p>
+<div id="upload" class="image">
+<img src="images/ch02/upload.png" alt="ファイルアップロード画面" />
+<p class="caption">
+図2.1: ファイルアップロード画面
+</p>
+</div>
+<p>紙幅を減らすため、細かな検証は省略しています。実際に運用するアプリケーションでは安全性やエラーのチェックなどをしっかりと行ってください。</p>
+<div class="footnote" epub:type="footnote" id="fn-multi-select"><p class="footnote">[*3] ファイル選択ダイアログでCtrlキーを押しながらファイルをクリックしていくことで、選んだファイルを同時にアップロードできます。また、Shiftを押しながら最初のファイルと最後のファイルをクリックすることで、その間にあるファイルをすべて選択状態にできます。</p></div>
+
+<h3><a id="h2-6-2"></a>PDFからの情報の抽出</h3>
+<p>次に、PDFファイルからタイトルと本文を抜き出す箇所を作ります。これを行うには幾つか方法がありますが、ここでは<a href="https://github.com/php-poppler/php-poppler" class="link">php-poppler</a>というライブラリーを使うことにします。</p>
 </body>
 </html>
