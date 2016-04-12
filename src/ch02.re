@@ -214,18 +214,21 @@ PDFファイルの内容をMySQLに登録するために、以下のようなス
 
 //footnote[multi-select][ファイル選択ダイアログでCtrlキーを押しながらファイルをクリックしていくことで、選んだファイルを同時にアップロードできます。また、Shiftを押しながら最初のファイルと最後のファイルをクリックすることで、その間にあるファイルをすべて選択状態にできます。]
 
-=== PDFからの情報の抽出
+=== PDFからの情報を抽出する
 
-次に、PDFファイルからタイトルと本文を抜き出す箇所を作ります。これを行うにはいくつか方法がありますが、ここでは@<href>{https://github.com/php-poppler/php-poppler, php-poppler}というライブラリーを使うことにします。php-popplerを使うとPDFを解析してタイトルや本文を抜き出すことができます@<fn>{poppler}。
+次に、PDFファイルからタイトルと本文を抜き出す処理を実装します。これを行うにはいくつか方法がありますが、ここでは@<href>{https://github.com/php-poppler/php-poppler, php-poppler}というライブラリーを使うことにします。php-popplerを使うとPDFを解析してタイトルや本文を抜き出すことができます@<fn>{poppler}。
 
-php-popplerは@<code>{Poppler}名前空間以下にいくつかのクラスを定義しており、以下のようにして使います。
+php-popplerは@<code>{Poppler}名前空間にいくつかのクラスを定義しており、以下のようにして使います。
 
 
 //list[php-poppler][php-popplerの基本的な使い方][php]{
 <?php
 
+// pdfinfoコマンドのラッパー
 $pdfinfo = \Poppler\Driver\Pdfinfo::create();
+// pdftotextコマンドのラッパー
 $pdftotext = \Poppler\Driver\Pdftotext::create();
+// pdftohtmlコマンドのラッパー
 $pdftohtml = \Poppler\Driver\Pdftohtml::create();
 
 $pdf = new \Poppler\Processer\Pdffile($pdfinfo, $pdftotet, $peftohtml);
@@ -253,3 +256,26 @@ Dockerイメージの中には、既にPopplerとphp-popplerがインストー�
 //}
 
 //footnote[poppler][C製のPDFライブラリーでPopplerという物があり、PDFを扱う様々なコマンドラインツールの提供もしています。php-popplerはこれらのコマンド呼び出しをラップしてPHPから扱いやすくした物です。]
+
+=== データベースにデータを挿入する
+
+それでは、いよいよMroongaにデータを入力しましょう。と言っても、いつも通り@<code>{PDO}クラスで@<code>{INSERT}文を実行するだけです。Mroongaの方で自動的に検索用のインデックスを作成してくれます。Dockerイメージ内に既にMySQL用のアダプターはインストールされていますので、単にPHPから呼び出すだけで使用できます。
+
+データベースを扱う@<code>{\PDFSearch\Table}クラスを実装し、@<code>{index.php}でそのクラスを使うようにしたのが以下の内容です。@<code>{\PDFSearch\Upload}には変更がないため省略しています。
+
+//list[ch02/insert/index.php][index.php][php]{
+#@mapfile(ch02/insert/index.php)
+#@end
+//}
+
+//list[ch02/insert/table.php][table.php][php]{
+#@mapfile(ch02/insert/table.php)
+#@end
+//}
+
+ウェブブラウザーでアクセスして、データベースの中身を表示してみましょう。
+
+//image[insert][アップロードしたPDFの情報を表示]{
+//}
+
+== 全文検索機能の作成

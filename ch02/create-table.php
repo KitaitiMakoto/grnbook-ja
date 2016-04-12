@@ -9,7 +9,8 @@ $table = TABLE_NAME;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $statement = <<<STATEMENT
 CREATE TABLE `{$table}` (
-    path    VARCHAR(255) PRIMARY KEY,
+    id      INT PRIMARY KEY AUTO_INCREMENT,
+    file    VARCHAR(255),
     title   VARCHAR(255),
     content LONGTEXT,
     FULLTEXT INDEX (title),

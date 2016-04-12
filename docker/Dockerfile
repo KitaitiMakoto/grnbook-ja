@@ -27,6 +27,7 @@ COPY 000-default.conf /etc/apache2/sites-available/
 COPY pdfsearch.conf /etc/apache2/sites-available/
 RUN ln -s /etc/apache2/sites-available/pdfsearch.conf /etc/apache2/sites-enabled/
 
+COPY php.ini /etc/php5/apache2/
 COPY config.inc.php /etc/phpmyadmin/config.inc.php
 
 EXPOSE 80
