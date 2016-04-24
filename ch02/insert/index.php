@@ -7,7 +7,7 @@ require_once __DIR__ . '/table.php';
 define('DBNAME', 'pdfsearch');
 
 $dsn = 'mysql:host=localhost;dbname=' . DBNAME . ';charset=utf8';
-$db = new \PDFSearch\Table($dsn, 'root', '');
+$table = new \PDFSearch\Table($dsn, 'root', '');
 
 function h($string, $flags = ENT_QUOTES, $encoding = 'UTF-8')
 {
@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && array_key_exists('pdf', $_FILES)) {
     $uploads = \PDFSearch\Upload::fromFilesInfo($_FILES['pdf']);
     try {
         foreach ($uploads as $upload) {
-            $db->insert($upload);
+            $tableb->insert($upload);
         }
         header('Location: .');
     } catch (\RuntimeException $e) {
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && array_key_exists('pdf', $_FILES)) {
     exit;
 }
 
-$records = $db->records();
+$records = $table->records();
 
 ?><!doctype html>
 <title>PDF Search</title>
