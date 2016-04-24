@@ -9,8 +9,10 @@ class Upload
     public static function fromFilesInfo(array $info)
     {
         $uploads = array();
-        foreach ($info['name'] as $number => $name) {
-            $tmpName = $info['tmp_name'][$number];
+        $fileCount = count($info['name']);
+        for ($i = 0; $i < $fileCount; $i++) {
+            $name = $info['name'][$i];
+            $tmpName = $info['tmp_name'][$i];
             $uploads[] = new Upload($name, $tmpName);
         }
         return $uploads;
