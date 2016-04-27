@@ -298,8 +298,10 @@ STATEMENT;
     <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">static</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">fromFilesInfo</span>(<span style="color: #008000; font-weight: bold">array</span> <span style="color: #19177C">$info</span>)
     {
         <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">array</span>();
-        <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;name&#39;</span>] <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$number</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$name</span>) {
-            <span style="color: #19177C">$tmpName</span> <span style="color: #666666">=</span> <span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;tmp_name&#39;</span>][<span style="color: #19177C">$number</span>];
+        <span style="color: #19177C">$fileCount</span> <span style="color: #666666">=</span> <span style="color: #008000">count</span>(<span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;name&#39;</span>]);
+        <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #19177C">$i</span> <span style="color: #666666">=</span> <span style="color: #666666">0</span>; <span style="color: #19177C">$i</span> <span style="color: #666666">&lt;</span> <span style="color: #19177C">$fileCount</span>; <span style="color: #19177C">$i</span><span style="color: #666666">++</span>) {
+            <span style="color: #19177C">$name</span> <span style="color: #666666">=</span> <span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;name&#39;</span>][<span style="color: #19177C">$i</span>];
+            <span style="color: #19177C">$tmpName</span> <span style="color: #666666">=</span> <span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;tmp_name&#39;</span>][<span style="color: #19177C">$i</span>];
             <span style="color: #19177C">$uploads</span>[] <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> Upload(<span style="color: #19177C">$name</span>, <span style="color: #19177C">$tmpName</span>);
         }
         <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$uploads</span>;
@@ -356,35 +358,36 @@ STATEMENT;
 <div class="caption-code">
 <p class="caption">リスト2.9: upload.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
-<span style="color: #408080; font-style: italic">// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む</span>
-<span style="color: #008000; font-weight: bold">require_once</span> <span style="color: #BA2121">&#39;vendor/autoload.php&#39;</span>;
-<span style="color: #008000; font-weight: bold">require_once</span> __DIR__ <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;/upload.php&#39;</span>;
+<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
 
-<span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">h</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span> <span style="color: #666666">=</span> ENT_QUOTES, <span style="color: #19177C">$encoding</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;UTF-8&#39;</span>)
+<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Upload</span>
 {
-    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">htmlspecialchars</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span>, <span style="color: #19177C">$encoding</span>);
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$name</span>;
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$tmpName</span>;
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">static</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">fromFilesInfo</span>(<span style="color: #008000; font-weight: bold">array</span> <span style="color: #19177C">$info</span>)
+    {
+        <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">array</span>();
+        <span style="color: #19177C">$fileCount</span> <span style="color: #666666">=</span> <span style="color: #008000">count</span>(<span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;name&#39;</span>]);
+        <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #19177C">$i</span> <span style="color: #666666">=</span> <span style="color: #666666">0</span>; <span style="color: #19177C">$i</span> <span style="color: #666666">&lt;</span> <span style="color: #19177C">$fileCount</span>; <span style="color: #19177C">$i</span><span style="color: #666666">++</span>) {
+            <span style="color: #19177C">$name</span> <span style="color: #666666">=</span> <span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;name&#39;</span>][<span style="color: #19177C">$i</span>];
+            <span style="color: #19177C">$tmpName</span> <span style="color: #666666">=</span> <span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;tmp_name&#39;</span>][<span style="color: #19177C">$i</span>];
+            <span style="color: #19177C">$uploads</span>[] <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> Upload(<span style="color: #19177C">$name</span>, <span style="color: #19177C">$tmpName</span>);
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$uploads</span>;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$name</span>, <span style="color: #19177C">$tmpName</span>)
+    {
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">name</span> <span style="color: #666666">=</span> <span style="color: #19177C">$name</span>;
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">tmpName</span> <span style="color: #666666">=</span> <span style="color: #19177C">$tmpName</span>;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">getName</span>()
+    {
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">name</span>;
+    }
 }
-
-<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span> <span style="color: #666666">&amp;&amp;</span> <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;pdf&#39;</span>, <span style="color: #19177C">$_FILES</span>)) {
-    <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> \PDFSearch\Upload<span style="color: #666666">::</span><span style="color: #7D9029">fromFilesInfo</span>(<span style="color: #19177C">$_FILES</span>[<span style="color: #BA2121">&#39;pdf&#39;</span>]);
-}
-
-<span style="color: #BC7A00">?&gt;</span>&lt;!doctype html&gt;
-&lt;title&gt;PDF Search&lt;/title&gt;
-&lt;h1&gt;PDF Search&lt;/h1&gt;
-
-&lt;h2&gt;アップロードされたファイル&lt;/h2&gt;
-<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #008000; font-weight: bold">empty</span>(<span style="color: #19177C">$uploads</span>))<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
-<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$uploads</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$upload</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
-&lt;p&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getTitle</span>()); <span style="color: #BC7A00">?&gt;</span>(<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getName</span>()); <span style="color: #BC7A00">?&gt;</span>)&lt;/p&gt;
-&lt;p&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #008000">mb_substr</span>(<span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getContent</span>(), <span style="color: #666666">0</span>, <span style="color: #666666">120</span>)); <span style="color: #BC7A00">?&gt;</span>&amp;hellip;&amp;hellip;&lt;/p&gt;
-<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
-<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endif</span>; <span style="color: #BC7A00">?&gt;</span>
-
-&lt;form enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
-  &lt;input name=&quot;pdf[]&quot; type=&quot;file&quot; multiple&gt;
-  &lt;input type=&quot;submit&quot;&gt;
-&lt;/form&gt;
 </pre>
 </div>
 <p>実際にPDFファイルをアップロードして、タイトルなどの情報が取得できているか確認しましょう。</p>
@@ -410,7 +413,7 @@ STATEMENT;
 <span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;DBNAME&#39;</span>, <span style="color: #BA2121">&#39;pdfsearch&#39;</span>);
 
 <span style="color: #19177C">$dsn</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;mysql:host=localhost;dbname=&#39;</span> <span style="color: #666666">.</span> DBNAME <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;;charset=utf8&#39;</span>;
-<span style="color: #19177C">$db</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDFSearch\Table(<span style="color: #19177C">$dsn</span>, <span style="color: #BA2121">&#39;root&#39;</span>, <span style="color: #BA2121">&#39;&#39;</span>);
+<span style="color: #19177C">$table</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDFSearch\Table(<span style="color: #19177C">$dsn</span>, <span style="color: #BA2121">&#39;root&#39;</span>, <span style="color: #BA2121">&#39;&#39;</span>);
 
 <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">h</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span> <span style="color: #666666">=</span> ENT_QUOTES, <span style="color: #19177C">$encoding</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;UTF-8&#39;</span>)
 {
@@ -421,7 +424,7 @@ STATEMENT;
     <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> \PDFSearch\Upload<span style="color: #666666">::</span><span style="color: #7D9029">fromFilesInfo</span>(<span style="color: #19177C">$_FILES</span>[<span style="color: #BA2121">&#39;pdf&#39;</span>]);
     <span style="color: #008000; font-weight: bold">try</span> {
         <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$uploads</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$upload</span>) {
-            <span style="color: #19177C">$db</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">insert</span>(<span style="color: #19177C">$upload</span>);
+            <span style="color: #19177C">$tableb</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">insert</span>(<span style="color: #19177C">$upload</span>);
         }
         <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;Location: .&#39;</span>);
     } <span style="color: #008000; font-weight: bold">catch</span> (\RuntimeException <span style="color: #19177C">$e</span>) {
@@ -432,7 +435,7 @@ STATEMENT;
     <span style="color: #008000; font-weight: bold">exit</span>;
 }
 
-<span style="color: #19177C">$records</span> <span style="color: #666666">=</span> <span style="color: #19177C">$db</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">records</span>();
+<span style="color: #19177C">$records</span> <span style="color: #666666">=</span> <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">records</span>();
 
 <span style="color: #BC7A00">?&gt;</span>&lt;!doctype html&gt;
 &lt;title&gt;PDF Search&lt;/title&gt;
@@ -514,5 +517,171 @@ STATEMENT;
 </div>
 
 <h2><a id="h2-7"></a><span class="secno">2.7　</span>全文検索機能の作成</h2>
+<p>ようやく、全文検索機能の実装です。実は、これもMroongaならではの特別なことは必要なく、通常のMySQLの全文検索機能、即ち<code class="inline-code tt">MATCH() ... AGAINST</code>構文を使用するだけです。テーブル作成時に、ストレージエンジンにMroongaを選択しておけば、他の操作は通常のMySQLと同じように実行できるようにデザインされているのです。</p>
+<p><code class="inline-code tt">MATCH() ... AGAINST</code>構文は元々MySQLに備わっている全文検索用の構文です。<code class="inline-code tt">MATCH</code>には検索対象にするカラム名を渡します。ここで指定できるのは、テーブル作成時に<code class="inline-code tt">FULLTEXT</code>インデックスを指定したカラムのみです。Docker内のテーブルでは、予め<code class="inline-code tt">title</code>カラムと<code class="inline-code tt">content</code>カラムに<code class="inline-code tt">FULLTEXT</code>インデックスを張っています。<code class="inline-code tt">AGAINST</code>には検索クエリーを渡します。オプションを渡すこともできます。詳細は<a href="https://dev.mysql.com/doc/refman/5.6/ja/fulltext-search.html" class="link">MySQLのドキュメント</a>を参照してください。</p>
+<p>Mroongaではこの構文を流用しており、元の挙動を知っている人にはおおよそ期待通りに動作するようになっていますが、厳密に同じではありません。Mroongaでのみ使える様々な機能が使えるようになっています。これについては、一旦基本の検索機能を作ったあとで触れたいと思います。</p>
+<p>今の「登録済みPDF一覧」の上に検索フォームを作成し、検索を実行した場合にはフォームの下に検索結果を表示するようにしてみましょう。そのために、<code class="inline-code tt">\PDFSearch\Table</code>クラスに検索用のメンバー関数を追加します。</p>
+<div class="caption-code">
+<p class="caption">リスト2.12: search.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
+
+<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Table</span>
+{
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">INSERT</span> <span style="color: #666666">=</span>
+        <span style="color: #BA2121">&quot;INSERT INTO `pdfs` (file, title, content)</span>
+<span style="color: #BA2121">         VALUES(:file, :title, :content);&quot;</span>;
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SELECT</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;</span>;
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` WHERE MATCH(content) AGAINST(:query IN BOOLEAN MODE);&quot;</span>;
+
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$pdo</span>;
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>)
+    {
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDO(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>);
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">insert</span>(Upload <span style="color: #19177C">$upload</span>)
+    {
+        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [
+            <span style="color: #BA2121">&#39;:file&#39;</span>    <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getName</span>(),
+            <span style="color: #BA2121">&#39;:title&#39;</span>   <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getTitle</span>(),
+            <span style="color: #BA2121">&#39;:content&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getContent</span>()
+        ];
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">INSERT</span>);
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">records</span>()
+    {
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SELECT</span>);
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>();
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">search</span>(<span style="color: #19177C">$query</span>)
+    {
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SEARCH</span>);
+        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [<span style="color: #BA2121">&#39;:query&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$query</span>];
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+    }
+}
+</pre>
+</div>
+<p><code class="inline-code tt">SEARCH</code>定数と<code class="inline-code tt">search</code>メンバー関数を追加しています。</p>
+<p>先ほど言ったような検索フォームと結果のエリアを追加すると、index.phpはこうなります。</p>
+<div class="caption-code">
+<p class="caption">リスト2.13: index.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #408080; font-style: italic">// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む</span>
+<span style="color: #008000; font-weight: bold">require_once</span> <span style="color: #BA2121">&#39;vendor/autoload.php&#39;</span>;
+<span style="color: #008000; font-weight: bold">require_once</span> __DIR__ <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;/upload.php&#39;</span>;
+<span style="color: #008000; font-weight: bold">require_once</span> __DIR__ <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;/table.php&#39;</span>;
+
+<span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;DBNAME&#39;</span>, <span style="color: #BA2121">&#39;pdfsearch&#39;</span>);
+
+<span style="color: #19177C">$dsn</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;mysql:host=localhost;dbname=&#39;</span> <span style="color: #666666">.</span> DBNAME <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;;charset=utf8&#39;</span>;
+<span style="color: #19177C">$table</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDFSearch\Table(<span style="color: #19177C">$dsn</span>, <span style="color: #BA2121">&#39;root&#39;</span>, <span style="color: #BA2121">&#39;&#39;</span>);
+
+<span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">h</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span> <span style="color: #666666">=</span> ENT_QUOTES, <span style="color: #19177C">$encoding</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;UTF-8&#39;</span>)
+{
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">htmlspecialchars</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span>, <span style="color: #19177C">$encoding</span>);
+}
+
+<span style="color: #408080; font-style: italic">// 検索処理</span>
+<span style="color: #19177C">$searchQuery</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">null</span>;
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;GET&#39;</span> <span style="color: #666666">&amp;&amp;</span>
+    <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;q&#39;</span>, <span style="color: #19177C">$_GET</span>) <span style="color: #666666">&amp;&amp;</span> <span style="color: #19177C">$_GET</span>[<span style="color: #BA2121">&#39;q&#39;</span>]) {
+    <span style="color: #19177C">$searchQuery</span> <span style="color: #666666">=</span> <span style="color: #19177C">$_GET</span>[<span style="color: #BA2121">&#39;q&#39;</span>];
+    <span style="color: #19177C">$searchResult</span> <span style="color: #666666">=</span> <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">search</span>(<span style="color: #19177C">$searchQuery</span>);
+}
+
+<span style="color: #408080; font-style: italic">// ファイルアップロード処理</span>
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span> <span style="color: #666666">&amp;&amp;</span>
+    <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;pdf&#39;</span>, <span style="color: #19177C">$_FILES</span>)) {
+    <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> \PDFSearch\Upload<span style="color: #666666">::</span><span style="color: #7D9029">fromFilesInfo</span>(<span style="color: #19177C">$_FILES</span>[<span style="color: #BA2121">&#39;pdf&#39;</span>]);
+    <span style="color: #008000; font-weight: bold">try</span> {
+        <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$uploads</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$upload</span>) {
+            <span style="color: #19177C">$tableb</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">insert</span>(<span style="color: #19177C">$upload</span>);
+        }
+        <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;Location: .&#39;</span>);
+    } <span style="color: #008000; font-weight: bold">catch</span> (\RuntimeException <span style="color: #19177C">$e</span>) {
+        <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;HTTP&#39;</span>, <span style="color: #008000; font-weight: bold">true</span>, <span style="color: #666666">500</span>);
+        <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;content-type: text/plain&#39;</span>);
+        <span style="color: #008000; font-weight: bold">echo</span> <span style="color: #19177C">$e</span>;
+    }
+    <span style="color: #008000; font-weight: bold">exit</span>;
+}
+
+<span style="color: #19177C">$records</span> <span style="color: #666666">=</span> <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">records</span>();
+
+<span style="color: #BC7A00">?&gt;</span>&lt;!doctype html&gt;
+&lt;title&gt;PDF Search&lt;/title&gt;
+&lt;h1&gt;PDF Search&lt;/h1&gt;
+
+&lt;h2&gt;検索&lt;/h2&gt;
+&lt;form method=&quot;get&quot;&gt;
+  &lt;input name=&quot;q&quot; type=&quot;search&quot; value=&quot;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$searchQuery</span>); <span style="color: #BC7A00">?&gt;</span>&quot;&gt;
+  &lt;input type=&quot;submit&quot; value=&quot;検索&quot;&gt;
+&lt;/form&gt;
+
+<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$searchResult</span> <span style="color: #666666">&amp;&amp;</span> <span style="color: #008000">count</span>(<span style="color: #19177C">$searchResult</span>) <span style="color: #666666">&gt;</span> <span style="color: #666666">0</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+&lt;h2&gt;「<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$searchQuery</span>); <span style="color: #BC7A00">?&gt;</span>」を含むPDF&lt;/h2&gt;
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;ファイル名&lt;/th&gt;
+    &lt;th&gt;タイトル&lt;/th&gt;
+    &lt;th&gt;内容&lt;/th&gt;
+  &lt;/tr&gt;
+  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$searchResult</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$record</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+    &lt;tr&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;file&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;title&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #008000">mb_substr</span>(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;content&#39;</span>], <span style="color: #666666">0</span>, <span style="color: #666666">120</span>)); <span style="color: #BC7A00">?&gt;</span>&amp;hellip;&amp;hellip;&lt;/td&gt;
+    &lt;/tr&gt;
+  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+&lt;/table&gt;
+<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endif</span>; <span style="color: #BC7A00">?&gt;</span>
+
+&lt;h2&gt;登録済みPDF一覧&lt;/h2&gt;
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;ファイル名&lt;/th&gt;
+    &lt;th&gt;タイトル&lt;/th&gt;
+    &lt;th&gt;内容&lt;/th&gt;
+  &lt;/tr&gt;
+  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$records</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$record</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+    &lt;tr&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;file&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;title&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #008000">mb_substr</span>(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;content&#39;</span>], <span style="color: #666666">0</span>, <span style="color: #666666">120</span>)); <span style="color: #BC7A00">?&gt;</span>&amp;hellip;&amp;hellip;&lt;/td&gt;
+    &lt;/tr&gt;
+  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+&lt;/table&gt;
+
+&lt;form enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
+  &lt;input name=&quot;pdf[]&quot; type=&quot;file&quot; multiple&gt;
+  &lt;input type=&quot;submit&quot;&gt;
+&lt;/form&gt;
+</pre>
+</div>
+<p>SQL一文で済むので簡単ですね。では、検索してみましょう。</p>
+<div id="search" class="image">
+<img src="images/ch02/search.png" alt="全文検索結果の表示" />
+<p class="caption">
+図2.4: 全文検索結果の表示
+</p>
+</div>
+<p>以上で、基本的な機能は完成です。以降では、Mroongaに特徴的な幾つかの機能を紹介し、実装していきます。</p>
 </body>
 </html>
