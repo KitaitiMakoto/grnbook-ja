@@ -45,7 +45,7 @@ EOS;
     public function search($query)
     {
         $sth = $this->pdo->prepare(self::SEARCH);
-        $params = ['query' => $query];
+        $params = [':query' => $query];
         $isSucceeded = $sth->execute($params);
         if (! $isSucceeded) {
             throw new \RuntimeException(implode(PHP_EOL, $sth->errorInfo()));
