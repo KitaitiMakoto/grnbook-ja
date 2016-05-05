@@ -19,7 +19,10 @@ RUN apt-get update && \
     php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
     rm composer-setup.php && \
     COMPOSER_HOME=/usr/share/php composer global require 'php-poppler/php-poppler'
-RUN mysqld & sleep 12 && mysql -uroot -e "INSTALL PLUGIN mroonga SONAME 'ha_mroonga.so'" && mysqladmin -uroot shutdown
+RUN mysqld & sleep 12 && \
+    mysql -uroot -e "INSTALL PLUGIN mroonga SONAME 'ha_mroonga.so'" && \
+    mysql -uroot -e "CREATE FUNCTION mroonga_snippet RETURNS STRING SONAME 'ha_mroonga.so'" && \
+    mysqladmin -uroot shutdown
 
 COPY eye.conf /etc/
 COPY eye /etc/eye/
