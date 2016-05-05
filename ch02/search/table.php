@@ -7,7 +7,9 @@ class Table
         "INSERT INTO `pdfs` (file, title, content)
          VALUES(:file, :title, :content);";
     const SELECT = "SELECT * FROM `pdfs` ORDER BY `id`;";
-    const SEARCH = "SELECT * FROM `pdfs` WHERE MATCH(content) AGAINST(:query);";
+    const SEARCH = <<<EOS
+SELECT * FROM `pdfs` WHERE MATCH(content) AGAINST(:query IN BOOLEAN MODE);
+EOS;
 
     protected $pdo;
 
