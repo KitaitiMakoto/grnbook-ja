@@ -1,3 +1,4 @@
+review_version: 2.0
 bookname: grnbook-ja
 booktitle: Groongaではじめる全文検索
 language: ja
@@ -6,5 +7,5 @@ highlight:
   html: pygments
   latex: listings
 stylesheet: main.css
-params: --stylesheet=main.css
+stylesheet: main.css
 texstyle: samplemacro
