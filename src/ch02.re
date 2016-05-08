@@ -373,10 +373,6 @@ St</div>
 
 ここでは、本書のアプリケーションに必要なことのみ説明しているので、詳細については公式ドキュメント（@<href>{http://mroonga.org/ja/docs/reference/udf/mroonga_snippet_html.html, 5.5.5. mroonga_snippet_html()}）を参照してください。
 
-//footnote[mroonga_snippet][タグや@<code>{class}属性を変更したい場合は、柔軟性の高い@<href>{http://mroonga.org/ja/docs/reference/udf/mroonga_snippet.html, mroonga_snippet()}関数を使用してください。]
-
-//footnote[linebreak][読みやすさのため、改行を調整しています。]
-
 現在の実装では検索でヒットした時に@<code>{content}カラムの抜粋を表示していますが、@<code>{mroonga_snippet_html()}の戻り値で置き換えてみましょう。@<code>{PDFSearch\Table::search()}で使用しているSQL（@<code>{PDFSearch\Table::SEARCH}定数）を変更します。@<code>{mroonga_snippet_html()}も@<code>{COUNT()}などと同様の関数なので、@<code>{AS}句を使って別名を付けることができます。
 
 //list[ch02/highlight/table.php][table.php][php]{
@@ -395,6 +391,8 @@ HTML中で@<code>{content}カラムを表示していた所を、@<code>{snippet
 
 ここにはセキュリティ上の懸念があります@<fn>{notsecurityissue}。@<code>{mroonga_snippet_html()}の戻り値では、カラム中のHTMLタグなどは全てエスケープされますが、取得したスニペットと他の文字列をPHPで結合すると、セキュリティホールになり得ます。加工せず、可能であれば単独で出力するようにしてください。加工や他の文字列との結合が必要な場合は、慎重に行ってください。
 
-//footnote[notsecurityissue][実際にはHTMLを正しく出力するために必要な注意点です。仮にセキュリティ上問題とならなくても、HTMLが正しく出力されず、アプリケーションが壊れてしまう可能性があります。]
-
 これで、検索結果のハイライトも出来ました。実際に検索して結果を楽しみましょう。
+
+//footnote[mroonga_snippet][タグや@<code>{class}属性を変更したい場合は、柔軟性の高い@<href>{http://mroonga.org/ja/docs/reference/udf/mroonga_snippet.html, mroonga_snippet()}関数を使用してください。]
+//footnote[linebreak][読みやすさのため、改行を調整しています。]
+//footnote[notsecurityissue][実際にはHTMLを正しく出力するために必要な注意点です。仮にセキュリティ上問題とならなくても、HTMLが正しく出力されず、アプリケーションが壊れてしまう可能性があります。]
