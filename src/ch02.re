@@ -221,7 +221,7 @@ PDFファイルの内容をMySQLに登録するために、以下のようなス
 php-popplerは@<code>{Poppler}名前空間にいくつかのクラスを定義しており、以下のようにして使います。
 
 
-//list[php-poppler][php-popplerの基本的な使い方][php]{
+//emlist[php-popplerの基本的な使い方][php]{
 <?php
 
 // pdfinfoコマンドのラッパー
@@ -328,7 +328,7 @@ SQL一文で済むので簡単ですね。では、検索してみましょう�
 
 @<code>{mroonga_snippet()}は以下のようにして使用します。
 
-//list[mroonga_snippet][mroonga_snippetの簡単な使い方][SQL]{
+//emlist[mroonga_snippetの簡単な使い方][SQL]{
 SELECT mroonga_snippet(
   content,
   120,
