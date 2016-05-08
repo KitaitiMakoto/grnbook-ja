@@ -195,12 +195,12 @@ PDFファイルの内容をMySQLに登録するために、以下のようなス
 
 ユーザーが表示させる起点の画面をindex.php、そのファイルから呼び出すアップロード機能の部分をupload.phpとして実装することにします。
 
-//list[index.php][index.php][php]{
+//list[ch02/upload/index.php][index.php][php]{
 #@mapfile(ch02/upload/index.php)
 #@end
 //}
 
-//list[upload.php][upload.php][php]{
+//list[ch02/upload/upload.php][upload.php][php]{
 #@mapfile(ch02/upload/upload.php)
 #@end
 //}
@@ -366,14 +366,14 @@ word_suffix	'</span>'	検索後の後に挿入される文字列です。
 
 現在の実装では検索でヒットした時に@<code>{content}カラムの抜粋を表示していますが、この@<code>{mroonga_snippet()}で置き換えてみましょう。@<code>{PDFSearch\Table::search()}で使用しているSQL（@<code>{PDFSearch\Table::SEARCH}定数）を変更します。@<code>{mroonga_snippet()}も@<code>{COUNT()}などと同様の関数なので、@<code>{AS}句を使って別名を付けることができます。
 
-//list[table.php][table.php][php]{
+//list[ch02/highlight/table.php][table.php][php]{
 #@mapfile(ch02/highlight/table.php)
 #@end
 //}
 
 HTML中で@<code>{content}カラムを表示していた所を、@<code>{snippets}に置き換えます。
 
-//list[index.php][index.php][php]{
+//list[ch02/highlight/index.php][index.php][php]{
 #@mapfile(ch02/highlight/index.php)
 #@end
 //}
