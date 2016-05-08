@@ -320,51 +320,64 @@ SQL一文で済むので簡単ですね。では、検索してみましょう�
 //image[highlight][検索語をハイライトして表示]{
 //}
 
-このように検索語をハイライトする機能を実装してみましょう。検索語を@<code>{<span class="query">}...@<code>{</span>}で囲むことにします。
+このように検索語をハイライトする機能を実装してみましょう。
 
-すぐに思い付くのは、取得した検索結果の@<code>{content}カラムを、再度PHPで解析してタグを挿入することですが、実はMroongaには、このための機能が備わっています。SQL中で利用可能な@<code>{mroonga_snippet()}関数です。
+すぐに思い付く実装方法は、取得した検索結果の@<code>{content}カラムを、再度PHPで解析してタグを挿入することですが、実はMroongaには、このための機能が備わっています。SQL中で利用可能な@<code>{mroonga_snippet_html()}関数です。これは特定のカラム（ここでは@<code>{content}）のうち、指定した語（「cat」）の前後数十バイトを抜き出し、文字列として返す関数です。
 
-@<code>{mroonga_snippet()}は、特定のカラム（ここでは@<code>{content}）のうち、指定した語（「cat」）の前後数十バイトを抜き出し、文字列として返す関数です。一レコード中に検索語が複数回現れる場合は、その数に応じて複数のスニペットを結合した一つの文字列を返します。検索語の前後に（HTMLタグなど）特定の文字列を挿入することができるので、スニペットの区切りはこれで区別できます。余談ですが「スニペット」は「断片」という意味で、この場合は@<code>{content}カラムのうちの一部を返すことを意味しています。
+@<code>{mroonga_snippet_html()}関数が返すスニペットは@<code>{<div class="snippet">}...@<code>{</div>}というタグで囲まれ、更に検索語は@<code>{<span class="keyword">}...@<code>{</span>}で囲まれます@<fn>{mroonga_snippet}。一レコード中に検索語が複数回現れる場合は、その数に応じて複数のスニペットを結合した一つの文字列を返します。余談ですが「スニペット」は「断片」という意味で、この場合は@<code>{content}カラムのうちの一部を返すことを意味しています。
 
-@<code>{mroonga_snippet()}は以下のようにして使用します。
+@<code>{mroonga_snippet_html()}は以下のようにして使用します。
 
-//emlist[mroonga_snippetの簡単な使い方][SQL]{
-SELECT mroonga_snippet(
-  content,
-  120,
-  3,
-  'utf8_general_ci',
-  1,
-  1,
-  '<p>',
-  '</p>',
-  'cat',
-  '<span class="keyword">',
-  '</span>',
-  ) AS snippets FROM `pdfs`;
+//emlist[mroonga_snippet_htmlの簡単な使い方][SQL]{
+SELECT mroonga_snippet_html(content, 'cat') FROM `pdfs`;
 //}
 
-多くの引数があります。それぞれの意味は以下の表の通りです。ここでは、本書のアプリケーションに必要なことのみ説明しているので、詳細については公式ドキュメント（@<href>{http://mroonga.org/ja/docs/reference/udf/mroonga_snippet.html, 5.5.4. mroonga_snippet()}）を参照してください。
+結果は、例えば次のようになります@<fn>{linebreak}。
 
-//table[mroonga_snippet_arguments][mroonga_snippet()の引数]{
-名前	例	概要
---------------
-document	content	スニペットを取得するカラム名です
-max_length	120	スニペットの長さです。バイト数で指定します。
-max_count	3	取得するスニペットの個数です。
-encoding	'utf8_general_ci'	文字エンコーディングです。MySQLの照合順序ので指定します。
-skip_leading_spaces	1	（なんだろう）
-html_escape	1	スニペットをHTMLとしてエスケープするか否かです。エスケープ場合は@<code>{1}、しない場合は@<code>{0}を指定します。
-snippet_prefix	'<p>'	各スニペットの前に挿入される文字列です。
-snippet_suffix	'</p>'	各スニペットの後に挿入される文字列です。
-word	'cat'	検索する文字列です。
-word_prefix	'<span class="keyword">'	検索後の前に挿入される文字列です。
-word_suffix	'</span>'	検索後の後に挿入される文字列です。
+//emlist[mroonga_snippet_html()の結果例][HTML]{
+<div class="snippet"><span class="keyword">Cat</span>
+
+A Little Game about Little Heroes
+
+Credits
+
+Writing/Layout/Design
+John Wick
+Wicked Editrix
+Annie Rush
+Special Thanks
+to Jared Sorensen
+For helping me throw out the (litter) box.
+Extra Special Tha</div>
+<div class="snippet">Still
+Who protects little heroes.
+
+http://www.wicked-dead.com/<span class="keyword">cat</span>
+
+<span class="keyword">Cat</span> uses the Advantage System.
+http://www.wicked-dead.com/advantage
+
+<span class="keyword">Cat</span>: A Little Game about Little Heroes is © and ™ 2004 by Joh</div>
+<div class="snippet"> Except boggins. Those are real.
+Go give your <span class="keyword">cat</span> a hug.
+
+Ta b l e o f C o n t e n t s
+“I Know I’m Dreaming”
+Introduction
+What You Need
+Making a <span class="keyword">Cat</span> Character
+Step 1: The Traits
+Step 2: Names
+St</div>
 //}
 
-尚、Mroongaのこの機能は現時点で実験的な物であり、将来変更される可能性があります。実際のアプリケーションに組み込む前に公式ドキュメントを確認するようにしてください。
+ここでは、本書のアプリケーションに必要なことのみ説明しているので、詳細については公式ドキュメント（@<href>{http://mroonga.org/ja/docs/reference/udf/mroonga_snippet_html.html, 5.5.5. mroonga_snippet_html()}）を参照してください。
 
-現在の実装では検索でヒットした時に@<code>{content}カラムの抜粋を表示していますが、この@<code>{mroonga_snippet()}で置き換えてみましょう。@<code>{PDFSearch\Table::search()}で使用しているSQL（@<code>{PDFSearch\Table::SEARCH}定数）を変更します。@<code>{mroonga_snippet()}も@<code>{COUNT()}などと同様の関数なので、@<code>{AS}句を使って別名を付けることができます。
+//footnote[mroonga_snippet][タグや@<code>{class}属性を変更したい場合は、柔軟性の高い@<href>{http://mroonga.org/ja/docs/reference/udf/mroonga_snippet.html, mroonga_snippet()}関数を使用してください。]
+
+//footnote[linebreak][読みやすさのため、改行を調整しています。]
+
+現在の実装では検索でヒットした時に@<code>{content}カラムの抜粋を表示していますが、@<code>{mroonga_snippet_html()}の戻り値で置き換えてみましょう。@<code>{PDFSearch\Table::search()}で使用しているSQL（@<code>{PDFSearch\Table::SEARCH}定数）を変更します。@<code>{mroonga_snippet_html()}も@<code>{COUNT()}などと同様の関数なので、@<code>{AS}句を使って別名を付けることができます。
 
 //list[ch02/highlight/table.php][table.php][php]{
 #@mapfile(ch02/highlight/table.php)
@@ -378,9 +391,9 @@ HTML中で@<code>{content}カラムを表示していた所を、@<code>{snippet
 #@end
 //}
 
-@<code>{snippets}の表示ではHTMLエスケープをしていないことに気が付いたでしょうか。@<code>{mroonga_snippet()}の実行時に、@<code>{snippet_prefix/suffix}、@<code>{word_prefix/suffix}としてとしてHTMLタグを挿入していますが、ここでHTMLエスケープしてしまうと、タグとしての役を果たさなくなってしまいます。そのため、直接出力しています。
+@<code>{snippets}の表示ではHTMLエスケープをしていないことに気が付いたでしょうか。@<code>{mroonga_snippet_html()}にHTMLタグが含まれているため、ここでHTMLエスケープしてしまうと、タグとしての役を果たさなくなってしまいます。そのため、直接出力しています。
 
-ここにはセキュリティ上の懸念があります@<fn>{notsecurityissue}。@<code>{mroonga_snippet()}の@<code>{html_escape}引数を@<code>{1}にしている限りは、（引数で指定した以外の）HTMLタグなどは全てエスケープされますが、取得したスニペットと他の文字列をPHPで結合すると、セキュリティホールになり得ます。加工せず、可能であれば単独で出力するようにしてください。加工や他の文字列との結合が必要な場合は、慎重に行ってください。
+ここにはセキュリティ上の懸念があります@<fn>{notsecurityissue}。@<code>{mroonga_snippet_html()}の戻り値では、カラム中のHTMLタグなどは全てエスケープされますが、取得したスニペットと他の文字列をPHPで結合すると、セキュリティホールになり得ます。加工せず、可能であれば単独で出力するようにしてください。加工や他の文字列との結合が必要な場合は、慎重に行ってください。
 
 //footnote[notsecurityissue][実際にはHTMLを正しく出力するために必要な注意点です。仮にセキュリティ上問題とならなくても、HTMLが正しく出力されず、アプリケーションが壊れてしまう可能性があります。]
 
