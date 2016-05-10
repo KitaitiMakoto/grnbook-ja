@@ -8,28 +8,28 @@
   <title>MySQLで作る全文検索システム</title>
 </head>
 <body>
-<h1><a id="h2"></a><span class="secno">第2章　</span>MySQLで作る全文検索システム</h1>
+<h1><a id="h1"></a><span class="secno">第1章　</span>MySQLで作る全文検索システム</h1>
 <div class="lead">
 <p>Groongaは様々なソフトウェアに組み込み、全文検索機能を提供することができます。その一つ、MySQLに組み込むためのMroongaを使って、全文検索システムを作ってみましょう。</p>
 </div>
 
-<h2><a id="h2-1"></a><span class="secno">2.1　</span>Mroongaの概要</h2>
+<h2><a id="h1-1"></a><span class="secno">1.1　</span>Mroongaの概要</h2>
 <p>Mroongaは、MySQLのストレージエンジンの一つです<a id="fnb-mariadb" href="#fn-mariadb" class="noteref" epub:type="noteref">*1</a>。MySQLのストレージエンジンにはMyISAMやInnoDBなどがあり、聞いたことがある人も多いでしょう。それぞれにパフォーマンスや対障害性などに特徴があり、テーブルごとに使い分けることができます。</p>
 <div class="footnote" epub:type="footnote" id="fn-mariadb"><p class="footnote">[*1] MySQLから派生したMariaDBというデータベースシステムでも使用できます。最新のMariaDBでは始めからMroongaが組み込まれています。</p></div>
 <p>その一つとしてMroongaは、Groongaを組み込んで、高速かつ多機能な全文検索を可能にしたストレージエンジンです。これをMySQLに組み込んで使うことで、SQLを使って全文検索を行えるようになります。</p>
 <p>Mroongaを全文検索システムの本番環境で使うには、公式マニュアルのインストールのページを参照してください。ここでは、本書で試す目的で、簡易に環境を準備する方法を紹介します。</p>
 
-<h2><a id="h2-2"></a><span class="secno">2.2　</span>Mroongaの環境の準備</h2>
+<h2><a id="h1-2"></a><span class="secno">1.2　</span>Mroongaの環境の準備</h2>
 <p>本書では、MySQL及びその他の環境の準備にDockerを使います。</p>
 <p>以後、PHPとMySQL、Mroongaを使ってPDF文書の全文検索システムを作成していきますが、普段使っているシステムにインストール済みの物を使うと、バージョンが異なって本書の内容が当てはまらなかったり、また、将来別件で異なるバージョンをインストールしたい場合などに手間が増えてしまいます。設定ファイルの競合も問題になるかも知れません。Dockerを使うと、システムの方に影響を与えずに、本書で必要なバージョンのソフトウェアを揃えることができます。不要になった場合には削除することも簡単で、その場合もシステムの方には影響を及ぼしません。</p>
 
-<h3><a id="h2-2-1"></a>Dockerのインストール</h3>
+<h3><a id="h1-2-1"></a>Dockerのインストール</h3>
 <p>（後で書く）</p>
 
-<h3><a id="h2-2-2"></a>Dockerコンテナの起動</h3>
+<h3><a id="h1-2-2"></a>Dockerコンテナの起動</h3>
 <p>本書用に必要なソフトウェアをインストールしたDockerイメージを作成してあります。ターミナルで上の<code class="inline-code tt">docker run</code>を実行したディレクトリーに移動し、以下のコマンドを実行してください。</p>
 <div class="caption-code">
-<p class="caption">リスト2.1: Dockerイメージの取得とコンテナの起動</p>
+<p class="caption">リスト1.1: Dockerイメージの取得とコンテナの起動</p>
 <pre class="list">% cd path/to/project
 % docker run --detach --name=pdfsearch --publish=8080:80 \
     --volume=$PWD:/var/lib/pdfsearch kitaitimakoto/grnbook-mroonga
@@ -52,13 +52,13 @@
 <pre class="emlist">% docker stop pdfsearch
 </pre>
 </div>
-<p>コンテナの操作に使用している<code class="inline-code tt">pdfsearch</code>という名前は、リスト2.1における<code class="inline-code tt">name</code>オプションで指定した物を使用しています。<code class="inline-code tt">docker run</code>実行時に異なる名前を指定した場合は、そちらを使いましょう。（nameをつけ忘れた時はdocker psで探して消すが、説明いる？）</p>
+<p>コンテナの操作に使用している<code class="inline-code tt">pdfsearch</code>という名前は、リスト1.1における<code class="inline-code tt">name</code>オプションで指定した物を使用しています。<code class="inline-code tt">docker run</code>実行時に異なる名前を指定した場合は、そちらを使いましょう。（nameをつけ忘れた時はdocker psで探して消すが、説明いる？）</p>
 <p>もし、二度目も<code class="inline-code tt">docker run</code>コマンドを使用してしまうと、新たに<em>別の</em>コンテナを作成してしまいます。MySQLのデータ等は引き継がれませんし、同じ目的のコンテナが二つ以上あると混乱の元ですので、通常は一つになるようにしておきましょう。</p>
 
-<h3><a id="h2-2-3"></a>動作確認</h3>
+<h3><a id="h1-2-3"></a>動作確認</h3>
 <p>Dockerコンテナが実際に動作していることを確認しましょう。このイメージにはPHPが含まれているので、<code class="inline-code tt">docker run</code>を実行したディレクトリーで以下のようなファイルを作成することで動作確認ができます。</p>
 <div class="caption-code">
-<p class="caption">リスト2.2: info.php</p>
+<p class="caption">リスト1.2: info.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #008000">phpinfo</span>();
 </pre>
@@ -74,7 +74,7 @@
 </div>
 <p>ありがちな間違いとして、Dockerコンテナとの共有ディレクトリーの指定ミスがあります。Dockerコンテナとホストマシンは、<code class="inline-code tt">docker run</code>コマンドの<code class="inline-code tt">volume</code>（<code class="inline-code tt">v</code>）オプションで指定したディレクトリーを共有します。上の例では<code class="inline-code tt">$PWD:/var/lib/pdfsearch</code>を指定しています。コロンの左側がホストマシンのディレクトリー、右側がコンテナ内のディレクトリーです。<code class="inline-code tt">$PWD</code>は（<code class="inline-code tt">docker run</code>を実行した）現在のディレクトリーを意味しますので、そこと別のディレクトリーにファイルを置いた場合は、コンテナ内のPHPが認識できません。事前にプロジェクトのディレクトリーに移動してから実行するようにしましょう（コンテナ内は<code class="inline-code tt">/var/lib/pdfsearch</code>がドキュメントルートとなるよう設定されており、こちらは常にこの値で大丈夫です）。</p>
 
-<h2><a id="h2-3"></a><span class="secno">2.3　</span>作成する全文検索システムの概要</h2>
+<h2><a id="h1-3"></a><span class="secno">1.3　</span>作成する全文検索システムの概要</h2>
 <p>それでは、PHPとMroongaを使って、全文検索システムを作っていきましょう。以下のようなシステムを作ることにします。</p>
 <dl>
 <dt>概要</dt>
@@ -85,11 +85,11 @@
 <dd>ウェブUIはPHPを使用して作成する<br />全文検索用のデータはMySQLに格納する<br />PDFからテキストを抜き出す処理は本書では扱わない（Dockerイメージ付属のツールを使う）</dd>
 </dl>
 
-<h2><a id="h2-4"></a><span class="secno">2.4　</span>データベースの作成</h2>
+<h2><a id="h1-4"></a><span class="secno">1.4　</span>データベースの作成</h2>
 <p>まず、PHPを使って、MySQLにデータベースを作成します。作成の手順は通常のMySQLでのデータベース作成と同様です。Dockerコンテナ内では既にMySQLが動作しており、<code class="inline-code tt">root</code>ユーザーでパスワード無しでログインできます。</p>
 <p>ソースコードは以下のようになります。<a id="fnb-loosephp" href="#fn-loosephp" class="noteref" epub:type="noteref">*2</a></p>
 <div class="caption-code">
-<p class="caption">リスト2.3: create-database.php</p>
+<p class="caption">リスト1.3: create-database.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;DBNAME&#39;</span>, <span style="color: #BA2121">&#39;pdfsearch&#39;</span>);
 
@@ -136,7 +136,7 @@
 <h2><a id="column-1"></a>PHPのデバッグ</h2>
 <p>PHPが期待通りに動作しない場合や画面が真っ白になって何が悪いか分からない場合は、<code class="inline-code tt">docker logs</code>コマンドでログを確認することができます。</p>
 <div class="caption-code">
-<p class="caption">リスト2.4: docker logsでPHPのログを確認</p>
+<p class="caption">リスト1.4: docker logsでPHPのログを確認</p>
 <pre class="list">% docker log pdfsearch
 13.03.2016 09:41:25 INFO  -- [web:php] switch :starting [:unmonitored =&gt; :starting] (reason: monitor by user)
 160313 09:41:26 mysqld_safe Can&#39;t log to error log and syslog at the same time.  Remove all --log-error configuration options for --syslog to take effect.
@@ -163,10 +163,10 @@
 <p>と設定するとよいでしょう。</p>
 </div>
 
-<h2><a id="h2-5"></a><span class="secno">2.5　</span>テーブルの作成</h2>
+<h2><a id="h1-5"></a><span class="secno">1.5　</span>テーブルの作成</h2>
 <p>データベースが出来たので、以下のカラムを持つ<code class="inline-code tt">pdfs</code>テーブル作りましょう。</p>
 <div id="pdfsearch" class="table">
-<p class="caption">表2.1: 作成するpdfsテーブル</p>
+<p class="caption">表1.1: 作成するpdfsテーブル</p>
 <table>
 <tr><th>カラム</th><th>内容</th><th>データ型</th><th>備考</th></tr>
 <tr><td>path</td><td>システム内のパス（場所）</td><td>VARCHAR(255)</td><td>主キー。検索対象ではない</td></tr>
@@ -176,7 +176,7 @@
 </div>
 <p>やり方はデータベースの作成と同様です。</p>
 <div class="caption-code">
-<p class="caption">リスト2.5: create-table.php</p>
+<p class="caption">リスト1.5: create-table.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;DBNAME&#39;</span>, <span style="color: #BA2121">&#39;pdfsearch&#39;</span>);
 <span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;TABLE_NAME&#39;</span>, <span style="color: #BA2121">&#39;pdfs&#39;</span>);
@@ -242,7 +242,7 @@ STATEMENT;
 <p>次に、インデックスの作成方法がInnoDBなどと異なります。PDFのタイトルや内容を完全一致で検索することはまずないでしょうから、通常のインデックスは必要ありません。代わりに、全文検索のための特別なインデックスを作る、<code class="inline-code tt">FULLTEXT INDEX</code>構文を使用します。これは、MySQLに元々備わっている、全文検索機能のための構文です。Mroongaでも用途は同じなので、全く同じ構文で使用できます。</p>
 <p>それ以外は、通常のMySQL使い方と同じです。主キーにはパスといった意味のある物ではなく、ただレコードを識別するためだけのサロゲートキーを使う人もいることでしょう。それでも構いません。</p>
 
-<h2><a id="h2-6"></a><span class="secno">2.6　</span>データ入力機能の作成</h2>
+<h2><a id="h1-6"></a><span class="secno">1.6　</span>データ入力機能の作成</h2>
 <p>いよいよアプリケーションらしい所を作っていきます。始めから検索機能に着手したいところですが、データがないことには何もできないので、入力機能から作成します。</p>
 <p>PDFファイルの内容をMySQLに登録するために、以下のようなステップを踏むことになります。</p>
 <ol>
@@ -251,11 +251,11 @@ STATEMENT;
 <li>タイトルと本文をMySQLの適切なカラムに挿入する</li>
 </ol>
 
-<h3><a id="h2-6-1"></a>PDFのアップロード機能を作る</h3>
+<h3><a id="h1-6-1"></a>PDFのアップロード機能を作る</h3>
 <p>まずはPDFのアップロード機能を作りましょう。PDFファイルその物は後で使うことはないので、一時ディレクトリーに置いたままで構いません。</p>
 <p>ユーザーが表示させる起点の画面をindex.php、そのファイルから呼び出すアップロード機能の部分をupload.phpとして実装することにします。</p>
 <div class="caption-code">
-<p class="caption">リスト2.6: index.php</p>
+<p class="caption">リスト1.6: index.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #008000; font-weight: bold">require_once</span> __DIR__ <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;/upload.php&#39;</span>;
 
@@ -286,7 +286,7 @@ STATEMENT;
 </pre>
 </div>
 <div class="caption-code">
-<p class="caption">リスト2.7: upload.php</p>
+<p class="caption">リスト1.7: upload.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
 
@@ -324,18 +324,18 @@ STATEMENT;
 <div id="upload" class="image">
 <img src="images/ch02/upload.png" alt="ファイルアップロード画面" />
 <p class="caption">
-図2.1: ファイルアップロード画面
+図1.1: ファイルアップロード画面
 </p>
 </div>
 <p>紙幅を減らすため、細かな検証は省略しています。実際に運用するアプリケーションでは安全性やエラーのチェックなどをしっかりと行ってください。</p>
 <div class="footnote" epub:type="footnote" id="fn-multi-select"><p class="footnote">[*3] ファイル選択ダイアログでCtrlキーを押しながらファイルをクリックしていくことで、選んだファイルを同時にアップロードできます。また、Shiftを押しながら最初のファイルと最後のファイルをクリックすることで、その間にあるファイルをすべて選択状態にできます。</p></div>
 
-<h3><a id="h2-6-2"></a>PDFからの情報を抽出する</h3>
+<h3><a id="h1-6-2"></a>PDFからの情報を抽出する</h3>
 <p>次に、PDFファイルからタイトルと本文を抜き出す処理を実装します。これを行うにはいくつか方法がありますが、ここでは<a href="https://github.com/php-poppler/php-poppler" class="link">php-poppler</a>というライブラリーを使うことにします。php-popplerを使うとPDFを解析してタイトルや本文を抜き出すことができます<a id="fnb-poppler" href="#fn-poppler" class="noteref" epub:type="noteref">*4</a>。</p>
 <p>php-popplerは<code class="inline-code tt">Poppler</code>名前空間にいくつかのクラスを定義しており、以下のようにして使います。</p>
-<div class="caption-code">
-<p class="caption">リスト2.8: php-popplerの基本的な使い方</p>
-<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<div class="emlist-code">
+<p class="caption">php-popplerの基本的な使い方</p>
+<pre class="emlist"><span style="color: #BC7A00">&lt;?php</span>
 
 <span style="color: #408080; font-style: italic">// pdfinfoコマンドのラッパー</span>
 <span style="color: #19177C">$pdfinfo</span> <span style="color: #666666">=</span> \Poppler\Driver\Pdfinfo<span style="color: #666666">::</span><span style="color: #7D9029">create</span>();
@@ -356,7 +356,7 @@ STATEMENT;
 <p>Dockerイメージの中には、既にPopplerとphp-popplerがインストール済みです。php-popplerはComposerでインストールしているので、<code class="inline-code tt">vendor/autoload.php</code>を読み込むことで、オートロードが有効になります。</p>
 <p>これを使って、先ほど作った<code class="inline-code tt">\PDFSearch\Upload</code>クラスにPDF関連の機能を追加します。</p>
 <div class="caption-code">
-<p class="caption">リスト2.9: upload.php</p>
+<p class="caption">リスト1.8: upload.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
 
@@ -394,16 +394,16 @@ STATEMENT;
 <div id="extract" class="image">
 <img src="images/ch02/extract.png" alt="PDF内の情報を取得" />
 <p class="caption">
-図2.2: PDF内の情報を取得
+図1.2: PDF内の情報を取得
 </p>
 </div>
 <div class="footnote" epub:type="footnote" id="fn-poppler"><p class="footnote">[*4] C製のPDFライブラリーでPopplerという物があり、PDFを扱う様々なコマンドラインツールの提供もしています。php-popplerはこれらのコマンド呼び出しをラップしてPHPから扱いやすくした物です。</p></div>
 
-<h3><a id="h2-6-3"></a>データベースにデータを挿入する</h3>
+<h3><a id="h1-6-3"></a>データベースにデータを挿入する</h3>
 <p>それでは、いよいよMroongaにデータを入力しましょう。と言っても、いつも通り<code class="inline-code tt">PDO</code>クラスで<code class="inline-code tt">INSERT</code>文を実行するだけです。Mroongaの方で自動的に検索用のインデックスを作成してくれます。Dockerイメージ内に既にMySQL用のアダプターはインストールされていますので、単にPHPから呼び出すだけで使用できます。</p>
 <p>データベースを扱う<code class="inline-code tt">\PDFSearch\Table</code>クラスを実装し、<code class="inline-code tt">index.php</code>でそのクラスを使うようにしたのが以下の内容です。<code class="inline-code tt">\PDFSearch\Upload</code>には変更がないため省略しています。</p>
 <div class="caption-code">
-<p class="caption">リスト2.10: index.php</p>
+<p class="caption">リスト1.9: index.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #408080; font-style: italic">// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む</span>
 <span style="color: #008000; font-weight: bold">require_once</span> <span style="color: #BA2121">&#39;vendor/autoload.php&#39;</span>;
@@ -464,7 +464,7 @@ STATEMENT;
 </pre>
 </div>
 <div class="caption-code">
-<p class="caption">リスト2.11: table.php</p>
+<p class="caption">リスト1.10: table.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
 
@@ -512,17 +512,17 @@ STATEMENT;
 <div id="insert" class="image">
 <img src="images/ch02/insert.png" alt="アップロードしたPDFの情報を表示" />
 <p class="caption">
-図2.3: アップロードしたPDFの情報を表示
+図1.3: アップロードしたPDFの情報を表示
 </p>
 </div>
 
-<h2><a id="h2-7"></a><span class="secno">2.7　</span>全文検索機能の作成</h2>
+<h2><a id="h1-7"></a><span class="secno">1.7　</span>全文検索機能の作成</h2>
 <p>ようやく、全文検索機能の実装です。実は、これもMroongaならではの特別なことは必要なく、通常のMySQLの全文検索機能、即ち<code class="inline-code tt">MATCH() ... AGAINST</code>構文を使用するだけです。テーブル作成時に、ストレージエンジンにMroongaを選択しておけば、他の操作は通常のMySQLと同じように実行できるようにデザインされているのです。</p>
 <p><code class="inline-code tt">MATCH() ... AGAINST</code>構文は元々MySQLに備わっている全文検索用の構文です。<code class="inline-code tt">MATCH</code>には検索対象にするカラム名を渡します。ここで指定できるのは、テーブル作成時に<code class="inline-code tt">FULLTEXT</code>インデックスを指定したカラムのみです。Docker内のテーブルでは、予め<code class="inline-code tt">title</code>カラムと<code class="inline-code tt">content</code>カラムに<code class="inline-code tt">FULLTEXT</code>インデックスを張っています。<code class="inline-code tt">AGAINST</code>には検索クエリーを渡します。オプションを渡すこともできます。詳細は<a href="https://dev.mysql.com/doc/refman/5.6/ja/fulltext-search.html" class="link">MySQLのドキュメント</a>を参照してください。</p>
 <p>Mroongaではこの構文を流用しており、元の挙動を知っている人にはおおよそ期待通りに動作するようになっていますが、厳密に同じではありません。Mroongaでのみ使える様々な機能が使えるようになっています。これについては、一旦基本の検索機能を作ったあとで触れたいと思います。</p>
 <p>今の「登録済みPDF一覧」の上に検索フォームを作成し、検索を実行した場合にはフォームの下に検索結果を表示するようにしてみましょう。そのために、<code class="inline-code tt">\PDFSearch\Table</code>クラスに検索用のメンバー関数を追加します。</p>
 <div class="caption-code">
-<p class="caption">リスト2.12: search.php</p>
+<p class="caption">リスト1.11: search.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
 
@@ -532,7 +532,9 @@ STATEMENT;
         <span style="color: #BA2121">&quot;INSERT INTO `pdfs` (file, title, content)</span>
 <span style="color: #BA2121">         VALUES(:file, :title, :content);&quot;</span>;
     <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SELECT</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;</span>;
-    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` WHERE MATCH(content) AGAINST(:query IN BOOLEAN MODE);&quot;</span>;
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>EOS
+SELECT <span style="color: #666666">*</span> FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(content) AGAINST(<span style="color: #666666">:</span>query IN BOOLEAN MODE);
+EOS;
 
     <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$pdo</span>;
 
@@ -581,7 +583,7 @@ STATEMENT;
 <p><code class="inline-code tt">SEARCH</code>定数と<code class="inline-code tt">search</code>メンバー関数を追加しています。</p>
 <p>先ほど言ったような検索フォームと結果のエリアを追加すると、index.phpはこうなります。</p>
 <div class="caption-code">
-<p class="caption">リスト2.13: index.php</p>
+<p class="caption">リスト1.12: index.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #408080; font-style: italic">// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む</span>
 <span style="color: #008000; font-weight: bold">require_once</span> <span style="color: #BA2121">&#39;vendor/autoload.php&#39;</span>;
@@ -679,9 +681,328 @@ STATEMENT;
 <div id="search" class="image">
 <img src="images/ch02/search.png" alt="全文検索結果の表示" />
 <p class="caption">
-図2.4: 全文検索結果の表示
+図1.4: 全文検索結果の表示
 </p>
 </div>
 <p>以上で、基本的な機能は完成です。以降では、Mroongaに特徴的な幾つかの機能を紹介し、実装していきます。</p>
+
+<h2><a id="h1-8"></a><span class="secno">1.8　</span>Mroongaならではの機能の作成</h2>
+<p>ここからは、MySQLの全文検索機能にはない、Mroongaならではの特徴を活かした機能を実装していきます。</p>
+
+<h3><a id="h1-8-1"></a>検索語のハイライト</h3>
+<p>現在の検索機能では、検索結果中、どこに検索語があるのか、自分で探さなくてはなりません。次の画像のように、検索語だけがハイライトされていると、とても見やすくなります。また、猫についてのPDFを探すつもりで「cat」で検索し「application」といった関係ない語がヒットした場合に、すぐにそのことに気付けるというメリットもあります。</p>
+<div id="highlight" class="image">
+<img src="images/ch02/highlight.png" alt="検索語をハイライトして表示" />
+<p class="caption">
+図1.5: 検索語をハイライトして表示
+</p>
+</div>
+<p>このように検索語をハイライトする機能を実装してみましょう。</p>
+<p>すぐに思い付く実装方法は、取得した検索結果の<code class="inline-code tt">content</code>カラムを、再度PHPで解析してタグを挿入することですが、実はMroongaには、このための機能が備わっています。SQL中で利用可能な<code class="inline-code tt">mroonga_snippet_html()</code>関数です。これは特定のカラム（ここでは<code class="inline-code tt">content</code>）のうち、指定した語（「cat」）の前後数十バイトを抜き出し、文字列として返す関数です。</p>
+<p><code class="inline-code tt">mroonga_snippet_html()</code>関数が返すスニペットは<code class="inline-code tt">&lt;div class=&quot;snippet&quot;&gt;</code>...<code class="inline-code tt">&lt;/div&gt;</code>というタグで囲まれ、更に検索語は<code class="inline-code tt">&lt;span class=&quot;keyword&quot;&gt;</code>...<code class="inline-code tt">&lt;/span&gt;</code>で囲まれます<a id="fnb-mroonga_snippet" href="#fn-mroonga_snippet" class="noteref" epub:type="noteref">*5</a>。一レコード中に検索語が複数回現れる場合は、その数に応じて複数のスニペットを結合した一つの文字列を返します。余談ですが「スニペット」は「断片」という意味で、この場合は<code class="inline-code tt">content</code>カラムのうちの一部を返すことを意味しています。</p>
+<p><code class="inline-code tt">mroonga_snippet_html()</code>は以下のようにして使用します。</p>
+<div class="emlist-code">
+<p class="caption">mroonga_snippet_htmlの簡単な使い方</p>
+<pre class="emlist"><span style="color: #008000; font-weight: bold">SELECT</span> mroonga_snippet_html(content, <span style="color: #BA2121">&#39;cat&#39;</span>) <span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span>;
+</pre>
+</div>
+<p>結果は、例えば次のようになります<a id="fnb-linebreak" href="#fn-linebreak" class="noteref" epub:type="noteref">*6</a>。</p>
+<div class="emlist-code">
+<p class="caption">mroonga_snippet_html()の結果例</p>
+<pre class="emlist"><span style="color: #008000; font-weight: bold">&lt;div</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;snippet&quot;</span><span style="color: #008000; font-weight: bold">&gt;&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>Cat<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span>
+
+A Little Game about Little Heroes
+
+Credits
+
+Writing/Layout/Design
+John Wick
+Wicked Editrix
+Annie Rush
+Special Thanks
+to Jared Sorensen
+For helping me throw out the (litter) box.
+Extra Special Tha<span style="color: #008000; font-weight: bold">&lt;/div&gt;</span>
+<span style="color: #008000; font-weight: bold">&lt;div</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;snippet&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>Still
+Who protects little heroes.
+
+http://www.wicked-dead.com/<span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>cat<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span>
+
+<span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>Cat<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span> uses the Advantage System.
+http://www.wicked-dead.com/advantage
+
+<span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>Cat<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span>: A Little Game about Little Heroes is © and ™ 2004 by Joh<span style="color: #008000; font-weight: bold">&lt;/div&gt;</span>
+<span style="color: #008000; font-weight: bold">&lt;div</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;snippet&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span> Except boggins. Those are real.
+Go give your <span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>cat<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span> a hug.
+
+Ta b l e o f C o n t e n t s
+“I Know I’m Dreaming”
+Introduction
+What You Need
+Making a <span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>Cat<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span> Character
+Step 1: The Traits
+Step 2: Names
+St<span style="color: #008000; font-weight: bold">&lt;/div&gt;</span>
+</pre>
+</div>
+<p>ここでは、本書のアプリケーションに必要なことのみ説明しているので、詳細については公式ドキュメント（<a href="http://mroonga.org/ja/docs/reference/udf/mroonga_snippet_html.html" class="link">5.5.5. mroonga_snippet_html()</a>）を参照してください。</p>
+<p>現在の実装では検索でヒットした時に<code class="inline-code tt">content</code>カラムの抜粋を表示していますが、<code class="inline-code tt">mroonga_snippet_html()</code>の戻り値で置き換えてみましょう。<code class="inline-code tt">PDFSearch\Table::search()</code>で使用しているSQL（<code class="inline-code tt">PDFSearch\Table::SEARCH</code>定数）を変更します。<code class="inline-code tt">mroonga_snippet_html()</code>も<code class="inline-code tt">COUNT()</code>などと同様の関数なので、<code class="inline-code tt">AS</code>句を使って別名を付けることができます。</p>
+<div class="caption-code">
+<p class="caption">リスト1.13: table.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
+
+<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Table</span>
+{
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">INSERT</span> <span style="color: #666666">=</span>
+        <span style="color: #BA2121">&quot;INSERT INTO `pdfs` (file, title, content)</span>
+<span style="color: #BA2121">         VALUES(:file, :title, :content);&quot;</span>;
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SELECT</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;</span>;
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>EOS
+SELECT <span style="color: #008000">file</span>, title, mroonga_snippet_html(content, <span style="color: #666666">:</span>query) <span style="color: #008000; font-weight: bold">AS</span> snippets
+FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(content) AGAINST(<span style="color: #666666">:</span>query IN BOOLEAN MODE);
+EOS;
+
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$pdo</span>;
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>)
+    {
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDO(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>);
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">insert</span>(Upload <span style="color: #19177C">$upload</span>)
+    {
+        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [
+            <span style="color: #BA2121">&#39;:file&#39;</span>    <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getName</span>(),
+            <span style="color: #BA2121">&#39;:title&#39;</span>   <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getTitle</span>(),
+            <span style="color: #BA2121">&#39;:content&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getContent</span>()
+        ];
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">INSERT</span>);
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">records</span>()
+    {
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SELECT</span>);
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>();
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">search</span>(<span style="color: #19177C">$query</span>)
+    {
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SEARCH</span>);
+        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [<span style="color: #BA2121">&#39;:query&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$query</span>];
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+    }
+}
+</pre>
+</div>
+<p>HTML中で<code class="inline-code tt">content</code>カラムを表示していた所を、<code class="inline-code tt">snippets</code>に置き換えます。</p>
+<div class="caption-code">
+<p class="caption">リスト1.14: index.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #408080; font-style: italic">// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む</span>
+<span style="color: #008000; font-weight: bold">require_once</span> <span style="color: #BA2121">&#39;vendor/autoload.php&#39;</span>;
+<span style="color: #008000; font-weight: bold">require_once</span> __DIR__ <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;/upload.php&#39;</span>;
+<span style="color: #008000; font-weight: bold">require_once</span> __DIR__ <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;/table.php&#39;</span>;
+
+<span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;DBNAME&#39;</span>, <span style="color: #BA2121">&#39;pdfsearch&#39;</span>);
+
+<span style="color: #19177C">$dsn</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;mysql:host=localhost;dbname=&#39;</span> <span style="color: #666666">.</span> DBNAME <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;;charset=utf8&#39;</span>;
+<span style="color: #19177C">$table</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDFSearch\Table(<span style="color: #19177C">$dsn</span>, <span style="color: #BA2121">&#39;root&#39;</span>, <span style="color: #BA2121">&#39;&#39;</span>);
+
+<span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">h</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span> <span style="color: #666666">=</span> ENT_QUOTES, <span style="color: #19177C">$encoding</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;UTF-8&#39;</span>)
+{
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">htmlspecialchars</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span>, <span style="color: #19177C">$encoding</span>);
+}
+
+<span style="color: #408080; font-style: italic">// 検索処理</span>
+<span style="color: #19177C">$searchQuery</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">null</span>;
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;GET&#39;</span> <span style="color: #666666">&amp;&amp;</span>
+    <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;q&#39;</span>, <span style="color: #19177C">$_GET</span>) <span style="color: #666666">&amp;&amp;</span> <span style="color: #19177C">$_GET</span>[<span style="color: #BA2121">&#39;q&#39;</span>]) {
+    <span style="color: #19177C">$searchQuery</span> <span style="color: #666666">=</span> <span style="color: #19177C">$_GET</span>[<span style="color: #BA2121">&#39;q&#39;</span>];
+    <span style="color: #19177C">$searchResult</span> <span style="color: #666666">=</span> <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">search</span>(<span style="color: #19177C">$searchQuery</span>);
+}
+
+<span style="color: #408080; font-style: italic">// ファイルアップロード処理</span>
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span> <span style="color: #666666">&amp;&amp;</span>
+    <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;pdf&#39;</span>, <span style="color: #19177C">$_FILES</span>)) {
+    <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> \PDFSearch\Upload<span style="color: #666666">::</span><span style="color: #7D9029">fromFilesInfo</span>(<span style="color: #19177C">$_FILES</span>[<span style="color: #BA2121">&#39;pdf&#39;</span>]);
+    <span style="color: #008000; font-weight: bold">try</span> {
+        <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$uploads</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$upload</span>) {
+            <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">insert</span>(<span style="color: #19177C">$upload</span>);
+        }
+        <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;Location: .&#39;</span>);
+    } <span style="color: #008000; font-weight: bold">catch</span> (\RuntimeException <span style="color: #19177C">$e</span>) {
+        <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;HTTP&#39;</span>, <span style="color: #008000; font-weight: bold">true</span>, <span style="color: #666666">500</span>);
+        <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;content-type: text/plain&#39;</span>);
+        <span style="color: #008000; font-weight: bold">echo</span> <span style="color: #19177C">$e</span>;
+    }
+    <span style="color: #008000; font-weight: bold">exit</span>;
+}
+
+<span style="color: #19177C">$records</span> <span style="color: #666666">=</span> <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">records</span>();
+
+<span style="color: #BC7A00">?&gt;</span>&lt;!doctype html&gt;
+&lt;title&gt;PDF Search&lt;/title&gt;
+&lt;style&gt;
+  .keyword {
+    font-weight: bold;
+    color: red;
+  }
+&lt;/style&gt;
+&lt;h1&gt;PDF Search&lt;/h1&gt;
+
+&lt;h2&gt;検索&lt;/h2&gt;
+&lt;form method=&quot;get&quot;&gt;
+  &lt;input name=&quot;q&quot; type=&quot;search&quot; value=&quot;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$searchQuery</span>); <span style="color: #BC7A00">?&gt;</span>&quot;&gt;
+  &lt;input type=&quot;submit&quot; value=&quot;検索&quot;&gt;
+&lt;/form&gt;
+
+<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$searchResult</span> <span style="color: #666666">&amp;&amp;</span> <span style="color: #008000">count</span>(<span style="color: #19177C">$searchResult</span>) <span style="color: #666666">&gt;</span> <span style="color: #666666">0</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+&lt;h2&gt;「<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$searchQuery</span>); <span style="color: #BC7A00">?&gt;</span>」を含むPDF&lt;/h2&gt;
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;ファイル名&lt;/th&gt;
+    &lt;th&gt;タイトル&lt;/th&gt;
+    &lt;th&gt;内容&lt;/th&gt;
+  &lt;/tr&gt;
+  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$searchResult</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$record</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+    &lt;tr&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;file&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;title&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> <span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;snippets&#39;</span>]; <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
+    &lt;/tr&gt;
+  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+&lt;/table&gt;
+<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endif</span>; <span style="color: #BC7A00">?&gt;</span>
+
+&lt;h2&gt;登録済みPDF一覧&lt;/h2&gt;
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;ファイル名&lt;/th&gt;
+    &lt;th&gt;タイトル&lt;/th&gt;
+    &lt;th&gt;内容&lt;/th&gt;
+  &lt;/tr&gt;
+  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$records</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$record</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+    &lt;tr&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;file&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;title&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #008000">mb_substr</span>(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;content&#39;</span>], <span style="color: #666666">0</span>, <span style="color: #666666">120</span>)); <span style="color: #BC7A00">?&gt;</span>&amp;hellip;&amp;hellip;&lt;/td&gt;
+    &lt;/tr&gt;
+  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+&lt;/table&gt;
+
+&lt;form enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
+  &lt;input name=&quot;pdf[]&quot; type=&quot;file&quot; multiple&gt;
+  &lt;input type=&quot;submit&quot;&gt;
+&lt;/form&gt;
+</pre>
+</div>
+<p><code class="inline-code tt">snippets</code>の表示ではHTMLエスケープをしていないことに気が付いたでしょうか。<code class="inline-code tt">mroonga_snippet_html()</code>にHTMLタグが含まれているため、ここでHTMLエスケープしてしまうと、タグとしての役を果たさなくなってしまいます。そのため、直接出力しています。</p>
+<p>ここにはセキュリティ上の懸念があります<a id="fnb-notsecurityissue" href="#fn-notsecurityissue" class="noteref" epub:type="noteref">*7</a>。<code class="inline-code tt">mroonga_snippet_html()</code>の戻り値では、カラム中のHTMLタグなどは全てエスケープされますが、取得したスニペットと他の文字列をPHPで結合すると、セキュリティホールになり得ます。加工せず、可能であれば単独で出力するようにしてください。加工や他の文字列との結合が必要な場合は、慎重に行ってください。</p>
+<p>これで、検索結果のハイライトも出来ました。実際に検索して結果を楽しみましょう。</p>
+<div class="footnote" epub:type="footnote" id="fn-mroonga_snippet"><p class="footnote">[*5] タグや<code class="inline-code tt">class</code>属性を変更したい場合は、柔軟性の高い<a href="http://mroonga.org/ja/docs/reference/udf/mroonga_snippet.html" class="link">mroonga_snippet()</a>関数を使用してください。</p></div>
+<div class="footnote" epub:type="footnote" id="fn-linebreak"><p class="footnote">[*6] 読みやすさのため、改行を調整しています。</p></div>
+<div class="footnote" epub:type="footnote" id="fn-notsecurityissue"><p class="footnote">[*7] 実際にはHTMLを正しく出力するために必要な注意点です。仮にセキュリティ上問題とならなくても、HTMLが正しく出力されず、アプリケーションが壊れてしまう可能性があります。</p></div>
+
+<h3><a id="h1-8-2"></a>重み付けによる並び替え</h3>
+<p>これまでは、検索結果の並び順については考慮していませんでした。やはり、検索語に近いPDFが先頭に並んでほしいものです。</p>
+<p>この「検索語に近い」または「より望ましい」という状態を、Mroongaではスコアという形で、数値として計算することができます。「検索語がより多く含まれているPDFの方が望ましい」「検索語が本文に含まれているよりもタイトルに含まれている方がより望ましい」といった判断が可能になるのです。</p>
+<p>Mroongaが使っているスコアの値は、<code class="inline-code tt">WHERE</code>句に指定している<code class="inline-code tt">MATH()</code>...<code class="inline-code tt">AGAINST()</code>の戻り値として取得できます。<code class="inline-code tt">AS</code>で別名を付けると使いやすいでしょう。</p>
+<div class="emlist-code">
+<p class="caption">スコアの取得</p>
+<pre class="emlist"><span style="color: #008000; font-weight: bold">SELECT</span> <span style="color: #008000; font-weight: bold">MATCH</span>(content) AGAINST(<span style="color: #BA2121">&#39;cat&#39;</span> <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>) <span style="color: #008000; font-weight: bold">as</span> score <span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span>;
+</pre>
+</div>
+<div class="emlist-code">
+<pre class="emlist">+-------+
+| score |
++-------+
+|   315 |
+|    10 |
+|     0 |
+|     0 |
+|     4 |
++-------+
+5 rows in set (0.47 sec)
+</pre>
+</div>
+<p>このスコアでソートすることで、より望ましい結果を上の方に表示することができます。</p>
+<p>では、このスコアというのは何によって決められているのでしょうか。それは、「類似度」と「重み」です。重みについては後ほど説明することにして、ここでは類似度を説明します。類似度についても詳細は公式ドキュメントに譲りますが、大雑把に言って、検索語と同じ語が多数含まれている文書ほど類似度が高い、つまり検索上位に表示されるようになっています。</p>
+<p>以下の<code class="inline-code tt">PDFSearch\Table::SEARCH</code>定数のように、スコアを取得してその値で並べ替えるだけで、多くの場合、期待される検索結果になるでしょう。</p>
+<div class="caption-code">
+<p class="caption">リスト1.15: table.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
+
+<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Table</span>
+{
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">INSERT</span> <span style="color: #666666">=</span>
+        <span style="color: #BA2121">&quot;INSERT INTO `pdfs` (file, title, content)</span>
+<span style="color: #BA2121">         VALUES(:file, :title, :content);&quot;</span>;
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SELECT</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;</span>;
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>EOS
+SELECT <span style="color: #008000">file</span>, title, mroonga_snippet_html(content, <span style="color: #666666">:</span>query) <span style="color: #008000; font-weight: bold">AS</span> snippets,
+MATCH(content) AGAINST(<span style="color: #666666">:</span>query IN BOOLEAN MODE) <span style="color: #008000; font-weight: bold">AS</span> score
+FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(content) AGAINST(<span style="color: #666666">:</span>query IN BOOLEAN MODE)
+ORDER BY score DESC;
+EOS;
+
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$pdo</span>;
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>)
+    {
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDO(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>);
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">insert</span>(Upload <span style="color: #19177C">$upload</span>)
+    {
+        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [
+            <span style="color: #BA2121">&#39;:file&#39;</span>    <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getName</span>(),
+            <span style="color: #BA2121">&#39;:title&#39;</span>   <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getTitle</span>(),
+            <span style="color: #BA2121">&#39;:content&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getContent</span>()
+        ];
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">INSERT</span>);
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">records</span>()
+    {
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SELECT</span>);
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>();
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">search</span>(<span style="color: #19177C">$query</span>)
+    {
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SEARCH</span>);
+        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [<span style="color: #BA2121">&#39;:query&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$query</span>];
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+    }
+}
+</pre>
+</div>
+<p>（TODO：タイトルも検索対象にしての重みの話をする）（+プラグマを付けるようにしたほうがいい？）</p>
 </body>
 </html>
