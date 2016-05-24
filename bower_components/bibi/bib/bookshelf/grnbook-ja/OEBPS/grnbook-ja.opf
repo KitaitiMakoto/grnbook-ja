@@ -3,7 +3,7 @@
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
     <dc:title id="title">Groongaではじめる全文検索</dc:title>
     <dc:language id="language">ja</dc:language>
-    <meta property="dcterms:modified">2016-05-10T13:50:42Z</meta>
+    <meta property="dcterms:modified">2016-05-24T13:43:47Z</meta>
     <dc:identifier id="BookId"></dc:identifier>
   </metadata>
   <manifest>
@@ -12,7 +12,9 @@
     <item id="main-css" href="main.css" media-type="text/css"/>
     <item id="titlepage-html" href="titlepage.html" media-type="application/xhtml+xml"/>
     <item id="ch02-html" href="ch02.html" media-type="application/xhtml+xml"/>
+    <item id="appendix-html" href="appendix.html" media-type="application/xhtml+xml"/>
     <item id="images-ch02-insert-png" href="images/ch02/insert.png" media-type="image/png"/>
+    <item id="images-ch02-weight-png" href="images/ch02/weight.png" media-type="image/png"/>
     <item id="images-ch02-upload-png" href="images/ch02/upload.png" media-type="image/png"/>
     <item id="images-ch02-extract-png" href="images/ch02/extract.png" media-type="image/png"/>
     <item id="images-ch02-search-png" href="images/ch02/search.png" media-type="image/png"/>
@@ -22,6 +24,7 @@
     <itemref idref="grnbook-ja" linear="no"/>
     <itemref idref="titlepage-html"/>
     <itemref idref="ch02-html"/>
+    <itemref idref="appendix-html"/>
   </spine>
   <guide>
     <reference type="cover" title="表紙" href="grnbook-ja.html"/>
