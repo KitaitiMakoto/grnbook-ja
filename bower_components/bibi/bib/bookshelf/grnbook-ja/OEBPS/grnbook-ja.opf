@@ -3,8 +3,8 @@
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
     <dc:title id="title">Groongaではじめる全文検索</dc:title>
     <dc:language id="language">ja</dc:language>
-    <meta property="dcterms:modified">2016-05-24T13:54:27Z</meta>
-    <dc:identifier id="BookId"></dc:identifier>
+    <meta property="dcterms:modified">2016-05-24T13:55:49Z</meta>
+    <dc:identifier id="BookId">https://github.com/KitaitiMakoto/grnbook-ja</dc:identifier>
   </metadata>
   <manifest>
     <item properties="nav" id="grnbook-ja-toc.html" href="grnbook-ja-toc.html" media-type="application/xhtml+xml"/>
