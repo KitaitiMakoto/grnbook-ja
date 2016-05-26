@@ -13,8 +13,7 @@ CREATE TABLE `{$table}` (
     file    VARCHAR(255),
     title   VARCHAR(255),
     content LONGTEXT,
-    FULLTEXT INDEX (title),
-    FULLTEXT INDEX (content)
+    FULLTEXT INDEX (title,content)
 ) ENGINE = Mroonga DEFAULT CHARSET utf8;
 STATEMENT;
     $dbh->exec($statement);
