@@ -396,3 +396,82 @@ HTML中で@<code>{content}カラムを表示していた所を、@<code>{snippet
 //footnote[mroonga_snippet][タグや@<code>{class}属性を変更したい場合は、柔軟性の高い@<href>{http://mroonga.org/ja/docs/reference/udf/mroonga_snippet.html, mroonga_snippet()}関数を使用してください。]
 //footnote[linebreak][読みやすさのため、改行を調整しています。]
 //footnote[notsecurityissue][実際にはHTMLを正しく出力するために必要な注意点です。仮にセキュリティ上問題とならなくても、HTMLが正しく出力されず、アプリケーションが壊れてしまう可能性があります。]
+
+=== スコアによる並び替え
+
+これまでは、検索結果の並び順については考慮していませんでした。やはり、検索語に近いPDFが先頭に並んでほしいものです。
+
+この「検索語に近い」または「より望ましい」という状態を、Mroongaではスコアという形で、数値として計算することができます。「検索語がより多く含まれているPDFの方が望ましい」「検索語が本文に含まれているよりもタイトルに含まれている方がより望ましい」といった判断が可能になるのです。
+
+Mroongaが使っているスコアの値は、@<code>{WHERE}句に指定している@<code>{MATH()}...@<code>{AGAINST()}の戻り値として取得できます。@<code>{AS}で別名を付けると使いやすいでしょう。
+
+//emlist[スコアの取得][SQL]{
+SELECT MATCH(content) AGAINST('cat' IN BOOLEAN MODE) as score FROM `pdfs`;
+//}
+//emlist{
++-------+
+| score |
++-------+
+|   315 |
+|    10 |
+|     0 |
+|     0 |
+|     4 |
++-------+
+5 rows in set (0.47 sec)
+//}
+
+このスコアでソートすることで、より望ましい結果を上の方に表示することができます。
+
+では、このスコアというのは何によって決められているのでしょうか。一つは、結果文書の中に踏まれている検索語の数です。検索語が多く含まれている文書ほど検索する人の要求に合っていると見做して、検索上位に表示させられるわけです。
+
+以下の用に@<code>{PDFSearch\Table::SEARCH}のSQLにちょっとした変更を加えるだけで、多くの場合、期待される検索結果になるでしょう。
+
+//emlist[変更前の\PDFSearch\Table::SEARCH定数][SQL]{
+SELECT file, title, mroonga_snippet_html(content, :query) AS snippets
+FROM `pdfs` WHERE MATCH(content) AGAINST(:query IN BOOLEAN MODE);
+//}
+
+//emlist[変更前の\PDFSearch\Table::SEARCH定数][SQL]{
+SELECT file, title, mroonga_snippet_html(content, :query) AS snippets,
+MATCH(content) AGAINST(:query IN BOOLEAN MODE) AS score
+FROM `pdfs` WHERE MATCH(content) AGAINST(:query IN BOOLEAN MODE)
+ORDER BY score DESC;
+//}
+
+もう一つの基準は重みと呼ばれます。重みは、どのカラムをより重視するかという指標です。例えば、次のような二つのPDFが登録されているとします。
+
+//table[two-groongas][Groongaという語を含む二つのPDF]{
+タイトル	内容
+--------------
+@<em>{Groonga}で作る全文検索システム	@<em>{Groonga}を使って全文検索システムを作ります。
+わたしのエッセイ集	今日、@<em>{Groonga}という言葉を耳にしました。不思議な言葉ですね、@<em>{Groonga}。検索してみると、「@<em>{Groonga}で学ぶ全文検索」という勉強会があるみたいなので、全文検索の何かなのでしょう。ところで、全文検索って何？
+//}
+
+Groongaのことが知りたくて検索する時に、どちらがヒットしてほしいでしょうか。始めの「Groongaで作る全文検索システム」の方ではないでしょうか。でも、「Groonga」という言葉が多く含まれているのは「わたしのエッセイ集」の方なので、今までの実装だと、こちらが上位に表示されることになってしまいます。前者を上位に持って来るために、「検索語がタイトルに含まれている方が、本文に含まれているよりも100倍くらい重要だ」という指標を導入することにしましょう。Mroongaまたは全文検索の言葉で「@<code>{title}カラムの重みを@<code>{content}カラムの100倍にする」ということになります。
+
+//image[weight][検索語がタイトル含まれている場合スコアが大きくなる]{
+//}
+
+上の画像にある三つのPDFではどれも本文中に「すべて」という語が含まれますが、タイトルにも含まれる「mrubyのすべて」のスコアが、含まれない「APIデザインケーススタディ」「Dockerエキスパート養成読本」に比べ、非常に大きくなっていることが分かります。実際、タイトルの重視をやめると、「mrubyのすべて」と「APIデザインケーススタディ」の順位は逆転します。
+
+このように重み付けするには、@<code>{W}プラグマを使用します。
+
+//emlist[][SQL]{
+MATCH(title,content) AGAINST('*W1:100,2:1 API')
+//}
+
+@<code>{W}が重み付けのためのプラグマ使用を指示し、その後はカラムごとの重み付けをカンマ区切りで指定します。「@<code>{1:100}」は「（@<code>{MATCH}で指定した）1カラム目の重みを100に」、「@<code>{2:1}」は「2カラム目の重みを1に」という命令になります。これにより、「検索語が1つタイトルに含まれていると、本文に100個含まれているのと同等のスコアになる」ということを実現しています（実際には100倍の差が付きさえすればいいので、2と200でも、10と1000でも構いません）。
+
+まとめると、実装は次のようになります。
+
+//list[ch02/sort/table.php][table.php][php]{
+#@mapfile(ch02/sort/table.php)
+#@end
+//}
+
+@<code>{W}プラグマを色々な値に変えて試してみてください。本書のようなチュートリアルではなく、実際の全文検索システムに置いてもスコアリングは非常に大切なポイントです。重み付けを使いこなしたスコアリングができると、いかにも全文検索システムを作っているという実感が出て、楽しいと思います。
+
+
+ * （D+プラグマはもっと前でやる）
+ * （プラグマ指定時のスニペットの表示方法が分からない） -> うまくできないのでそれ用の関数が近々実装される。
