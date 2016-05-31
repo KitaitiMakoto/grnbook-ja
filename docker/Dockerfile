@@ -10,6 +10,7 @@ RUN apt-get update && \
       echo mysql-server mysql-server/root_password_again password 'root'; \
     } | debconf-set-selections && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server poppler-utils php5-cli && \
+    apt-get clean && \
     gem update --system && \
     gem update --no-document && \
     gem cleanup && \
