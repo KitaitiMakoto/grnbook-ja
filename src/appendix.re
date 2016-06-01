@@ -140,3 +140,18 @@ Mroongaを含むGroongaについては、開発者が日本人であることも
 これを使って実際に入っているデータを確認・削除したり、コンテナはそのままでデータベースやテーブルの再作成を行ったりできます。テーブル作成時はストレージエンジンにMroongaを指定することを忘れないようにしてください。詳細は@<hd>{データベースとテーブルの作成}で解説しています。
 
 == PHPのデバッグ
+
+本書サンプルで作成するDockerコンテナの中ではApacheのmod_phpモジュールを使ってPHP 5.6が動作しています。もし、PHPスクリプトがうまく動作しない場合は、Apacheのエラーログを確認するといいでしょう。
+
+まず、@<code>{docker exec}コマンドを使ってコンテナの中に入ります（正確にはコンテナの中でbashを実行します）。
+
+//emlist[docker execでコンテナの中に入る]{
+% docker exec --interactive --tty pdfsearch /bin/bash
+//}
+
+Apacheのエラーログは/var/log/apache2/error_logなので、これを@<code>{less}や@<code>{tail}などのコマンドで見ながらPHPを実行することで、どんなエラーが起きているのかを知ることができます。
+
+//emlist[ログファイルを監視する]{
+# less /var/log/apache2/error_log
+# tail -f /var/log/apache2/error_log
+//}
