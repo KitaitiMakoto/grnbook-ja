@@ -120,6 +120,19 @@ Mroongaを含むGroongaについては、開発者が日本人であることも
 
 == Dockerコンテナの作り直し
 
+本書のサンプルではDockerコンテナを使ってApache、PHP、MySQLを動かしています。時には始めからやり直したくなることもあるかも知れません。そうした場合は、以下のように一度コンテナを削除して作り直すことができます。
+
+//emlist[コンテナの削除]{
+% docker rm pdfsearch
+//}
+
+//emlist[コンテナの作成]{
+% docker run --detach --name=pdfsearch --publish=8080:80 \
+    --volume=$PWD:/var/lib/pdfsearch kitaitimakoto/grnbook-mroonga
+//}
+
+コンテナを削除すると、データベース内のデータは全て失われます。PDFの登録からやり直しとなるので注意しましょう。ホストと共有しているPHPファイルは消えることはありません。
+
 == phpMyAdminによるデータの確認・操作
 
 == PHPのデバッグ
