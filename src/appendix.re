@@ -70,6 +70,46 @@ Mroongaを使ったテーブルの作成については、@<hd>{データベー�
 
 == データベースとテーブルの作成
 
+データベースの作成には、通常のMySQLと変わることは何もありません。MySQLサーバーに接続し、@<code>{CREATE DATABASE}文を実行することでデータベースを作成します。
+
+//emlist[データベースの作成][SQL]{
+CREATE DATABASE pdfsearch;
+//}
+
+必要に応じて権限設定などを行ってください。
+
+テーブルの作成には気を付けることがあります。まず、ストレージエンジンをMroongaにする必要があります。MySQLで何も指定せずに@<code>{CREATE TABLE}を実行した場合、ストレージエンジンはデフォルトのInnoDBになります。これを他のストレージエンジンに変更するには、@<code>{ENGINE}オプションを使用します。
+
+//emlist[テーブルのストレージエンジンにMroongaを指定][SQL]{
+CREATE TABLE `pdfs` (
+-- カラム定義等
+) ENGINE = Mroonga DEFAULT CHARSET utf8;
+//}
+
+また、検索対象にしたいカラムに、（通常のインデックスとは異なる）全文検索用んインデックスを作成する必要があります。
+
+//emlist[全文検索インデックスの追加][SQL]{
+ALTER TABLE `pdfs` ADD FULLTEXT INDEX (titke, content);
+//}
+
+これ自体は通常のMySQLでの操作なので、@<code>{ALTER TABLE}のほか、@<code>{CREATE TABLE}でインデックスを作成することもできます。
+
+//emlist[テーブル作成時の全文検索インデックスの作成][SQL]{
+CREATE TABLE `pdfs` (
+    id      INT PRIMARY KEY AUTO_INCREMENT,
+    file    VARCHAR(255),
+    title   VARCHAR(255),
+    content LONGTEXT,
+    FULLTEXT INDEX (title, content)
+) ENGINE = Mroonga DEFAULT CHARSET utf8;
+//}
+
+これは、本書で使用したDockerイメージを作る際に、実際に使用したSQL文です。
+
+また、SQLを使わず@<href>{https://www.phpmyadmin.net/,phpMyAdmin}のUIでテーブルを作成することもあるかも知れません。Mroongaがインストール済みであれば、phpMyAdminでもストレージエンジンの選択肢にMroongaが追加されていることを確認しているので、同じようにMroongaを使い始めることができます。
+
+== Mroongaのコミュニティ、サポート
+
 == Dockerコンテナの作り直し
 
 == phpMyAdminによるデータの確認・操作
