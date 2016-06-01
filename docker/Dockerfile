@@ -24,6 +24,14 @@ RUN mysqld & sleep 12 && \
     { echo phpmyadmin phpmyadmin/reconfigure-webserver multiselect none; \
     } | debconf-set-selections && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server-mroonga phpmyadmin && \
+    mysql -uroot -e 'CREATE DATABASE pdfsearch' && \
+    mysql -uroot pdfsearch -e 'CREATE TABLE `pdfs` ( \
+        id      INT PRIMARY KEY AUTO_INCREMENT, \
+        file    VARCHAR(255), \
+        title   VARCHAR(255), \
+        content LONGTEXT, \
+        FULLTEXT INDEX (title, content) \
+    ) ENGINE = Mroonga DEFAULT CHARSET utf8' && \
     mysqladmin -uroot shutdown && \
     apt-get clean
 
