@@ -110,6 +110,14 @@ CREATE TABLE `pdfs` (
 
 == Mroongaのコミュニティ、サポート
 
+Mroongaを含むGroongaについては、開発者が日本人であることもあり、日本語で気軽に問い合わせられます。公式サイトにはメーリングリスト、チャット、Twitter、Facebookページについて紹介されているので、質問や要望がある際にはぜひ活用してください。
+
+@<href>{http://mroonga.org/ja/docs/community.html}
+
+また、開発や運用などの有償のサポートサービスもあります。業務で使用する場合には検討するといいでしょう。
+
+@<href>{http://groonga.org/ja/support/}
+
 == Dockerコンテナの作り直し
 
 == phpMyAdminによるデータの確認・操作
