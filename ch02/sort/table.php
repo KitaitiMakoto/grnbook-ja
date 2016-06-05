@@ -8,9 +8,9 @@ class Table
          VALUES(:file, :title, :content);";
     const SELECT = "SELECT * FROM `pdfs` ORDER BY `id`;";
     const SEARCH = <<<EOS
-SELECT file, title, mroonga_snippet_html(content, :query) AS snippets,
-MATCH(title,content) AGAINST(:query IN BOOLEAN MODE) AS score
-FROM `pdfs` WHERE MATCH(title,content) AGAINST(:query IN BOOLEAN MODE)
+SELECT file, title, mroonga_snippet_html(content, :query AS query) AS snippets,
+MATCH(title,content) AGAINST(:query_with_pragma IN BOOLEAN MODE) AS score
+FROM `pdfs` WHERE MATCH(title,content) AGAINST(:query_with_pragma IN BOOLEAN MODE)
 ORDER BY score DESC;
 EOS;
 
@@ -48,7 +48,10 @@ EOS;
     public function search($query)
     {
         $sth = $this->pdo->prepare(self::SEARCH);
-        $params = [':query' => '*D+W1:100,2:1' . $query];
+        $params = [
+          ':query' => $query,
+          ':query_with_pragma' => '*D+W1:100,2:1 ' . $query
+        ];
         $isSucceeded = $sth->execute($params);
         if (! $isSucceeded) {
             throw new \RuntimeException(implode(PHP_EOL, $sth->errorInfo()));
