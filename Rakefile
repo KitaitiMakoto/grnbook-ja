@@ -31,6 +31,11 @@ task :pdf => CHAPS.ext('') do
   sh "review-pdfmaker config.yml"
 end
 
+desc 'Build web files'
+task :webroot => CHAPS.ext('') do
+  sh "review-webmaker config.yml"
+end
+
 desc 'Build all HTML files'
 task :html => WEBS
 
