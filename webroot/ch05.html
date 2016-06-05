@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" type="text/css" href="main.css" />
+<link rel="next" title="データ入力機能の作成" href="ch06.html"><link rel="prev" title="データベースの作成" href="ch04.html">  <meta name="generator" content="Re:VIEW" />
+  <title>テーブルの作成 | Groongaではじめる全文検索</title>
+</head>
+<body>
+  <div class="book">
+    <nav class="side-content">
+      <h1>Groongaではじめる全文検索</h1>
+      <ul class="book-toc">
+<li><a href="index.html">TOP</a></li>
+<li><a href="./intro.html">MySQLで作る全文検索システム</a></li>
+<li><a href="./ch01.html">1 Mroongaの概要</a></li>
+<li><a href="./ch02.html">2 Mroongaの環境の準備</a></li>
+<li><a href="./ch03.html">3 作成する全文検索システムの概要</a></li>
+<li><a href="./ch04.html">4 データベースの作成</a></li>
+<li><a href="./ch05.html">5 テーブルの作成</a></li>
+<li><a href="./ch06.html">6 データ入力機能の作成</a></li>
+<li><a href="./ch07.html">7 全文検索機能の作成</a></li>
+<li><a href="./ch08.html">8 Mroongaならではの機能の作成</a></li>
+<li><a href="./appendix.html">付録</a></li>
+</ul>
+      <p class="review-signature">powered by <a href="http://reviewml.com">Re:VIEW</a></p>
+    </nav>
+    <div class="book-body">
+      <header>
+      </header>
+      <div class="book-page">
+        <h1><a id="h5"></a><span class="secno">第5章　</span>テーブルの作成</h1>
+<p>データベースが出来たので、以下のカラムを持つ<code class="inline-code tt">pdfs</code>テーブル作りましょう。</p>
+<div id="pdfsearch" class="table">
+<p class="caption">表5.1: 作成するpdfsテーブル</p>
+<table>
+<tr><th>カラム</th><th>内容</th><th>データ型</th><th>備考</th></tr>
+<tr><td>path</td><td>システム内のパス（場所）</td><td>VARCHAR(255)</td><td>主キー。検索対象ではない</td></tr>
+<tr><td>title</td><td>PDF文書のタイトル</td><td>VARCHAR(255)</td><td>検索対象</td></tr>
+<tr><td>content</td><td>PDF内のテキスト</td><td>LONGTEXT</td><td>検索対象</td></tr>
+</table>
+</div>
+<p>やり方はデータベースの作成と同様です。</p>
+<div class="caption-code">
+<p class="caption">リスト5.1: create-table.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;DBNAME&#39;</span>, <span style="color: #BA2121">&#39;pdfsearch&#39;</span>);
+<span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;TABLE_NAME&#39;</span>, <span style="color: #BA2121">&#39;pdfs&#39;</span>);
+
+<span style="color: #19177C">$dsn</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;mysql:host=localhost;dbname=&#39;</span> <span style="color: #666666">.</span> DBNAME <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;;charset=utf8&#39;</span>;
+<span style="color: #19177C">$dbh</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> PDO(<span style="color: #19177C">$dsn</span>, <span style="color: #BA2121">&#39;root&#39;</span>, <span style="color: #BA2121">&#39;&#39;</span>);
+<span style="color: #19177C">$table</span> <span style="color: #666666">=</span> TABLE_NAME;
+
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span>) {
+    <span style="color: #19177C">$statement</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>STATEMENT
+CREATE TABLE <span style="color: #BA2121">`{$table}`</span> (
+    id      INT PRIMARY KEY AUTO_INCREMENT,
+    <span style="color: #008000">file</span>    VARCHAR(<span style="color: #666666">255</span>),
+    title   VARCHAR(<span style="color: #666666">255</span>),
+    content LONGTEXT,
+    FULLTEXT INDEX (title,content)
+) ENGINE <span style="color: #666666">=</span> Mroonga <span style="color: #008000; font-weight: bold">DEFAULT</span> CHARSET utf8;
+STATEMENT;
+    <span style="color: #19177C">$dbh</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">exec</span>(<span style="color: #19177C">$statement</span>);
+
+    <span style="color: #008000">header</span>(<span style="color: #BA2121">&quot;Location: </span><span style="color: #BB6688; font-weight: bold">{</span><span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_URI&#39;</span>]<span style="color: #BB6688; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>);
+}
+
+<span style="color: #19177C">$result</span> <span style="color: #666666">=</span> <span style="color: #19177C">$dbh</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">query</span>(<span style="color: #BA2121">&#39;SHOW TABLES&#39;</span>)<span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+<span style="color: #19177C">$tables</span> <span style="color: #666666">=</span> <span style="color: #008000">array_map</span>(<span style="color: #008000; font-weight: bold">function</span>(<span style="color: #19177C">$row</span>) {
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$row</span>[<span style="color: #666666">0</span>];
+}, <span style="color: #19177C">$result</span>);
+
+<span style="color: #BC7A00">?&gt;</span>
+&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;テーブルの作成&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;テーブルの作成&lt;/h1&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> (<span style="color: #008000">in_array</span>(TABLE_NAME, <span style="color: #19177C">$tables</span>)))<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+    &lt;form method=&quot;post&quot;&gt;
+      &lt;input type=&quot;submit&quot; value=&quot;pdfsテーブルの作成&quot;&gt;
+    &lt;/form&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endif</span>; <span style="color: #BC7A00">?&gt;</span>
+    &lt;h2&gt;現在のテーブル一覧&lt;/h2&gt;
+    &lt;ul&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$tables</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$table</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+      &lt;li&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> <span style="color: #008000">htmlspecialchars</span>(<span style="color: #19177C">$table</span>, ENT_QUOTES, <span style="color: #BA2121">&#39;UTF-8&#39;</span>) <span style="color: #BC7A00">?&gt;</span>&lt;/li&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+    &lt;/ul&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+</div>
+<p>http://localhost:8080/create-table.phpにアクセスして<code class="inline-code tt">pdfs</code>テーブルを作成してみましょう。事前に<code class="inline-code tt">pdfsearch</code>テーブルを作っておかないとエラーになるので注意してください。</p>
+<p>データベース作成時と違って、Mroongaを使ったテーブルを作る時にはいくつか注意点があります。</p>
+<p>一番大事なのは、<code class="inline-code tt">CREATE TABLE</code>文の最後に、ストレージエンジンとしてMroongaを指定することです。</p>
+<div class="emlist-code">
+<pre class="emlist"><span style="color: #008000; font-weight: bold">CREATE</span> <span style="color: #008000; font-weight: bold">TABLE</span> (
+<span style="color: #408080; font-style: italic">-- ...</span>
+) ENGINE <span style="color: #666666">=</span> Mroonga <span style="color: #008000; font-weight: bold">DEFAULT</span> CHARSET utf8;
+</pre>
+</div>
+<p>普段はInnoDBやMyISAMを指定しているところを切り替えるだけなので、難しいことはないでしょう。</p>
+<p>次に、インデックスの作成方法がInnoDBなどと異なります。PDFのタイトルや内容を完全一致で検索することはまずないでしょうから、通常のインデックスは必要ありません。代わりに、全文検索のための特別なインデックスを作る、<code class="inline-code tt">FULLTEXT INDEX</code>構文を使用します。これは、MySQLに元々備わっている、全文検索機能のための構文です。Mroongaでも用途は同じなので、全く同じ構文で使用できます。</p>
+<p>それ以外は、通常のMySQL使い方と同じです。主キーにはパスといった意味のある物ではなく、ただレコードを識別するためだけのサロゲートキーを使う人もいることでしょう。それでも構いません。</p>
+      </div>
+      <nav class="book-navi book-prev">
+                <a href="ch04.html">
+          <div class="book-cursor"><span class="cursor-prev">◀</span></div>
+        </a>
+              </nav>
+      <nav class="book-navi book-next">
+                <a href="ch06.html">
+          <div class="book-cursor"><span class="cursor-next">▶</span></div>
+        </a>
+              </nav>
+    </div>
+  </div>
+  <footer>
+      </footer>
+  </body>
+</html>

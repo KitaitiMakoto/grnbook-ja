@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ops="http://www.idpf.org/2007/ops" xml:lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" type="text/css" href="main.css" />
+  <meta name="generator" content="Re:VIEW" />
+  <title>データベースの作成</title>
+</head>
+<body>
+<h1><a id="h4"></a><span class="secno">第4章　</span>データベースの作成</h1>
+<p>まず、PHPを使って、MySQLにデータベースを作成します。作成の手順は通常のMySQLでのデータベース作成と同様です。Dockerコンテナ内では既にMySQLが動作しており、<code class="inline-code tt">root</code>ユーザーでパスワード無しでログインできます。</p>
+<p>ソースコードは以下のようになります。<a id="fnb-loosephp" href="#fn-loosephp" class="noteref" epub:type="noteref">*1</a></p>
+<div class="caption-code">
+<p class="caption">リスト4.1: create-database.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;DBNAME&#39;</span>, <span style="color: #BA2121">&#39;pdfsearch&#39;</span>);
+
+<span style="color: #19177C">$dbh</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> PDO(<span style="color: #BA2121">&#39;mysql:host=localhost;charset=utf8&#39;</span>, <span style="color: #BA2121">&#39;root&#39;</span>, <span style="color: #BA2121">&#39;&#39;</span>);
+
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span>) {
+    <span style="color: #19177C">$result</span> <span style="color: #666666">=</span> <span style="color: #19177C">$dbh</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">exec</span>(<span style="color: #BA2121">&#39;CREATE DATABASE &#39;</span> <span style="color: #666666">.</span> DBNAME);
+
+    <span style="color: #008000">header</span>(<span style="color: #BA2121">&quot;Location: </span><span style="color: #BB6688; font-weight: bold">{</span><span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_URI&#39;</span>]<span style="color: #BB6688; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>);
+}
+
+<span style="color: #19177C">$result</span> <span style="color: #666666">=</span> <span style="color: #19177C">$dbh</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">query</span>(<span style="color: #BA2121">&#39;SHOW DATABASES&#39;</span>)<span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+<span style="color: #19177C">$databases</span> <span style="color: #666666">=</span> <span style="color: #008000">array_map</span>(<span style="color: #008000; font-weight: bold">function</span>(<span style="color: #19177C">$row</span>) {
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$row</span>[<span style="color: #666666">0</span>];
+}, <span style="color: #19177C">$result</span>);
+<span style="color: #BC7A00">?&gt;</span>
+&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;データベースの作成&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;データベースの作成&lt;/h1&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> (<span style="color: #008000">in_array</span>(DBNAME, <span style="color: #19177C">$databases</span>)))<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+    &lt;form method=&quot;post&quot;&gt;
+      &lt;input type=&quot;submit&quot; value=&quot;pdfsearchデータベースの作成&quot;&gt;
+    &lt;/form&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endif</span>; <span style="color: #BC7A00">?&gt;</span>
+    &lt;h2&gt;現在のデータベース一覧&lt;/h2&gt;
+    &lt;ul&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$databases</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$database</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+      &lt;li&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> <span style="color: #008000">htmlspecialchars</span>(<span style="color: #19177C">$database</span>, ENT_QUOTES, <span style="color: #BA2121">&#39;UTF-8&#39;</span>); <span style="color: #BC7A00">?&gt;</span>&lt;/li&gt;
+    <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+    &lt;/ul&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+</div>
+<p>通常のMySQLに於けるデータベースと全く同じ手順でデータベースを作成していることが分かると思います。Mroongaを使う場合にも、データベースの作成には特別なことはありません。</p>
+<p>うまくできたら、http://localhost:8080/create-database.phpを表示して、実際に画面上のボタンを押してデータベースを作成してみましょう。「現在のデータベース一覧」に「pdfsearch」というデータベースが加わるはずです。</p>
+<div class="footnote" epub:type="footnote" id="fn-loosephp"><p class="footnote">[*1] 限定された状況での一度きりの処理のため、褒められない書き方をしている箇所もあります。実際のアプリケーションで使用する場合には、フレームワークなどのやり方に則った適切な方法でデータベースを操作してください。</p></div>
+<div class="column">
+
+<h2><a id="column-1"></a>PHPのデバッグ</h2>
+<p>PHPが期待通りに動作しない場合や画面が真っ白になって何が悪いか分からない場合は、<code class="inline-code tt">docker logs</code>コマンドでログを確認することができます。</p>
+<div class="caption-code">
+<p class="caption">リスト4.2: docker logsでPHPのログを確認</p>
+<pre class="list">% docker log pdfsearch
+13.03.2016 09:41:25 INFO  -- [web:php] switch :starting [:unmonitored =&gt; :starting] (reason: monitor by user)
+160313 09:41:26 mysqld_safe Can&#39;t log to error log and syslog at the same time.  Remove all --log-error configuration options for --syslog to take effect.
+160313 09:41:26 mysqld_safe Logging to &#39;/var/log/mysql/error.log&#39;.
+160313 09:41:27 mysqld_safe Starting mysqld daemon with databases from /var/lib/mysql
+[Sun Mar 13 09:41:54 2016] 172.17.0.1:58804 [200]: /create-database.php
+[Sun Mar 13 09:41:55 2016] 172.17.0.1:58808 [404]: /favicon.ico - No such file or directory
+[Sun Mar 13 09:42:01 2016] PHP Parse error:  syntax error, unexpected &#39;$databases&#39; (T_VARIABLE) in /var/lib/pdfsearch/create-database.php on line 14
+[Sun Mar 13 09:42:01 2016] 172.17.0.1:58812 [500]: /create-database.php - syntax error, unexpected &#39;$databases&#39; (T_VARIABLE) in /var/lib/pdfsearch/create-database.php on line 14
+</pre>
+</div>
+<p><code class="inline-code tt">-f</code>オプションを付け</p>
+<div class="emlist-code">
+<pre class="emlist">% docker logs -f pdfsearch
+</pre>
+</div>
+<p>と実行すると、ログが出力する度にそのログが表示されます。Dockerコンテナの中では<a href="http://php.net/manual/ja/features.commandline.webserver.php" class="link">PHPのビルトインサーバー</a>が動作しているため、ログの内容もそれに準じます。</p>
+<p>また、ブラウザーでエラー内容を確認したい場合には、PHPファイルの冒頭で</p>
+<div class="emlist-code">
+<pre class="emlist"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000">ini_set</span>(<span style="color: #BA2121">&#39;dispaly_errors&#39;</span>, <span style="color: #BA2121">&#39;stdout&#39;</span>);
+</pre>
+</div>
+<p>と設定するとよいでしょう。</p>
+</div>
+</body>
+</html>

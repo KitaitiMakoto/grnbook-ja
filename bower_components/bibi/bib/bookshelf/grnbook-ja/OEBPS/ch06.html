@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ops="http://www.idpf.org/2007/ops" xml:lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" type="text/css" href="main.css" />
+  <meta name="generator" content="Re:VIEW" />
+  <title>データ入力機能の作成</title>
+</head>
+<body>
+<h1><a id="h6"></a><span class="secno">第6章　</span>データ入力機能の作成</h1>
+<p>いよいよアプリケーションらしい所を作っていきます。始めから検索機能に着手したいところですが、データがないことには何もできないので、入力機能から作成します。</p>
+<p>PDFファイルの内容をMySQLに登録するために、以下のようなステップを踏むことになります。</p>
+<ol>
+<li>PHPによるウェブUIから一時ディレクトリーにアップロードする</li>
+<li>PDFファイルからタイトルと本文テキストを抽出する</li>
+<li>タイトルと本文をMySQLの適切なカラムに挿入する</li>
+</ol>
+
+<h2><a id="h6-1"></a><span class="secno">6.1　</span>PDFのアップロード機能を作る</h2>
+<p>まずはPDFのアップロード機能を作りましょう。PDFファイルその物は後で使うことはないので、一時ディレクトリーに置いたままで構いません。</p>
+<p>ユーザーが表示させる起点の画面をindex.php、そのファイルから呼び出すアップロード機能の部分をupload.phpとして実装することにします。</p>
+<div class="caption-code">
+<p class="caption">リスト6.1: index.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000; font-weight: bold">require_once</span> __DIR__ <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;/upload.php&#39;</span>;
+
+<span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">h</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span> <span style="color: #666666">=</span> ENT_QUOTES, <span style="color: #19177C">$encoding</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;UTF-8&#39;</span>)
+{
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">htmlspecialchars</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span>, <span style="color: #19177C">$encoding</span>);
+}
+
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span> <span style="color: #666666">&amp;&amp;</span> <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;pdf&#39;</span>, <span style="color: #19177C">$_FILES</span>)) {
+    <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> \PDFSearch\Upload<span style="color: #666666">::</span><span style="color: #7D9029">fromFilesInfo</span>(<span style="color: #19177C">$_FILES</span>[<span style="color: #BA2121">&#39;pdf&#39;</span>]);
+}
+
+<span style="color: #BC7A00">?&gt;</span>&lt;!doctype html&gt;
+&lt;title&gt;PDF Search&lt;/title&gt;
+&lt;h1&gt;PDF Search&lt;/h1&gt;
+
+&lt;h2&gt;アップロードされたファイル&lt;/h2&gt;
+<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #008000; font-weight: bold">empty</span>(<span style="color: #19177C">$uploads</span>))<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$uploads</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$upload</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+&lt;p&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getName</span>()); <span style="color: #BC7A00">?&gt;</span>&lt;/p&gt;
+<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endif</span>; <span style="color: #BC7A00">?&gt;</span>
+
+&lt;form enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
+  &lt;input name=&quot;pdf[]&quot; type=&quot;file&quot; multiple&gt;
+  &lt;input type=&quot;submit&quot;&gt;
+&lt;/form&gt;
+</pre>
+</div>
+<div class="caption-code">
+<p class="caption">リスト6.2: upload.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
+
+<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Upload</span>
+{
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$name</span>;
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$tmpName</span>;
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">static</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">fromFilesInfo</span>(<span style="color: #008000; font-weight: bold">array</span> <span style="color: #19177C">$info</span>)
+    {
+        <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">array</span>();
+        <span style="color: #19177C">$fileCount</span> <span style="color: #666666">=</span> <span style="color: #008000">count</span>(<span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;name&#39;</span>]);
+        <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #19177C">$i</span> <span style="color: #666666">=</span> <span style="color: #666666">0</span>; <span style="color: #19177C">$i</span> <span style="color: #666666">&lt;</span> <span style="color: #19177C">$fileCount</span>; <span style="color: #19177C">$i</span><span style="color: #666666">++</span>) {
+            <span style="color: #19177C">$name</span> <span style="color: #666666">=</span> <span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;name&#39;</span>][<span style="color: #19177C">$i</span>];
+            <span style="color: #19177C">$tmpName</span> <span style="color: #666666">=</span> <span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;tmp_name&#39;</span>][<span style="color: #19177C">$i</span>];
+            <span style="color: #19177C">$uploads</span>[] <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> Upload(<span style="color: #19177C">$name</span>, <span style="color: #19177C">$tmpName</span>);
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$uploads</span>;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$name</span>, <span style="color: #19177C">$tmpName</span>)
+    {
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">name</span> <span style="color: #666666">=</span> <span style="color: #19177C">$name</span>;
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">tmpName</span> <span style="color: #666666">=</span> <span style="color: #19177C">$tmpName</span>;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">getName</span>()
+    {
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">name</span>;
+    }
+}
+</pre>
+</div>
+<p>今の所、単にアップロードされたファイルの名前を表示しているだけです。後でその他の機能を実装していきます。複数のファイルをアップロードすると<a id="fnb-multi-select" href="#fn-multi-select" class="noteref" epub:type="noteref">*1</a>、全てが表示されることも確認してみてください。</p>
+<div id="upload" class="image">
+<img src="images/ch06/upload.png" alt="ファイルアップロード画面" />
+<p class="caption">
+図6.1: ファイルアップロード画面
+</p>
+</div>
+<p>紙幅を減らすため、細かな検証は省略しています。実際に運用するアプリケーションでは安全性やエラーのチェックなどをしっかりと行ってください。</p>
+<div class="footnote" epub:type="footnote" id="fn-multi-select"><p class="footnote">[*1] ファイル選択ダイアログでCtrlキーを押しながらファイルをクリックしていくことで、選んだファイルを同時にアップロードできます。また、Shiftを押しながら最初のファイルと最後のファイルをクリックすることで、その間にあるファイルをすべて選択状態にできます。</p></div>
+
+<h2><a id="h6-2"></a><span class="secno">6.2　</span>PDFからの情報を抽出する</h2>
+<p>次に、PDFファイルからタイトルと本文を抜き出す処理を実装します。これを行うにはいくつか方法がありますが、ここでは<a href="https://github.com/php-poppler/php-poppler" class="link">php-poppler</a>というライブラリーを使うことにします。php-popplerを使うとPDFを解析してタイトルや本文を抜き出すことができます<a id="fnb-poppler" href="#fn-poppler" class="noteref" epub:type="noteref">*2</a>。</p>
+<p>php-popplerは<code class="inline-code tt">Poppler</code>名前空間にいくつかのクラスを定義しており、以下のようにして使います。</p>
+<div class="emlist-code">
+<p class="caption">php-popplerの基本的な使い方</p>
+<pre class="emlist"><span style="color: #BC7A00">&lt;?php</span>
+
+<span style="color: #408080; font-style: italic">// pdfinfoコマンドのラッパー</span>
+<span style="color: #19177C">$pdfinfo</span> <span style="color: #666666">=</span> \Poppler\Driver\Pdfinfo<span style="color: #666666">::</span><span style="color: #7D9029">create</span>();
+<span style="color: #408080; font-style: italic">// pdftotextコマンドのラッパー</span>
+<span style="color: #19177C">$pdftotext</span> <span style="color: #666666">=</span> \Poppler\Driver\Pdftotext<span style="color: #666666">::</span><span style="color: #7D9029">create</span>();
+<span style="color: #408080; font-style: italic">// pdftohtmlコマンドのラッパー</span>
+<span style="color: #19177C">$pdftohtml</span> <span style="color: #666666">=</span> \Poppler\Driver\Pdftohtml<span style="color: #666666">::</span><span style="color: #7D9029">create</span>();
+
+<span style="color: #19177C">$pdf</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \Poppler\Processer\Pdffile(<span style="color: #19177C">$pdfinfo</span>, <span style="color: #19177C">$pdftotet</span>, <span style="color: #19177C">$peftohtml</span>);
+
+<span style="color: #408080; font-style: italic">// PDFからタイトルや著者、作成日時などの情報を連想配列として抜き出す</span>
+<span style="color: #008000; font-weight: bold">echo</span> <span style="color: #19177C">$pdf</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getInfo</span>(<span style="color: #BA2121">&#39;path/to/document.pdf&#39;</span>);
+<span style="color: #408080; font-style: italic">// PDFから本文テキストを抜き出す</span>
+<span style="color: #008000; font-weight: bold">echo</span> <span style="color: #19177C">$pdf</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">toText</span>(<span style="color: #BA2121">&#39;path/to/document.pdf&#39;</span>);
+</pre>
+</div>
+<p>HTML関連の機能を使わないとしても、<code class="inline-code tt">\Poppler\Processer\Pdffile</code>のコンストラクターには<code class="inline-code tt">\Poppler\Driver\Pdftohtml</code>のインスタンスを渡す必要があるので注意してください。</p>
+<p>Dockerイメージの中には、既にPopplerとphp-popplerがインストール済みです。php-popplerはComposerでインストールしているので、<code class="inline-code tt">vendor/autoload.php</code>を読み込むことで、オートロードが有効になります。</p>
+<p>これを使って、先ほど作った<code class="inline-code tt">\PDFSearch\Upload</code>クラスにPDF関連の機能を追加します。</p>
+<div class="caption-code">
+<p class="caption">リスト6.3: upload.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
+
+<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Upload</span>
+{
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$name</span>;
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$tmpName</span>;
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">static</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">fromFilesInfo</span>(<span style="color: #008000; font-weight: bold">array</span> <span style="color: #19177C">$info</span>)
+    {
+        <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">array</span>();
+        <span style="color: #19177C">$fileCount</span> <span style="color: #666666">=</span> <span style="color: #008000">count</span>(<span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;name&#39;</span>]);
+        <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #19177C">$i</span> <span style="color: #666666">=</span> <span style="color: #666666">0</span>; <span style="color: #19177C">$i</span> <span style="color: #666666">&lt;</span> <span style="color: #19177C">$fileCount</span>; <span style="color: #19177C">$i</span><span style="color: #666666">++</span>) {
+            <span style="color: #19177C">$name</span> <span style="color: #666666">=</span> <span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;name&#39;</span>][<span style="color: #19177C">$i</span>];
+            <span style="color: #19177C">$tmpName</span> <span style="color: #666666">=</span> <span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;tmp_name&#39;</span>][<span style="color: #19177C">$i</span>];
+            <span style="color: #19177C">$uploads</span>[] <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> Upload(<span style="color: #19177C">$name</span>, <span style="color: #19177C">$tmpName</span>);
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$uploads</span>;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$name</span>, <span style="color: #19177C">$tmpName</span>)
+    {
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">name</span> <span style="color: #666666">=</span> <span style="color: #19177C">$name</span>;
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">tmpName</span> <span style="color: #666666">=</span> <span style="color: #19177C">$tmpName</span>;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">getName</span>()
+    {
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">name</span>;
+    }
+}
+</pre>
+</div>
+<p>実際にPDFファイルをアップロードして、タイトルなどの情報が取得できているか確認しましょう。</p>
+<div id="extract" class="image">
+<img src="images/ch06/extract.png" alt="PDF内の情報を取得" />
+<p class="caption">
+図6.2: PDF内の情報を取得
+</p>
+</div>
+<div class="footnote" epub:type="footnote" id="fn-poppler"><p class="footnote">[*2] C製のPDFライブラリーでPopplerという物があり、PDFを扱う様々なコマンドラインツールの提供もしています。php-popplerはこれらのコマンド呼び出しをラップしてPHPから扱いやすくした物です。</p></div>
+
+<h2><a id="h6-3"></a><span class="secno">6.3　</span>データベースにデータを挿入する</h2>
+<p>それでは、いよいよMroongaにデータを入力しましょう。と言っても、いつも通り<code class="inline-code tt">PDO</code>クラスで<code class="inline-code tt">INSERT</code>文を実行するだけです。Mroongaの方で自動的に検索用のインデックスを作成してくれます。Dockerイメージ内に既にMySQL用のアダプターはインストールされていますので、単にPHPから呼び出すだけで使用できます。</p>
+<p>データベースを扱う<code class="inline-code tt">\PDFSearch\Table</code>クラスを実装し、<code class="inline-code tt">index.php</code>でそのクラスを使うようにしたのが以下の内容です。<code class="inline-code tt">\PDFSearch\Upload</code>には変更がないため省略しています。</p>
+<div class="caption-code">
+<p class="caption">リスト6.4: index.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #408080; font-style: italic">// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む</span>
+<span style="color: #008000; font-weight: bold">require_once</span> <span style="color: #BA2121">&#39;vendor/autoload.php&#39;</span>;
+<span style="color: #008000; font-weight: bold">require_once</span> __DIR__ <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;/upload.php&#39;</span>;
+<span style="color: #008000; font-weight: bold">require_once</span> __DIR__ <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;/table.php&#39;</span>;
+
+<span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;DBNAME&#39;</span>, <span style="color: #BA2121">&#39;pdfsearch&#39;</span>);
+
+<span style="color: #19177C">$dsn</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;mysql:host=localhost;dbname=&#39;</span> <span style="color: #666666">.</span> DBNAME <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;;charset=utf8&#39;</span>;
+<span style="color: #19177C">$table</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDFSearch\Table(<span style="color: #19177C">$dsn</span>, <span style="color: #BA2121">&#39;root&#39;</span>, <span style="color: #BA2121">&#39;&#39;</span>);
+
+<span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">h</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span> <span style="color: #666666">=</span> ENT_QUOTES, <span style="color: #19177C">$encoding</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;UTF-8&#39;</span>)
+{
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">htmlspecialchars</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span>, <span style="color: #19177C">$encoding</span>);
+}
+
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span> <span style="color: #666666">&amp;&amp;</span> <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;pdf&#39;</span>, <span style="color: #19177C">$_FILES</span>)) {
+    <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> \PDFSearch\Upload<span style="color: #666666">::</span><span style="color: #7D9029">fromFilesInfo</span>(<span style="color: #19177C">$_FILES</span>[<span style="color: #BA2121">&#39;pdf&#39;</span>]);
+    <span style="color: #008000; font-weight: bold">try</span> {
+        <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$uploads</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$upload</span>) {
+            <span style="color: #19177C">$tableb</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">insert</span>(<span style="color: #19177C">$upload</span>);
+        }
+        <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;Location: .&#39;</span>);
+    } <span style="color: #008000; font-weight: bold">catch</span> (\RuntimeException <span style="color: #19177C">$e</span>) {
+        <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;HTTP&#39;</span>, <span style="color: #008000; font-weight: bold">true</span>, <span style="color: #666666">500</span>);
+        <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;content-type: text/plain&#39;</span>);
+        <span style="color: #008000; font-weight: bold">echo</span> <span style="color: #19177C">$e</span>;
+    }
+    <span style="color: #008000; font-weight: bold">exit</span>;
+}
+
+<span style="color: #19177C">$records</span> <span style="color: #666666">=</span> <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">records</span>();
+
+<span style="color: #BC7A00">?&gt;</span>&lt;!doctype html&gt;
+&lt;title&gt;PDF Search&lt;/title&gt;
+&lt;h1&gt;PDF Search&lt;/h1&gt;
+
+&lt;h2&gt;登録済みPDF一覧&lt;/h2&gt;
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;ファイル名&lt;/th&gt;
+    &lt;th&gt;タイトル&lt;/th&gt;
+    &lt;th&gt;内容&lt;/th&gt;
+  &lt;/tr&gt;
+  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$records</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$record</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+    &lt;tr&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;file&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;title&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
+      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #008000">mb_substr</span>(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;content&#39;</span>], <span style="color: #666666">0</span>, <span style="color: #666666">120</span>)); <span style="color: #BC7A00">?&gt;</span>&amp;hellip;&amp;hellip;&lt;/td&gt;
+    &lt;/tr&gt;
+  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+&lt;/table&gt;
+
+&lt;form enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
+  &lt;input name=&quot;pdf[]&quot; type=&quot;file&quot; multiple&gt;
+  &lt;input type=&quot;submit&quot;&gt;
+&lt;/form&gt;
+</pre>
+</div>
+<div class="caption-code">
+<p class="caption">リスト6.5: table.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
+
+<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Table</span>
+{
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">INSERT</span> <span style="color: #666666">=</span>
+        <span style="color: #BA2121">&quot;INSERT INTO `pdfs` (file, title, content)</span>
+<span style="color: #BA2121">         VALUES(:file, :title, :content);&quot;</span>;
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SELECT</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;</span>;
+
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$pdo</span>;
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>)
+    {
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDO(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>);
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">insert</span>(Upload <span style="color: #19177C">$upload</span>)
+    {
+        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [
+            <span style="color: #BA2121">&#39;:file&#39;</span>    <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getName</span>(),
+            <span style="color: #BA2121">&#39;:title&#39;</span>   <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getTitle</span>(),
+            <span style="color: #BA2121">&#39;:content&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getContent</span>()
+        ];
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">INSERT</span>);
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">records</span>()
+    {
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SELECT</span>);
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>();
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+    }
+}
+</pre>
+</div>
+<p>ウェブブラウザーでアクセスして、データベースの中身を表示してみましょう。</p>
+<div id="insert" class="image">
+<img src="images/ch06/insert.png" alt="アップロードしたPDFの情報を表示" />
+<p class="caption">
+図6.3: アップロードしたPDFの情報を表示
+</p>
+</div>
+</body>
+</html>
