@@ -19,7 +19,7 @@ CLOBBER.include WEBS
 task :default => :book
 
 desc 'Build files of the book'
-task :book => [:epub, :pdf]
+task :book => [:epub, :pdf, :webroot]
 
 desc 'Build EPUB file'
 task :epub => CHAPS.ext('') do
