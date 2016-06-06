@@ -80,5 +80,5 @@ task :gh_pages => [:gh_pages_worktree, :book] do
 end
 
 task :gh_pages_worktree do
-  sh 'git worktree add gh-pages gh-ages' unless File.directory? GH_PAGES_WORKTREE
+  sh 'git worktree add gh-pages gh-pages' unless File.directory? GH_PAGES_WORKTREE
 end
