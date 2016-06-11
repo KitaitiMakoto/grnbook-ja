@@ -147,11 +147,27 @@
     {
         <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">name</span> <span style="color: #666666">=</span> <span style="color: #19177C">$name</span>;
         <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">tmpName</span> <span style="color: #666666">=</span> <span style="color: #19177C">$tmpName</span>;
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdf</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \Poppler\Processor\PdfFile(
+          \Poppler\Driver\Pdfinfo<span style="color: #666666">::</span><span style="color: #7D9029">create</span>(),
+          \Poppler\Driver\Pdftotext<span style="color: #666666">::</span><span style="color: #7D9029">create</span>(),
+          \Poppler\Driver\Pdftohtml<span style="color: #666666">::</span><span style="color: #7D9029">create</span>()
+        );
     }
 
     <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">getName</span>()
     {
         <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">name</span>;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">getTitle</span>()
+    {
+        <span style="color: #19177C">$info</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdf</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getInfo</span>(<span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">tmpName</span>);
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;Title&#39;</span>];
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">getContent</span>()
+    {
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdf</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">toText</span>(<span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">tmpName</span>);
     }
 }
 </pre>

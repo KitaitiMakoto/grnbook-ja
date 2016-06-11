@@ -31,12 +31,14 @@
       </header>
       <div class="book-page">
         <h1><a id="h7"></a><span class="secno">第7章　</span>全文検索機能の作成</h1>
-<p>ようやく、全文検索機能の実装です。実は、これもMroongaならではの特別なことは必要なく、通常のMySQLの全文検索機能、即ち<code class="inline-code tt">MATCH() ... AGAINST</code>構文を使用するだけです。テーブル作成時に、ストレージエンジンにMroongaを選択しておけば、他の操作は通常のMySQLと同じように実行できるようにデザインされているのです。</p>
-<p><code class="inline-code tt">MATCH() ... AGAINST</code>構文は元々MySQLに備わっている全文検索用の構文です。<code class="inline-code tt">MATCH</code>には検索対象にするカラム名を渡します。ここで指定できるのは、テーブル作成時に<code class="inline-code tt">FULLTEXT</code>インデックスを指定したカラムのみです。Docker内のテーブルでは、予め<code class="inline-code tt">title</code>カラムと<code class="inline-code tt">content</code>カラムに<code class="inline-code tt">FULLTEXT</code>インデックスを張っています。<code class="inline-code tt">AGAINST</code>には検索クエリーを渡します。オプションを渡すこともできます。詳細は<a href="https://dev.mysql.com/doc/refman/5.6/ja/fulltext-search.html" class="link">MySQLのドキュメント</a>を参照してください。</p>
+<p>ようやく、全文検索機能の実装です。実は、これもMroongaならではの特別なことは必要なく、通常のMySQLの全文検索機能、即ち<code class="inline-code tt">MATCH() ... AGAINST()</code>構文を使用するだけです。テーブル作成時に、ストレージエンジンにMroongaを選択しておけば、他の操作は通常のMySQLと同じように実行できるようにデザインされているのです。</p>
+<p><code class="inline-code tt">MATCH() ... AGAINST()</code>構文は元々MySQLに備わっている全文検索用の構文です。<code class="inline-code tt">MATCH</code>には検索対象にするカラム名を渡します。ここで指定できるのは、テーブル作成時に<code class="inline-code tt">FULLTEXT</code>インデックスを指定したカラムのみです。Docker内のテーブルでは、予め<code class="inline-code tt">title</code>カラムと<code class="inline-code tt">content</code>カラムのセットに<code class="inline-code tt">FULLTEXT</code>インデックスを張っています。<code class="inline-code tt">AGAINST</code>には検索クエリーを渡します。オプションを渡すこともできます。詳細は<a href="https://dev.mysql.com/doc/refman/5.6/ja/fulltext-search.html" class="link">MySQLのドキュメント</a>を参照してください。</p>
 <p>Mroongaではこの構文を流用しており、元の挙動を知っている人にはおおよそ期待通りに動作するようになっていますが、厳密に同じではありません。Mroongaでのみ使える様々な機能が使えるようになっています。これについては、一旦基本の検索機能を作ったあとで触れたいと思います。</p>
+
+<h2><a id="h7-1"></a><span class="secno">7.1　</span>一検索語用の実装</h2>
 <p>今の「登録済みPDF一覧」の上に検索フォームを作成し、検索を実行した場合にはフォームの下に検索結果を表示するようにしてみましょう。そのために、<code class="inline-code tt">\PDFSearch\Table</code>クラスに検索用のメンバー関数を追加します。</p>
 <div class="caption-code">
-<p class="caption">リスト7.1: search.php</p>
+<p class="caption">リスト7.3: search.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
 
@@ -47,7 +49,7 @@
 <span style="color: #BA2121">         VALUES(:file, :title, :content);&quot;</span>;
     <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SELECT</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;</span>;
     <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>EOS
-SELECT <span style="color: #666666">*</span> FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(content) AGAINST(<span style="color: #666666">:</span>query IN BOOLEAN MODE);
+SELECT <span style="color: #666666">*</span> FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(title, content) AGAINST(<span style="color: #666666">:</span>query IN BOOLEAN MODE);
 EOS;
 
     <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$pdo</span>;
@@ -128,7 +130,7 @@ EOS;
     <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> \PDFSearch\Upload<span style="color: #666666">::</span><span style="color: #7D9029">fromFilesInfo</span>(<span style="color: #19177C">$_FILES</span>[<span style="color: #BA2121">&#39;pdf&#39;</span>]);
     <span style="color: #008000; font-weight: bold">try</span> {
         <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$uploads</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$upload</span>) {
-            <span style="color: #19177C">$tableb</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">insert</span>(<span style="color: #19177C">$upload</span>);
+            <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">insert</span>(<span style="color: #19177C">$upload</span>);
         }
         <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;Location: .&#39;</span>);
     } <span style="color: #008000; font-weight: bold">catch</span> (\RuntimeException <span style="color: #19177C">$e</span>) {
@@ -198,7 +200,89 @@ EOS;
 図7.1: 全文検索結果の表示
 </p>
 </div>
-<p>以上で、基本的な機能は完成です。以降では、Mroongaに特徴的な幾つかの機能を紹介し、実装していきます。</p>
+<p>以上で、基本的な機能は完成です。</p>
+
+<h2><a id="h7-2"></a><span class="secno">7.2　</span>AND検索の実装</h2>
+<p>一単語で検索している間は気になりませんが、検索フォームに二単語入れると、検索結果に違和感を覚えるかも知れません。例えば「cat MySQL」で検索した場合に、「catは含んでいるが、MySQLは含んでいない」という文書がヒットする（OR検索になっている）ためです。こういう結果が望ましい場面もありますが、Google検索はこうではなく「cat MySQL」で検索した場合には「catもMySQLも両方とも含んでいるページ」が検索結果上位に登場するようになっています（AND検索になっている）。Google検索には非常にたくさんの人が馴染んでいるため、どちらの挙動でもいい場合には合わせておくのがいいでしょう。</p>
+<p>Mroongaでこのような挙動になっているのは、MySQLのブーリアンモードによる全文検索が、デフォルトでこのようになっているためです。AND検索になるよう、何らかの処理を追加する必要があります。</p>
+<p>方法は二つあり、一つは、PHPでクエリーパラメーター（<code class="inline-code tt">$_GET['q']</code>）を単語に分割し、それぞれにAND検索用の命令を追加していく方法です。Mroongaに限らずMySQLの全文検索でも使える汎用的な方法ですが、SQLインジェクション脆弱性などを作り込まずにPHPを書いていく必要があり、本書のスコープ外になるためここでは採用しません。</p>
+<p>もう一つは、SQLのクエリーを実行するタイミングで、クエリー内容の解釈を変更させる「<b class="kw">プラグマ</b><!-- IDX:プラグマ -->」というMroonga特有の命令を使う方法です。プラグマは<code class="inline-code tt">AGAINST()</code>句内で使用し、次のようになります。</p>
+<div class="emlist-code">
+<p class="caption">プラグマを追加したクエリー</p>
+<pre class="emlist">AGAINST(<span style="color: #BA2121">&#39;*D+ cat Ruby&#39;</span> <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>)
+</pre>
+</div>
+<p>検索語の先頭に追加されたのがプラグマです。以下のような構文になっています。</p>
+<ul>
+<li>「<code class="inline-code tt">*</code>」で開始する</li>
+<li>プラグマの種類を指定する。種類には「<code class="inline-code tt">D</code>」や「<code class="inline-code tt">W</code>」などがある</li>
+<li>種類の後に、そのプラグマの詳細な挙動を指定するパラメーターを指定する（指定方法はプラグマごとに異なる）。ここでは「<code class="inline-code tt">+</code>」を指定している</li>
+<li>検索語の前に空白文字を置く</li>
+</ul>
+<p>検索をAND検索にするには「<code class="inline-code tt">D+</code>」というプラグマを使用します。「<code class="inline-code tt">D</code>」によって「複数の検索語をANDで扱うのかORなのかNOTなのか」という検索語の扱いを指定する、と宣言し、「<code class="inline-code tt">+</code>」を使うことで「AND検索として扱う」ということを指定します。「<code class="inline-code tt">+</code>」の部分を「<code class="inline-code tt">-</code>」など他のキーワードに変えることで別の指定もできますが、ここでは扱いません。</p>
+<p>本書の範囲を外れる詳細については、Mroongaの<a href="http://mroonga.org/ja/docs/reference/full_text_search/boolean_mode.html" class="link">ブーリアンモード</a>のマニュアルページを参照してください。</p>
+<p>それでは実際に、これを使ってAND検索を実装しましょう。<code class="inline-code tt">\PDFSearch\Table\SEARCH</code>定数のSQLと、その中のパラメーターをバインドする変数を変更します。</p>
+<div class="caption-code">
+<p class="caption">リスト7.3: search.php</p>
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
+
+<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Table</span>
+{
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">INSERT</span> <span style="color: #666666">=</span>
+        <span style="color: #BA2121">&quot;INSERT INTO `pdfs` (file, title, content)</span>
+<span style="color: #BA2121">         VALUES(:file, :title, :content);&quot;</span>;
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SELECT</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;</span>;
+    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>EOS
+SELECT <span style="color: #666666">*</span> FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(title, content) AGAINST(<span style="color: #666666">:</span>query_with_pragma IN BOOLEAN MODE);
+EOS;
+
+    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$pdo</span>;
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>)
+    {
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDO(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>);
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">insert</span>(Upload <span style="color: #19177C">$upload</span>)
+    {
+        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [
+            <span style="color: #BA2121">&#39;:file&#39;</span>    <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getName</span>(),
+            <span style="color: #BA2121">&#39;:title&#39;</span>   <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getTitle</span>(),
+            <span style="color: #BA2121">&#39;:content&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getContent</span>()
+        ];
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">INSERT</span>);
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">records</span>()
+    {
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SELECT</span>);
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>();
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">search</span>(<span style="color: #19177C">$query</span>)
+    {
+        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SEARCH</span>);
+        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [<span style="color: #BA2121">&#39;:query_with_pragma&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #BA2121">&#39;*D+&#39;</span> <span style="color: #666666">.</span> <span style="color: #19177C">$query</span>];
+        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
+        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        }
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+    }
+}
+</pre>
+</div>
+<p>これで「cat MySQL」と検索した場合に、両方を含む文書しかヒットしないようになります。</p>
+<p>次章では、Mroongaに特徴的な幾つかの機能を紹介し、実装していきます。</p>
       </div>
       <nav class="book-navi book-prev">
                 <a href="ch06.html">

@@ -103,8 +103,8 @@ St<span style="color: #008000; font-weight: bold">&lt;/div&gt;</span>
 <span style="color: #BA2121">         VALUES(:file, :title, :content);&quot;</span>;
     <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SELECT</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;</span>;
     <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>EOS
-SELECT <span style="color: #008000">file</span>, title, mroonga_snippet_html(content, <span style="color: #666666">:</span>query) <span style="color: #008000; font-weight: bold">AS</span> snippets
-FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(content) AGAINST(<span style="color: #666666">:</span>query IN BOOLEAN MODE);
+SELECT <span style="color: #008000">file</span>, title, mroonga_snippet_html(content, <span style="color: #666666">:</span>query <span style="color: #008000; font-weight: bold">AS</span> query) <span style="color: #008000; font-weight: bold">AS</span> snippets
+FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(title, content) AGAINST(<span style="color: #666666">:</span>query IN BOOLEAN MODE);
 EOS;
 
     <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$pdo</span>;
@@ -266,7 +266,7 @@ EOS;
 <p>Mroongaが使っているスコアの値は、<code class="inline-code tt">WHERE</code>句に指定している<code class="inline-code tt">MATH()</code>...<code class="inline-code tt">AGAINST()</code>の戻り値として取得できます。<code class="inline-code tt">AS</code>で別名を付けると使いやすいでしょう。</p>
 <div class="emlist-code">
 <p class="caption">スコアの取得</p>
-<pre class="emlist"><span style="color: #008000; font-weight: bold">SELECT</span> <span style="color: #008000; font-weight: bold">MATCH</span>(content) AGAINST(<span style="color: #BA2121">&#39;cat&#39;</span> <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>) <span style="color: #008000; font-weight: bold">as</span> score <span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span>;
+<pre class="emlist"><span style="color: #008000; font-weight: bold">SELECT</span> <span style="color: #008000; font-weight: bold">MATCH</span>(title, content) AGAINST(<span style="color: #BA2121">&#39;cat&#39;</span> <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>) <span style="color: #008000; font-weight: bold">as</span> score <span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span>;
 </pre>
 </div>
 <div class="emlist-code">
@@ -288,14 +288,14 @@ EOS;
 <div class="emlist-code">
 <p class="caption">変更前の\PDFSearch\Table::SEARCH定数</p>
 <pre class="emlist"><span style="color: #008000; font-weight: bold">SELECT</span> file, title, mroonga_snippet_html(content, :query) <span style="color: #008000; font-weight: bold">AS</span> snippets
-<span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span> <span style="color: #008000; font-weight: bold">WHERE</span> <span style="color: #008000; font-weight: bold">MATCH</span>(content) AGAINST(:query <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>);
+<span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span> <span style="color: #008000; font-weight: bold">WHERE</span> <span style="color: #008000; font-weight: bold">MATCH</span>(title, content) AGAINST(:query <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>);
 </pre>
 </div>
 <div class="emlist-code">
 <p class="caption">変更前の\PDFSearch\Table::SEARCH定数</p>
 <pre class="emlist"><span style="color: #008000; font-weight: bold">SELECT</span> file, title, mroonga_snippet_html(content, :query) <span style="color: #008000; font-weight: bold">AS</span> snippets,
-<span style="color: #008000; font-weight: bold">MATCH</span>(content) AGAINST(:query <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>) <span style="color: #008000; font-weight: bold">AS</span> score
-<span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span> <span style="color: #008000; font-weight: bold">WHERE</span> <span style="color: #008000; font-weight: bold">MATCH</span>(content) AGAINST(:query <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>)
+<span style="color: #008000; font-weight: bold">MATCH</span>(title, content) AGAINST(:query <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>) <span style="color: #008000; font-weight: bold">AS</span> score
+<span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span> <span style="color: #008000; font-weight: bold">WHERE</span> <span style="color: #008000; font-weight: bold">MATCH</span>(title, content) AGAINST(:query <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>)
 <span style="color: #008000; font-weight: bold">ORDER</span> <span style="color: #008000; font-weight: bold">BY</span> score <span style="color: #008000; font-weight: bold">DESC</span>;
 </pre>
 </div>
@@ -336,8 +336,8 @@ EOS;
     <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SELECT</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;</span>;
     <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>EOS
 SELECT <span style="color: #008000">file</span>, title, mroonga_snippet_html(content, <span style="color: #666666">:</span>query <span style="color: #008000; font-weight: bold">AS</span> query) <span style="color: #008000; font-weight: bold">AS</span> snippets,
-MATCH(title,content) AGAINST(<span style="color: #666666">:</span>query_with_pragma IN BOOLEAN MODE) <span style="color: #008000; font-weight: bold">AS</span> score
-FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(title,content) AGAINST(<span style="color: #666666">:</span>query_with_pragma IN BOOLEAN MODE)
+MATCH(title, content) AGAINST(<span style="color: #666666">:</span>query_with_pragma IN BOOLEAN MODE) <span style="color: #008000; font-weight: bold">AS</span> score
+FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(title, content) AGAINST(<span style="color: #666666">:</span>query_with_pragma IN BOOLEAN MODE)
 ORDER BY score DESC;
 EOS;
 
