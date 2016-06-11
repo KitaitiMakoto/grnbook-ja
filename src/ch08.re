@@ -95,7 +95,7 @@ HTML中で@<code>{content}カラムを表示していた所を、@<code>{snippet
 Mroongaが使っているスコアの値は、@<code>{WHERE}句に指定している@<code>{MATH()}...@<code>{AGAINST()}の戻り値として取得できます。@<code>{AS}で別名を付けると使いやすいでしょう。
 
 //emlist[スコアの取得][SQL]{
-SELECT MATCH(content) AGAINST('cat' IN BOOLEAN MODE) as score FROM `pdfs`;
+SELECT MATCH(title, content) AGAINST('cat' IN BOOLEAN MODE) as score FROM `pdfs`;
 //}
 //emlist{
 +-------+
@@ -118,13 +118,13 @@ SELECT MATCH(content) AGAINST('cat' IN BOOLEAN MODE) as score FROM `pdfs`;
 
 //emlist[変更前の\PDFSearch\Table::SEARCH定数][SQL]{
 SELECT file, title, mroonga_snippet_html(content, :query) AS snippets
-FROM `pdfs` WHERE MATCH(content) AGAINST(:query IN BOOLEAN MODE);
+FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE);
 //}
 
 //emlist[変更前の\PDFSearch\Table::SEARCH定数][SQL]{
 SELECT file, title, mroonga_snippet_html(content, :query) AS snippets,
-MATCH(content) AGAINST(:query IN BOOLEAN MODE) AS score
-FROM `pdfs` WHERE MATCH(content) AGAINST(:query IN BOOLEAN MODE)
+MATCH(title, content) AGAINST(:query IN BOOLEAN MODE) AS score
+FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE)
 ORDER BY score DESC;
 //}
 

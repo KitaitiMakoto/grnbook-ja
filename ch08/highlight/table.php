@@ -8,8 +8,8 @@ class Table
          VALUES(:file, :title, :content);";
     const SELECT = "SELECT * FROM `pdfs` ORDER BY `id`;";
     const SEARCH = <<<EOS
-SELECT file, title, mroonga_snippet_html(content, :query) AS snippets
-FROM `pdfs` WHERE MATCH(content) AGAINST(:query IN BOOLEAN MODE);
+SELECT file, title, mroonga_snippet_html(content, :query AS query) AS snippets
+FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE);
 EOS;
 
     protected $pdo;

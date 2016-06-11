@@ -8,7 +8,7 @@ class Table
          VALUES(:file, :title, :content);";
     const SELECT = "SELECT * FROM `pdfs` ORDER BY `id`;";
     const SEARCH = <<<EOS
-SELECT * FROM `pdfs` WHERE MATCH(content) AGAINST(:query IN BOOLEAN MODE);
+SELECT * FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE);
 EOS;
 
     protected $pdo;
