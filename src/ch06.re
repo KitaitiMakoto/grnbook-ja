@@ -65,7 +65,7 @@ Dockerイメージの中には、既にPopplerとphp-popplerがインストー�
 これを使って、先ほど作った@<code>{\PDFSearch\Upload}クラスにPDF関連の機能を追加します。
 
 //list[ch06/extract/upload.php][upload.php][php]{
-#@mapfile(ch06/upload/upload.php)
+#@mapfile(ch06/extract/upload.php)
 #@end
 //}
 
