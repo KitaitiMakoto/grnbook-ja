@@ -9,8 +9,8 @@ class Table
     const SELECT = "SELECT * FROM `pdfs` ORDER BY `id`;";
     const SEARCH = <<<EOS
 SELECT file, title, mroonga_snippet_html(content, :query AS query) AS snippets,
-MATCH(title,content) AGAINST(:query_with_pragma IN BOOLEAN MODE) AS score
-FROM `pdfs` WHERE MATCH(title,content) AGAINST(:query_with_pragma IN BOOLEAN MODE)
+MATCH(title, content) AGAINST(:query_with_pragma IN BOOLEAN MODE) AS score
+FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query_with_pragma IN BOOLEAN MODE)
 ORDER BY score DESC;
 EOS;
 
