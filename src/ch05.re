@@ -11,7 +11,7 @@ Mroongaではこの構文を流用しており、元の挙動を知っている�
 
 今の「登録済みPDF一覧」の上に検索フォームを作成し、検索を実行した場合にはフォームの下に検索結果を表示するようにしてみましょう。そのために、@<code>{\PDFSearch\Table}クラスに検索用のメンバー関数を追加します。
 
-//list[ch05/search/search.php][search.php][php]{
+//list[ch05/search/table.php][table.php][php]{
 #@mapfile(ch05/search/table.php)
 #@end
 //}
@@ -59,7 +59,7 @@ AGAINST('*D+ cat Ruby' IN BOOLEAN MODE)
 
 それでは実際に、これを使ってAND検索を実装しましょう。@<code>{\PDFSearch\Table\SEARCH}定数のSQLと、その中のパラメーターをバインドする変数を変更します。
 
-//list[ch05/search/search.php][search.php][php]{
+//list[ch05/pragma/table.php][table.php][php]{
 #@mapfile(ch05/pragma/table.php)
 #@end
 //}
