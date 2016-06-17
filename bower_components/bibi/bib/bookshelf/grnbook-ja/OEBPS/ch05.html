@@ -16,7 +16,7 @@
 <h2><a id="h5-1"></a><span class="secno">5.1　</span>一検索語用の実装</h2>
 <p>今の「登録済みPDF一覧」の上に検索フォームを作成し、検索を実行した場合にはフォームの下に検索結果を表示するようにしてみましょう。そのために、<code class="inline-code tt">\PDFSearch\Table</code>クラスに検索用のメンバー関数を追加します。</p>
 <div class="caption-code">
-<p class="caption">リスト5.3: search.php</p>
+<p class="caption">リスト5.1: table.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
 
@@ -201,7 +201,7 @@ EOS;
 <p>本書の範囲を外れる詳細については、Mroongaの<a href="http://mroonga.org/ja/docs/reference/full_text_search/boolean_mode.html" class="link">ブーリアンモード</a>のマニュアルページを参照してください。</p>
 <p>それでは実際に、これを使ってAND検索を実装しましょう。<code class="inline-code tt">\PDFSearch\Table\SEARCH</code>定数のSQLと、その中のパラメーターをバインドする変数を変更します。</p>
 <div class="caption-code">
-<p class="caption">リスト5.3: search.php</p>
+<p class="caption">リスト5.3: table.php</p>
 <pre class="list"><span style="color: #BC7A00">&lt;?php</span>
 <span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
 
