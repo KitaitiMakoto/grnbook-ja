@@ -4,7 +4,7 @@
 
 == 検索語のハイライト
 
-現在の検索機能では、検索結果中、どこに検索語があるのか、自分で探さなくてはなりません。次の画像のように、検索語だけがハイライトされていると、とても見やすくなります。また、猫についてのPDFを探すつもりで「cat」で検索し「application」といった関係ない語がヒットした場合に、すぐにそのことに気付けるというメリットもあります。
+現在の検索機能では、検索結果中、どこに検索語があるのか、自分で探さなくてはなりません。次の画像のように、検索語だけがハイライトされていると、とても見やすくなります。また、菌類についてのPDFを探すつもりで「きのこ」で検索し「お気づきのこと」といった関係ない語がヒットした場合に、すぐにそのことに気付けるというメリットもあります。
 
 //image[highlight][検索語をハイライトして表示]{
 //}
@@ -18,46 +18,17 @@
 @<code>{mroonga_snippet_html()}は以下のようにして使用します。
 
 //emlist[mroonga_snippet_htmlの簡単な使い方][SQL]{
-SELECT mroonga_snippet_html(content, 'cat') FROM `pdfs`;
+SELECT mroonga_snippet_html(content, 'きのこ') FROM `pdfs`;
 //}
 
 結果は、例えば次のようになります@<fn>{linebreak}。
 
 //emlist[mroonga_snippet_html()の結果例][HTML]{
-<div class="snippet"><span class="keyword">Cat</span>
-
-A Little Game about Little Heroes
-
-Credits
-
-Writing/Layout/Design
-John Wick
-Wicked Editrix
-Annie Rush
-Special Thanks
-to Jared Sorensen
-For helping me throw out the (litter) box.
-Extra Special Tha</div>
-<div class="snippet">Still
-Who protects little heroes.
-
-http://www.wicked-dead.com/<span class="keyword">cat</span>
-
-<span class="keyword">Cat</span> uses the Advantage System.
-http://www.wicked-dead.com/advantage
-
-<span class="keyword">Cat</span>: A Little Game about Little Heroes is © and ™ 2004 by Joh</div>
-<div class="snippet"> Except boggins. Those are real.
-Go give your <span class="keyword">cat</span> a hug.
-
-Ta b l e o f C o n t e n t s
-“I Know I’m Dreaming”
-Introduction
-What You Need
-Making a <span class="keyword">Cat</span> Character
-Step 1: The Traits
-Step 2: Names
-St</div>
+<div class="snippet">ットとするつもりだったのに間違えて git add * と打ち込んでし
+まったと<span class="keyword">きのこ</span>とを考えましょう。 ファイルが両方ともステージされて
+しまいました</div><div class="snippet">細は、“何が変わるのかの把握” を参照ください
+もうひとつお気づ<span class="keyword">きのこ</span>とがあることでしょう。 GitHub は、このプル
+リクエストが問題なくマー</div>
 //}
 
 ここでは、本書のアプリケーションに必要なことのみ説明しているので、詳細については公式ドキュメント（@<href>{http://mroonga.org/ja/docs/reference/udf/mroonga_snippet_html.html, 5.5.5. mroonga_snippet_html()}）を参照してください。
