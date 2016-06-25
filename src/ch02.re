@@ -10,7 +10,7 @@
 
 === OS Xへのインストール
 
-OS XへDockerをインストールするには、公式サイトで配布されているDocker Toolbeltをインストールします。これはDocker関連ツールをまとめたパッケージです。以下の配布ページからダウンロードし、インストーラーでインストールしてください。尚、Docker ToolbeltのインストールにはOS X 10.8以上が必要です（2016年6月現在）。
+OS XへDockerをインストールするには、公式サイトで配布されているDocker Toolboxをインストールします。これはDocker関連ツールをまとめたパッケージです。以下の配布ページからダウンロードし、インストーラーでインストールしてください。尚、Docker ToolboxのインストールにはOS X 10.8以上が必要です（2016年6月現在）。
 
 @<href>{https://www.docker.com/products/docker-toolbox}
 
