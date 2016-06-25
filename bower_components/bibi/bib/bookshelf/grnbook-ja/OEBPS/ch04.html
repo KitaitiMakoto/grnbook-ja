@@ -123,31 +123,32 @@
 <p>これを使って、先ほど作った<code class="inline-code tt">\PDFSearch\Upload</code>クラスにPDF関連の機能を追加します。</p>
 <div class="caption-code">
 <p class="caption">リスト4.3: upload.php</p>
-<pre class="list">namespace PDFSearch;
+<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
+<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
 
-class Upload
+<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Upload</span>
 {
-    // ...
-    public function __construct($name, $tmpName)
+    <span style="color: #408080; font-style: italic">// ...</span>
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$name</span>, <span style="color: #19177C">$tmpName</span>)
     {
-        $this-&gt;name = $name;
-        $this-&gt;tmpName = $tmpName;
-        $this-&gt;pdf = new \Poppler\Processor\PdfFile(
-          \Poppler\Driver\Pdfinfo::create(),
-          \Poppler\Driver\Pdftotext::create(),
-          \Poppler\Driver\Pdftohtml::create()
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">name</span> <span style="color: #666666">=</span> <span style="color: #19177C">$name</span>;
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">tmpName</span> <span style="color: #666666">=</span> <span style="color: #19177C">$tmpName</span>;
+        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdf</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \Poppler\Processor\PdfFile(
+          \Poppler\Driver\Pdfinfo<span style="color: #666666">::</span><span style="color: #7D9029">create</span>(),
+          \Poppler\Driver\Pdftotext<span style="color: #666666">::</span><span style="color: #7D9029">create</span>(),
+          \Poppler\Driver\Pdftohtml<span style="color: #666666">::</span><span style="color: #7D9029">create</span>()
         );
     }
-    // ...
-    public function getTitle()
+    <span style="color: #408080; font-style: italic">// ...</span>
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">getTitle</span>()
     {
-        $info = $this-&gt;pdf-&gt;getInfo($this-&gt;tmpName);
-        return $info[&#39;Title&#39;];
+        <span style="color: #19177C">$info</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdf</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getInfo</span>(<span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">tmpName</span>);
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$info</span>[<span style="color: #BA2121">&#39;Title&#39;</span>];
     }
 
-    public function getContent()
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">getContent</span>()
     {
-        return $this-&gt;pdf-&gt;toText($this-&gt;tmpName);
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdf</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">toText</span>(<span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">tmpName</span>);
     }
 }
 </pre>
