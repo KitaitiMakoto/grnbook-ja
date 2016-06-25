@@ -32,7 +32,7 @@
 <p>ここからは、MySQLの全文検索機能にはない、Mroongaならではの特徴を活かした機能を実装していきます。</p>
 
 <h2><a id="h6-1"></a><span class="secno">6.1　</span>検索語のハイライト</h2>
-<p>現在の検索機能では、検索結果中、どこに検索語があるのか、自分で探さなくてはなりません。次の画像のように、検索語だけがハイライトされていると、とても見やすくなります。また、猫についてのPDFを探すつもりで「cat」で検索し「application」といった関係ない語がヒットした場合に、すぐにそのことに気付けるというメリットもあります。</p>
+<p>現在の検索機能では、検索結果中、どこに検索語があるのか、自分で探さなくてはなりません。次の画像のように、検索語だけがハイライトされていると、とても見やすくなります。また、菌類についてのPDFを探すつもりで「きのこ」で検索し「お気づきのこと」といった関係ない語がヒットした場合に、すぐにそのことに気付けるというメリットもあります。</p>
 <div id="highlight" class="image">
 <img src="images/ch06/highlight.png" alt="検索語をハイライトして表示" />
 <p class="caption">
@@ -45,46 +45,17 @@
 <p><code class="inline-code tt">mroonga_snippet_html()</code>は以下のようにして使用します。</p>
 <div class="emlist-code">
 <p class="caption">mroonga_snippet_htmlの簡単な使い方</p>
-<pre class="emlist"><span style="color: #008000; font-weight: bold">SELECT</span> mroonga_snippet_html(content, <span style="color: #BA2121">&#39;cat&#39;</span>) <span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span>;
+<pre class="emlist"><span style="color: #008000; font-weight: bold">SELECT</span> mroonga_snippet_html(content, <span style="color: #BA2121">&#39;きのこ&#39;</span>) <span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span>;
 </pre>
 </div>
 <p>結果は、例えば次のようになります<a id="fnb-linebreak" href="#fn-linebreak" class="noteref" epub:type="noteref">*2</a>。</p>
 <div class="emlist-code">
 <p class="caption">mroonga_snippet_html()の結果例</p>
-<pre class="emlist"><span style="color: #008000; font-weight: bold">&lt;div</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;snippet&quot;</span><span style="color: #008000; font-weight: bold">&gt;&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>Cat<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span>
-
-A Little Game about Little Heroes
-
-Credits
-
-Writing/Layout/Design
-John Wick
-Wicked Editrix
-Annie Rush
-Special Thanks
-to Jared Sorensen
-For helping me throw out the (litter) box.
-Extra Special Tha<span style="color: #008000; font-weight: bold">&lt;/div&gt;</span>
-<span style="color: #008000; font-weight: bold">&lt;div</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;snippet&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>Still
-Who protects little heroes.
-
-http://www.wicked-dead.com/<span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>cat<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span>
-
-<span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>Cat<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span> uses the Advantage System.
-http://www.wicked-dead.com/advantage
-
-<span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>Cat<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span>: A Little Game about Little Heroes is © and ™ 2004 by Joh<span style="color: #008000; font-weight: bold">&lt;/div&gt;</span>
-<span style="color: #008000; font-weight: bold">&lt;div</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;snippet&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span> Except boggins. Those are real.
-Go give your <span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>cat<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span> a hug.
-
-Ta b l e o f C o n t e n t s
-“I Know I’m Dreaming”
-Introduction
-What You Need
-Making a <span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>Cat<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span> Character
-Step 1: The Traits
-Step 2: Names
-St<span style="color: #008000; font-weight: bold">&lt;/div&gt;</span>
+<pre class="emlist"><span style="color: #008000; font-weight: bold">&lt;div</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;snippet&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>ットとするつもりだったのに間違えて git add * と打ち込んでし
+まったと<span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>きのこ<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span>とを考えましょう。 ファイルが両方ともステージされて
+しまいました<span style="color: #008000; font-weight: bold">&lt;/div&gt;&lt;div</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;snippet&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>細は、“何が変わるのかの把握” を参照ください
+もうひとつお気づ<span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>きのこ<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span>とがあることでしょう。 GitHub は、このプル
+リクエストが問題なくマー<span style="color: #008000; font-weight: bold">&lt;/div&gt;</span>
 </pre>
 </div>
 <p>ここでは、本書のアプリケーションに必要なことのみ説明しているので、詳細については公式ドキュメント（<a href="http://mroonga.org/ja/docs/reference/udf/mroonga_snippet_html.html" class="link">5.5.5. mroonga_snippet_html()</a>）を参照してください。</p>
