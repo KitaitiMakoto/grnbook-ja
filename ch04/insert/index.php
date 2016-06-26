@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' &&
     $uploads = \PDFSearch\Upload::fromFilesInfo($_FILES['pdf']);
     try {
         foreach ($uploads as $upload) {
-            $tableb->insert($upload);
+            $table->insert($upload);
         }
         header('Location: .');
     } catch (\RuntimeException $e) {
