@@ -148,7 +148,8 @@
 
 <span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Upload</span>
 {
-    <span style="color: #408080; font-style: italic">// ...</span>
+    <span style="color: #408080; font-style: italic">// :</span>
+    <span style="color: #408080; font-style: italic">// :</span>
     <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$name</span>, <span style="color: #19177C">$tmpName</span>)
     {
         <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">name</span> <span style="color: #666666">=</span> <span style="color: #19177C">$name</span>;
@@ -159,7 +160,8 @@
           \Poppler\Driver\Pdftohtml<span style="color: #666666">::</span><span style="color: #7D9029">create</span>()
         );
     }
-    <span style="color: #408080; font-style: italic">// ...</span>
+    <span style="color: #408080; font-style: italic">// :</span>
+    <span style="color: #408080; font-style: italic">// :</span>
     <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">getTitle</span>()
     {
         <span style="color: #19177C">$info</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdf</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getInfo</span>(<span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">tmpName</span>);
@@ -203,11 +205,12 @@
     <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">htmlspecialchars</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span>, <span style="color: #19177C">$encoding</span>);
 }
 
-<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span> <span style="color: #666666">&amp;&amp;</span> <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;pdf&#39;</span>, <span style="color: #19177C">$_FILES</span>)) {
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span> <span style="color: #666666">&amp;&amp;</span>
+    <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;pdf&#39;</span>, <span style="color: #19177C">$_FILES</span>)) {
     <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> \PDFSearch\Upload<span style="color: #666666">::</span><span style="color: #7D9029">fromFilesInfo</span>(<span style="color: #19177C">$_FILES</span>[<span style="color: #BA2121">&#39;pdf&#39;</span>]);
     <span style="color: #008000; font-weight: bold">try</span> {
         <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$uploads</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$upload</span>) {
-            <span style="color: #19177C">$tableb</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">insert</span>(<span style="color: #19177C">$upload</span>);
+            <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">insert</span>(<span style="color: #19177C">$upload</span>);
         }
         <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;Location: .&#39;</span>);
     } <span style="color: #008000; font-weight: bold">catch</span> (\RuntimeException <span style="color: #19177C">$e</span>) {

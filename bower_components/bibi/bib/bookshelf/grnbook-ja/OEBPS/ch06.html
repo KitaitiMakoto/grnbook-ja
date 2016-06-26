@@ -289,38 +289,8 @@ MATCH(title, content) AGAINST(<span style="color: #666666">:</span>query_with_pr
 FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(title, content) AGAINST(<span style="color: #666666">:</span>query_with_pragma IN BOOLEAN MODE)
 ORDER BY score DESC;
 EOS;
-
-    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$pdo</span>;
-
-    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>)
-    {
-        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDO(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>);
-    }
-
-    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">insert</span>(Upload <span style="color: #19177C">$upload</span>)
-    {
-        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [
-            <span style="color: #BA2121">&#39;:file&#39;</span>    <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getName</span>(),
-            <span style="color: #BA2121">&#39;:title&#39;</span>   <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getTitle</span>(),
-            <span style="color: #BA2121">&#39;:content&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getContent</span>()
-        ];
-        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">INSERT</span>);
-        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
-        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
-            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
-        }
-    }
-
-    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">records</span>()
-    {
-        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SELECT</span>);
-        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>();
-        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
-            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
-        }
-        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
-    }
-
+    <span style="color: #408080; font-style: italic">// :</span>
+    <span style="color: #408080; font-style: italic">// :</span>
     <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">search</span>(<span style="color: #19177C">$query</span>)
     {
         <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SEARCH</span>);
@@ -338,8 +308,5 @@ EOS;
 </pre>
 </div>
 <p><code class="inline-code tt">W</code>プラグマを色々な値に変えて試してみてください。本書のようなチュートリアルではなく、実際の全文検索システムに置いてもスコアリングは非常に大切なポイントです。重み付けを使いこなしたスコアリングができると、いかにも全文検索システムを作っているという実感が出て、楽しいと思います。</p>
-<ul>
-<li>（D+プラグマはもっと前でやる）</li>
-</ul>
 </body>
 </html>

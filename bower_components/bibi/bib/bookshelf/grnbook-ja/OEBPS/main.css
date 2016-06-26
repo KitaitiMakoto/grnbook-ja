@@ -158,6 +158,7 @@ pre.emlist, pre.source, pre.list {
     margin: 0;
     padding: 5px;
     border: 1px #aaa solid;
+    background-color: #efefef;
 }
 div p.caption {
     margin: 0;
@@ -188,6 +189,7 @@ div.image img {
     margin: 0 auto;
     padding: 0;
     display: block;
+    border: gray 3px;
 }
 div.cover-image img {
     width: 100%;
@@ -251,4 +253,8 @@ strong{
 }
 em {
     font-style: italic;
+}
+code.inline-code {
+    padding: 2px;
+    background-color: #efefef;
 }
