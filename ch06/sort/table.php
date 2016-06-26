@@ -1,4 +1,5 @@
 <?php
+// #@@range_begin(head)
 namespace PDFSearch;
 
 class Table
@@ -13,6 +14,7 @@ MATCH(title, content) AGAINST(:query_with_pragma IN BOOLEAN MODE) AS score
 FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query_with_pragma IN BOOLEAN MODE)
 ORDER BY score DESC;
 EOS;
+// #@@range_end(head)
 
     protected $pdo;
 
@@ -45,6 +47,7 @@ EOS;
         return $sth->fetchAll();
     }
 
+    // #@@range_begin(search)
     public function search($query)
     {
         $sth = $this->pdo->prepare(self::SEARCH);
@@ -59,3 +62,4 @@ EOS;
         return $sth->fetchAll();
     }
 }
+// #@@range_end(search)

@@ -12,7 +12,12 @@ Mroongaではこの構文を流用しており、元の挙動を知っている�
 今の「登録済みPDF一覧」の上に検索フォームを作成し、検索を実行した場合にはフォームの下に検索結果を表示するようにしてみましょう。そのために、@<code>{\PDFSearch\Table}クラスに検索用のメンバー関数を追加します。
 
 //list[ch05/search/table.php][table.php][php]{
-#@mapfile(ch05/search/table.php)
+<?php
+#@maprange(ch05/search/table.php,head)
+#@end
+    // :
+    // :
+#@maprange(ch05/search/table.php,search)
 #@end
 //}
 
@@ -21,7 +26,14 @@ Mroongaではこの構文を流用しており、元の挙動を知っている�
 先ほど言ったような検索フォームと結果のエリアを追加すると、index.phpはこうなります。
 
 //list[ch05/search/index.php][index.php][php]{
-#@mapfile(ch05/search/index.php)
+<?php
+// :
+// :
+#@maprange(ch05/search/index.php,search)
+#@end
+// :
+// :
+#@maprange(ch05/search/index.php,searchresult)
 #@end
 //}
 
@@ -60,8 +72,19 @@ AGAINST('*D+ cat Ruby' IN BOOLEAN MODE)
 それでは実際に、これを使ってAND検索を実装しましょう。@<code>{\PDFSearch\Table\SEARCH}定数のSQLと、その中のパラメーターをバインドする変数を変更します。
 
 //list[ch05/pragma/table.php][table.php][php]{
-#@mapfile(ch05/pragma/table.php)
+<?php
+#@maprange(ch05/pragma/table.php,head)
 #@end
+    // :
+    // :
+#@maprange(ch05/pragma/table.php,sql)
+#@end
+    // :
+    // :
+#@maprange(ch05/pragma/table.php,search)
+#@end
+    // :
+    // :
 //}
 
 これで「cat MySQL」と検索した場合に、両方を含む文書しかヒットしないようになります。

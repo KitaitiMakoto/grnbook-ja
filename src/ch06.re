@@ -126,7 +126,12 @@ MATCH(title,content) AGAINST('*W1:100,2:1 API')
 まとめると、実装は次のようになります。
 
 //list[ch06/sort/table.php][table.php][php]{
-#@mapfile(ch06/sort/table.php)
+<?php
+#@maprange(ch06/sort/table.php,head)
+#@end
+    // :
+    // :
+#@maprange(ch06/sort/table.php,search)
 #@end
 //}
 

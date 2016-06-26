@@ -1,8 +1,10 @@
 <?php
+// #@@range_begin(head)
 namespace PDFSearch;
 
 class Upload
 {
+    // #@@range_end(head)
     protected $name;
     protected $tmpName;
 
@@ -18,6 +20,7 @@ class Upload
         return $uploads;
     }
 
+    // #@@range_begin(__construct)
     public function __construct($name, $tmpName)
     {
         $this->name = $name;
@@ -28,12 +31,14 @@ class Upload
           \Poppler\Driver\Pdftohtml::create()
         );
     }
+    // #@@range_end(__construct)
 
     public function getName()
     {
         return $this->name;
     }
 
+    // #@@range_begin(newmethods)
     public function getTitle()
     {
         $info = $this->pdf->getInfo($this->tmpName);
@@ -45,3 +50,4 @@ class Upload
         return $this->pdf->toText($this->tmpName);
     }
 }
+// #@@range_end(newmethods)

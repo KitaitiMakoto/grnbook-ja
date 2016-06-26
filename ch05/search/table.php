@@ -1,4 +1,5 @@
 <?php
+// #@@range_begin(head)
 namespace PDFSearch;
 
 class Table
@@ -12,6 +13,7 @@ SELECT * FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE)
 EOS;
 
     protected $pdo;
+    // #@@range_end(head)
 
     public function __construct($dsn, $username, $password)
     {
@@ -42,6 +44,7 @@ EOS;
         return $sth->fetchAll();
     }
 
+    // #@@range_begin(search)
     public function search($query)
     {
         $sth = $this->pdo->prepare(self::SEARCH);
@@ -53,3 +56,4 @@ EOS;
         return $sth->fetchAll();
     }
 }
+// #@@range_end(search)

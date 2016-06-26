@@ -14,6 +14,7 @@ function h($string, $flags = ENT_QUOTES, $encoding = 'UTF-8')
     return htmlspecialchars($string, $flags, $encoding);
 }
 
+// #@@range_begin(search)
 // 検索処理
 $searchQuery = null;
 if ($_SERVER['REQUEST_METHOD'] === 'GET' &&
@@ -21,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' &&
     $searchQuery = $_GET['q'];
     $searchResult = $table->search($searchQuery);
 }
+// #@@range_end(search)
 
 // ファイルアップロード処理
 if ($_SERVER['REQUEST_METHOD'] === 'POST' &&
@@ -45,6 +47,7 @@ $records = $table->records();
 <title>PDF Search</title>
 <h1>PDF Search</h1>
 
+<!-- #@@range_begin(searchresult) -->
 <h2>検索</h2>
 <form method="get">
   <input name="q" type="search" value="<?php echo h($searchQuery); ?>">
@@ -69,6 +72,7 @@ $records = $table->records();
 </table>
 <?php endif; ?>
 
+<!--  #@@range_end(searchresult) -->
 <h2>登録済みPDF一覧</h2>
 <table>
   <tr>
