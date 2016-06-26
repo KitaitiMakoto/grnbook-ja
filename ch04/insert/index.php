@@ -14,7 +14,8 @@ function h($string, $flags = ENT_QUOTES, $encoding = 'UTF-8')
     return htmlspecialchars($string, $flags, $encoding);
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && array_key_exists('pdf', $_FILES)) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' &&
+    array_key_exists('pdf', $_FILES)) {
     $uploads = \PDFSearch\Upload::fromFilesInfo($_FILES['pdf']);
     try {
         foreach ($uploads as $upload) {
