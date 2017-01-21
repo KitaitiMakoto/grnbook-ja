@@ -146,7 +146,9 @@ PHPの情報が表示されれば、環境の準備は成功しています。
 
 //emlist[Dockerコンテナの停止と削除]{
 % docker stop pdfsearch
+pdfsearch
 % docker rm pdfsearch
+pdfsearch
 //}
 
 ありがちな間違いとして、Dockerコンテナとの共有ディレクトリーの指定ミスがあります。@<code>{docker run}（@<code>{docker create}）コマンドの@<code>{volume}オプションをもう一度確認しましょう。@<code>{$PWD}は（@<code>{docker run}を実行した）現在のディレクトリーを意味しますので、そこと別のディレクトリーにファイルを置いた場合は、コンテナ内のPHPが認識できません。事前にプロジェクトのディレクトリーに移動してから実行するようにしましょう。
