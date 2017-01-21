@@ -86,10 +86,10 @@ CREATE TABLE `pdfs` (
 ) ENGINE = Mroonga DEFAULT CHARSET utf8;
 //}
 
-また、検索対象にしたいカラムに、（通常のインデックスとは異なる）全文検索用んインデックスを作成する必要があります。
+また、検索対象にしたいカラムに、（通常のインデックスとは異なる）全文検索用インデックスを作成する必要があります。
 
 //emlist[全文検索インデックスの追加][SQL]{
-ALTER TABLE `pdfs` ADD FULLTEXT INDEX (titke, content);
+ALTER TABLE `pdfs` ADD FULLTEXT INDEX (title, content);
 //}
 
 これ自体は通常のMySQLでの操作なので、@<code>{ALTER TABLE}のほか、@<code>{CREATE TABLE}でインデックスを作成することもできます。
