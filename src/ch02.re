@@ -133,26 +133,12 @@ phpinfo();
 
 //}
 
-ブラウザーでアクセスしてみましょう。OS X、Windowsの場合は、アクセス先のIPアドレスは、@<code>{docker-machine env default}コマンドで確認することができます。
+ブラウザーで @<tt>{http://localhost:8080/info.php} にアクセスしてみましょう。
 
-//emlist[Dockerが動作している仮想マシンのIPアドレス確認]{
-% docker-machine env default
-export DOCKER_TLS_VERIFY="1"
-export DOCKER_HOST="tcp://192.168.99.100:2376"
-export DOCKER_CERT_PATH="/Users/xxxxx/.docker/machine/machines/default"
-export DOCKER_MACHINE_NAME="default"
-# Run this command to configure your shell:
-# eval "$(docker-machine env default)"
+//image[phpinfo][phpinfo()の実行結果]{
 //}
 
-この場合は、@<code>{DOCKER_HOST}環境変数に見えている192.168.99.100がアクセスするべきIPアドレスとなります。http://192.168.99.100:8080/info.phpにアクセスしてください。
-
-（Windowsの場合も同じでいい？）
-
-Linuxの場合は同じホストで実行されるので、localhostや127.0.0.1になります。
-
 PHPの情報が表示されれば、環境の準備は成功しています。
-（Docker Toolbox使っている場合はlocalhostじゃなさそう）
 
 「Not Found」の画面が表示されてしまう場合は、どこかで間違えてしまったようです。これまでの手順を見ながらやり直してみてください。
 
