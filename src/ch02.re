@@ -123,7 +123,9 @@ pdfsearch
 
 == 動作確認
 
-Dockerコンテナが実際に動作していることを確認しましょう。このイメージにはPHPが含まれているので、@<code>{docker run}または@<code>{create}を実行したディレクトリーで以下のようなファイルを作成することで動作確認ができます。
+Dockerコンテナが実際に動作していることを確認しましょう。Dockerコンテナを停止している場合には、@<code>{docker start pdfsearch}で再度起動してください。
+
+このイメージにはPHPが含まれているので、@<code>{docker run}または@<code>{create}を実行したディレクトリーで以下のようなファイルを作成することで動作確認ができます。
 
 //list[info.php][info.php][php]{
 <?php
