@@ -1,32 +1,29 @@
 = Mroongaの環境の準備
 
-本書では、MySQL及びその他の環境の準備にDockerを使います。
+本書では、MySQL及びその他の環境の準備にDockerを使います。OS X El Capitanで確認していますが、異なるOSでも違いはないと思います。
 
 以後、PHPとMySQL、Mroongaを使ってPDF文書の全文検索システムを作成していきますが、ラップトップなどの普段使っているシステムにインストール済みの物を使うと、バージョンが異なって本書の内容が当てはまらなかったり、また、将来別件で異なるバージョンをインストールしたい場合などに手間が増えてしまいます。設定ファイルの競合も問題になるかも知れません。Dockerを使うと、システムの方に影響を与えずに、本書で必要なバージョンのソフトウェアを揃えることができます。不要になった場合には削除することも簡単で、その場合もシステムの方には影響を及ぼしません。
 
 == Dockerのインストール
 
-まず、Dockerその物をインストールしましょう。DockerはOS X、Windows、Linuxそれぞれのプラットフォームで動作します。本番環境として動かすにはLinuxを使うべきですが、本書のようなお試し環境の共有目的ではどの環境で使っても問題ありません。
+まず、Dockerその物をインストールしましょう。DockerはOS X、Windows、Linuxそれぞれのプラットフォームで動作します。本番環境として動かすにはLinuxを使うべきですが、本書のようなお試し環境の共有目的ではどの環境で使っても問題ありません。ここでは、本書執筆の際にも使用した、OS Xでのインストール方法を解説します。Linux、Windowsでのインストールについては、それぞれDocker公式サイトでの解説を参照してください。
+
+ * Linuxの場合 ... @<href>{https://docs.docker.com/engine/installation/linux/, Install Docker on Linux distributions}
+ * Windowsの場合 ... @<href>{https://docs.docker.com/docker-for-windows/, Get started with Docker for Windows}
 
 === OS Xへのインストール
 
-OS XへDockerをインストールするには、公式サイトで配布されているDocker Toolboxをインストールします。これはDocker関連ツールをまとめたパッケージです。以下の配布ページからダウンロードし、インストーラーでインストールしてください。尚、Docker ToolboxのインストールにはOS X 10.8以上が必要です（2016年6月現在）。
+Docker公式サイトでは@<href>{https://docs.docker.com/docker-for-mac/, Get started with Docker for Mac}でインストール方法が解説されていますので、以下の方法でうまくいかない場合などには参照してください。
 
-@<href>{https://www.docker.com/products/docker-toolbox}
+OS XへDockerをインストールするには、公式サイトで配布されているDocker for Macをインストールします。これはDocker関連ツールをまとめたパッケージです。以下の配布ページから「Get Docker for Mac (stable)」と書かれたリンクからダウンロードし、インストーラーでインストールしてください。尚、Docker ToolboxのインストールにはOS X 10.11以上が必要です（2017年1月現在）。
 
-インストール中に、インストールするコンポーネントの選択画面があります。本書の内容を試すには「Docker Client」「Docker Machine」「Docker Quickstart Termial」が必要です。また、まだインストールしていない場合は「Oracle VM VirtualBox」も必要になるので、これもインストールしてください。
+@<href>{https://docs.docker.com/docker-for-mac/#/download-docker-for-mac}
+
+インストールが終わったら、Dockerを起動します。アプリケーションディレクトリーでDockerをダブルタップするか、SpotlightでDockerを検索して実行してください@<fn>{docker-privileges}。するとメニューバーにDockerのクジラのアイコンが表示されます。これによりDockerの起動が確認できました。
+
+//footnote[docker-privileges][初回実行時には「Docker needs privileged access.」というウィンドウに続き、OSのパスワード入力が求められます。これはDockerが管理者権限を要する操作を行うためです。]
 
 その他の選択場面については、どれを選んでも本書の内容には影響がありません。
-
-インストールが終わったら、これから使うことになる、Dockerを使うためのターミナルを起動しましょう。LaunchpadやSpotlightでDocker Quickstart Terminalを探して実行してください。初回は様々な環境のセットアップが実行されるため、使用できるようになるまで時間が掛かります。少し待ちましょう。二回目以降はもう少し早く起動できるようになります。以後、「（ホストの）ターミナル」という言葉を使う場合には、こうしてDockerを使う環境を準備したターミナルを指すことにします。
-
-=== Windowsへのインストール
-
-（後で書く）
-
-=== Linuxへのインストール
-
-（後で書く）
 
 == Dockerコンテナの起動
 
