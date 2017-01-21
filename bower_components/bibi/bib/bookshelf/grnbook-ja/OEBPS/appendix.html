@@ -68,34 +68,34 @@ deb-src http://packages.groonga.org/debian/ jessie main
 <p>データベースの作成には、通常のMySQLと変わることは何もありません。MySQLサーバーに接続し、<code class="inline-code tt">CREATE DATABASE</code>文を実行することでデータベースを作成します。</p>
 <div class="emlist-code">
 <p class="caption">データベースの作成</p>
-<pre class="emlist"><span style="color: #008000; font-weight: bold">CREATE</span> <span style="color: #008000; font-weight: bold">DATABASE</span> pdfsearch;
+<pre class="emlist language-SQL">CREATE DATABASE pdfsearch;
 </pre>
 </div>
 <p>必要に応じて権限設定などを行ってください。</p>
 <p>テーブルの作成には気を付けることがあります。まず、ストレージエンジンをMroongaにする必要があります。MySQLで何も指定せずに<code class="inline-code tt">CREATE TABLE</code>を実行した場合、ストレージエンジンはデフォルトのInnoDBになります。これを他のストレージエンジンに変更するには、<code class="inline-code tt">ENGINE</code>オプションを使用します。</p>
 <div class="emlist-code">
 <p class="caption">テーブルのストレージエンジンにMroongaを指定</p>
-<pre class="emlist"><span style="color: #008000; font-weight: bold">CREATE</span> <span style="color: #008000; font-weight: bold">TABLE</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span> (
-<span style="color: #408080; font-style: italic">-- カラム定義等</span>
-) ENGINE <span style="color: #666666">=</span> Mroonga <span style="color: #008000; font-weight: bold">DEFAULT</span> CHARSET utf8;
+<pre class="emlist language-SQL">CREATE TABLE `pdfs` (
+-- カラム定義等
+) ENGINE = Mroonga DEFAULT CHARSET utf8;
 </pre>
 </div>
-<p>また、検索対象にしたいカラムに、（通常のインデックスとは異なる）全文検索用んインデックスを作成する必要があります。</p>
+<p>また、検索対象にしたいカラムに、（通常のインデックスとは異なる）全文検索用インデックスを作成する必要があります。</p>
 <div class="emlist-code">
 <p class="caption">全文検索インデックスの追加</p>
-<pre class="emlist"><span style="color: #008000; font-weight: bold">ALTER</span> <span style="color: #008000; font-weight: bold">TABLE</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span> <span style="color: #008000; font-weight: bold">ADD</span> FULLTEXT <span style="color: #008000; font-weight: bold">INDEX</span> (titke, content);
+<pre class="emlist language-SQL">ALTER TABLE `pdfs` ADD FULLTEXT INDEX (title, content);
 </pre>
 </div>
 <p>これ自体は通常のMySQLでの操作なので、<code class="inline-code tt">ALTER TABLE</code>のほか、<code class="inline-code tt">CREATE TABLE</code>でインデックスを作成することもできます。</p>
 <div class="emlist-code">
 <p class="caption">テーブル作成時の全文検索インデックスの作成</p>
-<pre class="emlist"><span style="color: #008000; font-weight: bold">CREATE</span> <span style="color: #008000; font-weight: bold">TABLE</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span> (
-    id      <span style="color: #008000">INT</span> <span style="color: #008000; font-weight: bold">PRIMARY</span> <span style="color: #008000; font-weight: bold">KEY</span> AUTO_INCREMENT,
-    file    <span style="color: #008000">VARCHAR</span>(<span style="color: #666666">255</span>),
-    title   <span style="color: #008000">VARCHAR</span>(<span style="color: #666666">255</span>),
+<pre class="emlist language-SQL">CREATE TABLE `pdfs` (
+    id      INT PRIMARY KEY AUTO_INCREMENT,
+    file    VARCHAR(255),
+    title   VARCHAR(255),
     content LONGTEXT,
-    FULLTEXT <span style="color: #008000; font-weight: bold">INDEX</span> (title, content)
-) ENGINE <span style="color: #666666">=</span> Mroonga <span style="color: #008000; font-weight: bold">DEFAULT</span> CHARSET utf8;
+    FULLTEXT INDEX (title, content)
+) ENGINE = Mroonga DEFAULT CHARSET utf8;
 </pre>
 </div>
 <p>これは、本書で使用したDockerイメージを作る際に、実際に使用したSQL文です。</p>

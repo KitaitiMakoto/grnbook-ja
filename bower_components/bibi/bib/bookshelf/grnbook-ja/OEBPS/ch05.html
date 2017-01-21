@@ -17,31 +17,31 @@
 <p>今の「登録済みPDF一覧」の上に検索フォームを作成し、検索を実行した場合にはフォームの下に検索結果を表示するようにしてみましょう。そのために、<code class="inline-code tt">\PDFSearch\Table</code>クラスに検索用のメンバー関数を追加します。</p>
 <div class="caption-code">
 <p class="caption">リスト5.1: table.php</p>
-<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
-<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
+<pre class="list language-php">&lt;?php
+namespace PDFSearch;
 
-<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Table</span>
+class Table
 {
-    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">INSERT</span> <span style="color: #666666">=</span>
-        <span style="color: #BA2121">&quot;INSERT INTO `pdfs` (file, title, content)</span>
-<span style="color: #BA2121">         VALUES(:file, :title, :content);&quot;</span>;
-    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SELECT</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;</span>;
-    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>EOS
-SELECT <span style="color: #666666">*</span> FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(title, content) AGAINST(<span style="color: #666666">:</span>query IN BOOLEAN MODE);
+    const INSERT =
+        &quot;INSERT INTO `pdfs` (file, title, content)
+         VALUES(:file, :title, :content);&quot;;
+    const SELECT = &quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;;
+    const SEARCH = &lt;&lt;&lt;EOS
+SELECT * FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE);
 EOS;
 
-    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$pdo</span>;
-    <span style="color: #408080; font-style: italic">// :</span>
-    <span style="color: #408080; font-style: italic">// :</span>
-    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">search</span>(<span style="color: #19177C">$query</span>)
+    protected $pdo;
+    // :
+    // :
+    public function search($query)
     {
-        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SEARCH</span>);
-        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [<span style="color: #BA2121">&#39;:query&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$query</span>];
-        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
-        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
-            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        $sth = $this-&gt;pdo-&gt;prepare(self::SEARCH);
+        $params = [':query' =&gt; $query];
+        $isSucceeded = $sth-&gt;execute($params);
+        if (! $isSucceeded) {
+            throw new \RuntimeException(implode(PHP_EOL, $sth-&gt;errorInfo()));
         }
-        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+        return $sth-&gt;fetchAll();
     }
 }
 </pre>
@@ -50,41 +50,42 @@ EOS;
 <p>先ほど言ったような検索フォームと結果のエリアを追加すると、index.phpはこうなります。</p>
 <div class="caption-code">
 <p class="caption">リスト5.2: index.php</p>
-<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
-<span style="color: #408080; font-style: italic">// :</span>
-<span style="color: #408080; font-style: italic">// :</span>
-<span style="color: #408080; font-style: italic">// 検索処理</span>
-<span style="color: #19177C">$searchQuery</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">null</span>;
-<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;GET&#39;</span> <span style="color: #666666">&amp;&amp;</span>
-    <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;q&#39;</span>, <span style="color: #19177C">$_GET</span>) <span style="color: #666666">&amp;&amp;</span> <span style="color: #19177C">$_GET</span>[<span style="color: #BA2121">&#39;q&#39;</span>]) {
-    <span style="color: #19177C">$searchQuery</span> <span style="color: #666666">=</span> <span style="color: #19177C">$_GET</span>[<span style="color: #BA2121">&#39;q&#39;</span>];
-    <span style="color: #19177C">$searchResult</span> <span style="color: #666666">=</span> <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">search</span>(<span style="color: #19177C">$searchQuery</span>);
+<pre class="list language-php">&lt;?php
+// :
+// :
+// 検索処理
+$searchQuery = null;
+if ($_SERVER['REQUEST_METHOD'] === 'GET' &amp;&amp;
+    array_key_exists('q', $_GET) &amp;&amp; $_GET['q']) {
+    $searchQuery = $_GET['q'];
+    $searchResult = $table-&gt;search($searchQuery);
 }
-<span style="color: #408080; font-style: italic">// :</span>
-<span style="color: #408080; font-style: italic">// :</span>
-<span style="color: #666666">&lt;</span>h2<span style="color: #666666">&gt;</span>検索<span style="color: #666666">&lt;/</span>h2<span style="color: #666666">&gt;</span>
-<span style="color: #666666">&lt;</span>form method<span style="color: #666666">=</span><span style="color: #BA2121">&quot;get&quot;</span><span style="color: #666666">&gt;</span>
-  <span style="color: #666666">&lt;</span>input name<span style="color: #666666">=</span><span style="color: #BA2121">&quot;q&quot;</span> type<span style="color: #666666">=</span><span style="color: #BA2121">&quot;search&quot;</span> value<span style="color: #666666">=</span><span style="color: #BA2121">&quot;&lt;?php echo h(</span><span style="color: #BB6688; font-weight: bold">$searchQuery</span><span style="color: #BA2121">); ?&gt;&quot;</span><span style="color: #666666">&gt;</span>
-  <span style="color: #666666">&lt;</span>input type<span style="color: #666666">=</span><span style="color: #BA2121">&quot;submit&quot;</span> value<span style="color: #666666">=</span><span style="color: #BA2121">&quot;検索&quot;</span><span style="color: #666666">&gt;</span>
-<span style="color: #666666">&lt;/</span>form<span style="color: #666666">&gt;</span>
+// :
+// :
+&lt;h2&gt;検索&lt;/h2&gt;
+&lt;form method=&quot;get&quot;&gt;
+  &lt;input name=&quot;q&quot; type=&quot;search&quot; value=&quot;&lt;?php echo h($searchQuery); ?&gt;&quot;&gt;
+  &lt;input type=&quot;submit&quot; value=&quot;検索&quot;&gt;
+&lt;/form&gt;
 
-<span style="color: #666666">&lt;?</span>php <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$searchResult</span> <span style="color: #666666">&amp;&amp;</span> <span style="color: #008000">count</span>(<span style="color: #19177C">$searchResult</span>) <span style="color: #666666">&gt;</span> <span style="color: #666666">0</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
-&lt;h2&gt;「<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$searchQuery</span>); <span style="color: #BC7A00">?&gt;</span>」を含むPDF&lt;/h2&gt;
+&lt;?php if ($searchResult &amp;&amp; count($searchResult) &gt; 0): ?&gt;
+&lt;h2&gt;「&lt;?php echo h($searchQuery); ?&gt;」を含むPDF&lt;/h2&gt;
 &lt;table&gt;
   &lt;tr&gt;
     &lt;th&gt;ファイル名&lt;/th&gt;
     &lt;th&gt;タイトル&lt;/th&gt;
     &lt;th&gt;内容&lt;/th&gt;
   &lt;/tr&gt;
-  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$searchResult</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$record</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+  &lt;?php foreach ($searchResult as $record): ?&gt;
     &lt;tr&gt;
-      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;file&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
-      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;title&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
-      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #008000">mb_substr</span>(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;content&#39;</span>], <span style="color: #666666">0</span>, <span style="color: #666666">120</span>)); <span style="color: #BC7A00">?&gt;</span>&amp;hellip;&amp;hellip;&lt;/td&gt;
+      &lt;td&gt;&lt;?php echo h($record['file']); ?&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;?php echo h($record['title']); ?&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;?php echo h(mb_substr($record['content'], 0, 120)); ?&gt;&amp;hellip;&amp;hellip;&lt;/td&gt;
     &lt;/tr&gt;
-  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+  &lt;?php endforeach; ?&gt;
 &lt;/table&gt;
-<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endif</span>; <span style="color: #BC7A00">?&gt;</span>
+&lt;?php endif; ?&gt;
+
 </pre>
 </div>
 <p>SQL一文で済むので簡単ですね。では、検索してみましょう。</p>
@@ -103,7 +104,7 @@ EOS;
 <p>もう一つは、SQLのクエリーを実行するタイミングで、クエリー内容の解釈を変更させる「<b class="kw">プラグマ</b><!-- IDX:プラグマ -->」というMroonga特有の命令を使う方法です。プラグマは<code class="inline-code tt">AGAINST()</code>句内で使用し、次のようになります。</p>
 <div class="emlist-code">
 <p class="caption">プラグマを追加したクエリー</p>
-<pre class="emlist">AGAINST(<span style="color: #BA2121">&#39;*D+ Commons ライセンス&#39;</span> <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>)
+<pre class="emlist language-SQL">AGAINST('*D+ Commons ライセンス' IN BOOLEAN MODE)
 </pre>
 </div>
 <p>検索語の先頭に追加されたのがプラグマです。以下のような構文になっています。</p>
@@ -118,24 +119,24 @@ EOS;
 <p>それでは実際に、これを使ってAND検索を実装しましょう。<code class="inline-code tt">\PDFSearch\Table\SEARCH</code>定数のSQLと、その中のパラメーターをバインドする変数を変更します。</p>
 <div class="caption-code">
 <p class="caption">リスト5.3: table.php</p>
-<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
-<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
+<pre class="list language-php">&lt;?php
+namespace PDFSearch;
 
-<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Table</span>
+class Table
 {
-    <span style="color: #408080; font-style: italic">// :</span>
-    <span style="color: #408080; font-style: italic">// :</span>
-    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>EOS
-SELECT <span style="color: #666666">*</span> FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(title, content) AGAINST(<span style="color: #666666">:</span>query_with_pragma IN BOOLEAN MODE);
+    // :
+    // :
+    const SEARCH = &lt;&lt;&lt;EOS
+SELECT * FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query_with_pragma IN BOOLEAN MODE);
 EOS;
-    <span style="color: #408080; font-style: italic">// :</span>
-    <span style="color: #408080; font-style: italic">// :</span>
-    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">search</span>(<span style="color: #19177C">$query</span>)
+    // :
+    // :
+    public function search($query)
     {
-        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SEARCH</span>);
-        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [<span style="color: #BA2121">&#39;:query_with_pragma&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #BA2121">&#39;*D+&#39;</span> <span style="color: #666666">.</span> <span style="color: #19177C">$query</span>];
-    <span style="color: #408080; font-style: italic">// :</span>
-    <span style="color: #408080; font-style: italic">// :</span>
+        $sth = $this-&gt;pdo-&gt;prepare(self::SEARCH);
+        $params = [':query_with_pragma' =&gt; '*D+' . $query];
+    // :
+    // :
 </pre>
 </div>
 <p>これで「Commons ライセンス」と検索した場合に、両方を含む文書しかヒットしないようになります。</p>

@@ -25,77 +25,77 @@
 <p><code class="inline-code tt">mroonga_snippet_html()</code>は以下のようにして使用します。</p>
 <div class="emlist-code">
 <p class="caption">mroonga_snippet_htmlの簡単な使い方</p>
-<pre class="emlist"><span style="color: #008000; font-weight: bold">SELECT</span> mroonga_snippet_html(content, <span style="color: #BA2121">&#39;きのこ&#39;</span>) <span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span>;
+<pre class="emlist language-SQL">SELECT mroonga_snippet_html(content, 'きのこ') FROM `pdfs`;
 </pre>
 </div>
 <p>結果は、例えば次のようになります<a id="fnb-linebreak" href="#fn-linebreak" class="noteref" epub:type="noteref">*2</a>。</p>
 <div class="emlist-code">
 <p class="caption">mroonga_snippet_html()の結果例</p>
-<pre class="emlist"><span style="color: #008000; font-weight: bold">&lt;div</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;snippet&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>ットとするつもりだったのに間違えて git add * と打ち込んでし
-まったと<span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>きのこ<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span>とを考えましょう。 ファイルが両方ともステージされて
-しまいました<span style="color: #008000; font-weight: bold">&lt;/div&gt;&lt;div</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;snippet&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>細は、“何が変わるのかの把握” を参照ください
-もうひとつお気づ<span style="color: #008000; font-weight: bold">&lt;span</span> <span style="color: #7D9029">class=</span><span style="color: #BA2121">&quot;keyword&quot;</span><span style="color: #008000; font-weight: bold">&gt;</span>きのこ<span style="color: #008000; font-weight: bold">&lt;/span&gt;</span>とがあることでしょう。 GitHub は、このプル
-リクエストが問題なくマー<span style="color: #008000; font-weight: bold">&lt;/div&gt;</span>
+<pre class="emlist language-HTML">&lt;div class=&quot;snippet&quot;&gt;ットとするつもりだったのに間違えて git add * と打ち込んでし
+まったと&lt;span class=&quot;keyword&quot;&gt;きのこ&lt;/span&gt;とを考えましょう。 ファイルが両方ともステージされて
+しまいました&lt;/div&gt;&lt;div class=&quot;snippet&quot;&gt;細は、“何が変わるのかの把握” を参照ください
+もうひとつお気づ&lt;span class=&quot;keyword&quot;&gt;きのこ&lt;/span&gt;とがあることでしょう。 GitHub は、このプル
+リクエストが問題なくマー&lt;/div&gt;
 </pre>
 </div>
 <p>ここでは、本書のアプリケーションに必要なことのみ説明しているので、詳細については公式ドキュメント（<a href="http://mroonga.org/ja/docs/reference/udf/mroonga_snippet_html.html" class="link">5.5.5. mroonga_snippet_html()</a>）を参照してください。</p>
 <p>現在の実装では検索でヒットした時に<code class="inline-code tt">content</code>カラムの抜粋を表示していますが、<code class="inline-code tt">mroonga_snippet_html()</code>の戻り値で置き換えてみましょう。<code class="inline-code tt">PDFSearch\Table::search()</code>で使用しているSQL（<code class="inline-code tt">PDFSearch\Table::SEARCH</code>定数）を変更します。<code class="inline-code tt">mroonga_snippet_html()</code>も<code class="inline-code tt">COUNT()</code>などと同様の関数なので、<code class="inline-code tt">AS</code>句を使って別名を付けることができます。</p>
 <div class="caption-code">
 <p class="caption">リスト6.1: table.php</p>
-<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
-<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
+<pre class="list language-php">&lt;?php
+namespace PDFSearch;
 
-<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Table</span>
+class Table
 {
-    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">INSERT</span> <span style="color: #666666">=</span>
-        <span style="color: #BA2121">&quot;INSERT INTO `pdfs` (file, title, content)</span>
-<span style="color: #BA2121">         VALUES(:file, :title, :content);&quot;</span>;
-    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SELECT</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;</span>;
-    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>EOS
-SELECT <span style="color: #008000">file</span>, title, mroonga_snippet_html(content, <span style="color: #666666">:</span>query <span style="color: #008000; font-weight: bold">AS</span> query) <span style="color: #008000; font-weight: bold">AS</span> snippets
-FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(title, content) AGAINST(<span style="color: #666666">:</span>query IN BOOLEAN MODE);
+    const INSERT =
+        &quot;INSERT INTO `pdfs` (file, title, content)
+         VALUES(:file, :title, :content);&quot;;
+    const SELECT = &quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;;
+    const SEARCH = &lt;&lt;&lt;EOS
+SELECT file, title, mroonga_snippet_html(content, :query AS query) AS snippets
+FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE);
 EOS;
 
-    <span style="color: #008000; font-weight: bold">protected</span> <span style="color: #19177C">$pdo</span>;
+    protected $pdo;
 
-    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">__construct</span>(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>)
+    public function __construct($dsn, $username, $password)
     {
-        <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDO(<span style="color: #19177C">$dsn</span>, <span style="color: #19177C">$username</span>, <span style="color: #19177C">$password</span>);
+        $this-&gt;pdo = new \PDO($dsn, $username, $password);
     }
 
-    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">insert</span>(Upload <span style="color: #19177C">$upload</span>)
+    public function insert(Upload $upload)
     {
-        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [
-            <span style="color: #BA2121">&#39;:file&#39;</span>    <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getName</span>(),
-            <span style="color: #BA2121">&#39;:title&#39;</span>   <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getTitle</span>(),
-            <span style="color: #BA2121">&#39;:content&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$upload</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">getContent</span>()
+        $params = [
+            ':file'    =&gt; $upload-&gt;getName(),
+            ':title'   =&gt; $upload-&gt;getTitle(),
+            ':content' =&gt; $upload-&gt;getContent()
         ];
-        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">INSERT</span>);
-        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
-        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
-            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        $sth = $this-&gt;pdo-&gt;prepare(self::INSERT);
+        $isSucceeded = $sth-&gt;execute($params);
+        if (! $isSucceeded) {
+            throw new \RuntimeException(implode(PHP_EOL, $sth-&gt;errorInfo()));
         }
     }
 
-    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">records</span>()
+    public function records()
     {
-        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SELECT</span>);
-        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>();
-        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
-            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        $sth = $this-&gt;pdo-&gt;prepare(self::SELECT);
+        $isSucceeded = $sth-&gt;execute();
+        if (! $isSucceeded) {
+            throw new \RuntimeException(implode(PHP_EOL, $sth-&gt;errorInfo()));
         }
-        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+        return $sth-&gt;fetchAll();
     }
 
-    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">search</span>(<span style="color: #19177C">$query</span>)
+    public function search($query)
     {
-        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SEARCH</span>);
-        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [<span style="color: #BA2121">&#39;:query&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$query</span>];
-        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
-        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
-            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        $sth = $this-&gt;pdo-&gt;prepare(self::SEARCH);
+        $params = [':query' =&gt; $query];
+        $isSucceeded = $sth-&gt;execute($params);
+        if (! $isSucceeded) {
+            throw new \RuntimeException(implode(PHP_EOL, $sth-&gt;errorInfo()));
         }
-        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+        return $sth-&gt;fetchAll();
     }
 }
 </pre>
@@ -103,50 +103,50 @@ EOS;
 <p>HTML中で<code class="inline-code tt">content</code>カラムを表示していた所を、<code class="inline-code tt">snippets</code>に置き換えます。</p>
 <div class="caption-code">
 <p class="caption">リスト6.2: index.php</p>
-<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
-<span style="color: #408080; font-style: italic">// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む</span>
-<span style="color: #008000; font-weight: bold">require_once</span> <span style="color: #BA2121">&#39;vendor/autoload.php&#39;</span>;
-<span style="color: #008000; font-weight: bold">require_once</span> __DIR__ <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;/upload.php&#39;</span>;
-<span style="color: #008000; font-weight: bold">require_once</span> __DIR__ <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;/table.php&#39;</span>;
+<pre class="list language-php">&lt;?php
+// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む
+require_once 'vendor/autoload.php';
+require_once __DIR__ . '/upload.php';
+require_once __DIR__ . '/table.php';
 
-<span style="color: #008000">define</span>(<span style="color: #BA2121">&#39;DBNAME&#39;</span>, <span style="color: #BA2121">&#39;pdfsearch&#39;</span>);
+define('DBNAME', 'pdfsearch');
 
-<span style="color: #19177C">$dsn</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;mysql:host=localhost;dbname=&#39;</span> <span style="color: #666666">.</span> DBNAME <span style="color: #666666">.</span> <span style="color: #BA2121">&#39;;charset=utf8&#39;</span>;
-<span style="color: #19177C">$table</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> \PDFSearch\Table(<span style="color: #19177C">$dsn</span>, <span style="color: #BA2121">&#39;root&#39;</span>, <span style="color: #BA2121">&#39;&#39;</span>);
+$dsn = 'mysql:host=localhost;dbname=' . DBNAME . ';charset=utf8';
+$table = new \PDFSearch\Table($dsn, 'root', '');
 
-<span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">h</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span> <span style="color: #666666">=</span> ENT_QUOTES, <span style="color: #19177C">$encoding</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;UTF-8&#39;</span>)
+function h($string, $flags = ENT_QUOTES, $encoding = 'UTF-8')
 {
-    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">htmlspecialchars</span>(<span style="color: #19177C">$string</span>, <span style="color: #19177C">$flags</span>, <span style="color: #19177C">$encoding</span>);
+    return htmlspecialchars($string, $flags, $encoding);
 }
 
-<span style="color: #408080; font-style: italic">// 検索処理</span>
-<span style="color: #19177C">$searchQuery</span> <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">null</span>;
-<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;GET&#39;</span> <span style="color: #666666">&amp;&amp;</span>
-    <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;q&#39;</span>, <span style="color: #19177C">$_GET</span>) <span style="color: #666666">&amp;&amp;</span> <span style="color: #19177C">$_GET</span>[<span style="color: #BA2121">&#39;q&#39;</span>]) {
-    <span style="color: #19177C">$searchQuery</span> <span style="color: #666666">=</span> <span style="color: #19177C">$_GET</span>[<span style="color: #BA2121">&#39;q&#39;</span>];
-    <span style="color: #19177C">$searchResult</span> <span style="color: #666666">=</span> <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">search</span>(<span style="color: #19177C">$searchQuery</span>);
+// 検索処理
+$searchQuery = null;
+if ($_SERVER['REQUEST_METHOD'] === 'GET' &amp;&amp;
+    array_key_exists('q', $_GET) &amp;&amp; $_GET['q']) {
+    $searchQuery = $_GET['q'];
+    $searchResult = $table-&gt;search($searchQuery);
 }
 
-<span style="color: #408080; font-style: italic">// ファイルアップロード処理</span>
-<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$_SERVER</span>[<span style="color: #BA2121">&#39;REQUEST_METHOD&#39;</span>] <span style="color: #666666">===</span> <span style="color: #BA2121">&#39;POST&#39;</span> <span style="color: #666666">&amp;&amp;</span>
-    <span style="color: #008000">array_key_exists</span>(<span style="color: #BA2121">&#39;pdf&#39;</span>, <span style="color: #19177C">$_FILES</span>)) {
-    <span style="color: #19177C">$uploads</span> <span style="color: #666666">=</span> \PDFSearch\Upload<span style="color: #666666">::</span><span style="color: #7D9029">fromFilesInfo</span>(<span style="color: #19177C">$_FILES</span>[<span style="color: #BA2121">&#39;pdf&#39;</span>]);
-    <span style="color: #008000; font-weight: bold">try</span> {
-        <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$uploads</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$upload</span>) {
-            <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">insert</span>(<span style="color: #19177C">$upload</span>);
+// ファイルアップロード処理
+if ($_SERVER['REQUEST_METHOD'] === 'POST' &amp;&amp;
+    array_key_exists('pdf', $_FILES)) {
+    $uploads = \PDFSearch\Upload::fromFilesInfo($_FILES['pdf']);
+    try {
+        foreach ($uploads as $upload) {
+            $table-&gt;insert($upload);
         }
-        <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;Location: .&#39;</span>);
-    } <span style="color: #008000; font-weight: bold">catch</span> (\RuntimeException <span style="color: #19177C">$e</span>) {
-        <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;HTTP&#39;</span>, <span style="color: #008000; font-weight: bold">true</span>, <span style="color: #666666">500</span>);
-        <span style="color: #008000">header</span>(<span style="color: #BA2121">&#39;content-type: text/plain&#39;</span>);
-        <span style="color: #008000; font-weight: bold">echo</span> <span style="color: #19177C">$e</span>;
+        header('Location: .');
+    } catch (\RuntimeException $e) {
+        header('HTTP', true, 500);
+        header('content-type: text/plain');
+        echo $e;
     }
-    <span style="color: #008000; font-weight: bold">exit</span>;
+    exit;
 }
 
-<span style="color: #19177C">$records</span> <span style="color: #666666">=</span> <span style="color: #19177C">$table</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">records</span>();
+$records = $table-&gt;records();
 
-<span style="color: #BC7A00">?&gt;</span>&lt;!doctype html&gt;
+?&gt;&lt;!doctype html&gt;
 &lt;title&gt;PDF Search&lt;/title&gt;
 &lt;style&gt;
   .keyword {
@@ -158,27 +158,27 @@ EOS;
 
 &lt;h2&gt;検索&lt;/h2&gt;
 &lt;form method=&quot;get&quot;&gt;
-  &lt;input name=&quot;q&quot; type=&quot;search&quot; value=&quot;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$searchQuery</span>); <span style="color: #BC7A00">?&gt;</span>&quot;&gt;
+  &lt;input name=&quot;q&quot; type=&quot;search&quot; value=&quot;&lt;?php echo h($searchQuery); ?&gt;&quot;&gt;
   &lt;input type=&quot;submit&quot; value=&quot;検索&quot;&gt;
 &lt;/form&gt;
 
-<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #19177C">$searchResult</span> <span style="color: #666666">&amp;&amp;</span> <span style="color: #008000">count</span>(<span style="color: #19177C">$searchResult</span>) <span style="color: #666666">&gt;</span> <span style="color: #666666">0</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
-&lt;h2&gt;「<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$searchQuery</span>); <span style="color: #BC7A00">?&gt;</span>」を含むPDF&lt;/h2&gt;
+&lt;?php if ($searchResult &amp;&amp; count($searchResult) &gt; 0): ?&gt;
+&lt;h2&gt;「&lt;?php echo h($searchQuery); ?&gt;」を含むPDF&lt;/h2&gt;
 &lt;table&gt;
   &lt;tr&gt;
     &lt;th&gt;ファイル名&lt;/th&gt;
     &lt;th&gt;タイトル&lt;/th&gt;
     &lt;th&gt;内容&lt;/th&gt;
   &lt;/tr&gt;
-  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$searchResult</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$record</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+  &lt;?php foreach ($searchResult as $record): ?&gt;
     &lt;tr&gt;
-      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;file&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
-      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;title&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
-      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> <span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;snippets&#39;</span>]; <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
+      &lt;td&gt;&lt;?php echo h($record['file']); ?&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;?php echo h($record['title']); ?&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;?php echo $record['snippets']; ?&gt;&lt;/td&gt;
     &lt;/tr&gt;
-  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+  &lt;?php endforeach; ?&gt;
 &lt;/table&gt;
-<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endif</span>; <span style="color: #BC7A00">?&gt;</span>
+&lt;?php endif; ?&gt;
 
 &lt;h2&gt;登録済みPDF一覧&lt;/h2&gt;
 &lt;table&gt;
@@ -187,13 +187,13 @@ EOS;
     &lt;th&gt;タイトル&lt;/th&gt;
     &lt;th&gt;内容&lt;/th&gt;
   &lt;/tr&gt;
-  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">foreach</span> (<span style="color: #19177C">$records</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #19177C">$record</span>)<span style="color: #666666">:</span> <span style="color: #BC7A00">?&gt;</span>
+  &lt;?php foreach ($records as $record): ?&gt;
     &lt;tr&gt;
-      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;file&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
-      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;title&#39;</span>]); <span style="color: #BC7A00">?&gt;</span>&lt;/td&gt;
-      &lt;td&gt;<span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">echo</span> h(<span style="color: #008000">mb_substr</span>(<span style="color: #19177C">$record</span>[<span style="color: #BA2121">&#39;content&#39;</span>], <span style="color: #666666">0</span>, <span style="color: #666666">120</span>)); <span style="color: #BC7A00">?&gt;</span>&amp;hellip;&amp;hellip;&lt;/td&gt;
+      &lt;td&gt;&lt;?php echo h($record['file']); ?&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;?php echo h($record['title']); ?&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;?php echo h(mb_substr($record['content'], 0, 120)); ?&gt;&amp;hellip;&amp;hellip;&lt;/td&gt;
     &lt;/tr&gt;
-  <span style="color: #BC7A00">&lt;?php</span> <span style="color: #008000; font-weight: bold">endforeach</span>; <span style="color: #BC7A00">?&gt;</span>
+  &lt;?php endforeach; ?&gt;
 &lt;/table&gt;
 
 &lt;form enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
@@ -209,13 +209,13 @@ EOS;
 <div class="footnote" epub:type="footnote" id="fn-linebreak"><p class="footnote">[*2] 読みやすさのため、改行を調整しています。</p></div>
 <div class="footnote" epub:type="footnote" id="fn-notsecurityissue"><p class="footnote">[*3] 実際にはHTMLを正しく出力するために必要な注意点です。仮にセキュリティ上問題とならなくても、HTMLが正しく出力されず、アプリケーションが壊れてしまう可能性があります。</p></div>
 
-<h3><a id="h6-1-1"></a>スコアによる並び替え</h3>
+<h2><a id="h6-2"></a><span class="secno">6.2　</span>スコアによる並び替え</h2>
 <p>これまでは、検索結果の並び順については考慮していませんでした。やはり、検索語に近いPDFが先頭に並んでほしいものです。</p>
 <p>この「検索語に近い」または「より望ましい」という状態を、Mroongaではスコアという形で、数値として計算することができます。「検索語がより多く含まれているPDFの方が望ましい」「検索語が本文に含まれているよりもタイトルに含まれている方がより望ましい」といった判断が可能になるのです。</p>
 <p>Mroongaが使っているスコアの値は、<code class="inline-code tt">WHERE</code>句に指定している<code class="inline-code tt">MATH()</code>...<code class="inline-code tt">AGAINST()</code>の戻り値として取得できます。<code class="inline-code tt">AS</code>で別名を付けると使いやすいでしょう。</p>
 <div class="emlist-code">
 <p class="caption">スコアの取得</p>
-<pre class="emlist"><span style="color: #008000; font-weight: bold">SELECT</span> <span style="color: #008000; font-weight: bold">MATCH</span>(title, content) AGAINST(<span style="color: #BA2121">&#39;cat&#39;</span> <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>) <span style="color: #008000; font-weight: bold">as</span> score <span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span>;
+<pre class="emlist language-SQL">SELECT MATCH(title, content) AGAINST('cat' IN BOOLEAN MODE) as score FROM `pdfs`;
 </pre>
 </div>
 <div class="emlist-code">
@@ -232,20 +232,20 @@ EOS;
 </pre>
 </div>
 <p>このスコアでソートすることで、より望ましい結果を上の方に表示することができます。</p>
-<p>では、このスコアというのは何によって決められているのでしょうか。一つは、結果文書の中に踏まれている検索語の数です。検索語が多く含まれている文書ほど検索する人の要求に合っていると見做して、検索上位に表示させられるわけです。</p>
+<p>では、このスコアというのは何によって決められているのでしょうか。一つは、結果文書の中に含まれている検索語の数です。検索語が多く含まれている文書ほど検索する人の要求に合っていると見做して、検索上位に表示させられるわけです。</p>
 <p>以下の用に<code class="inline-code tt">PDFSearch\Table::SEARCH</code>のSQLにちょっとした変更を加えるだけで、多くの場合、期待される検索結果になるでしょう。</p>
 <div class="emlist-code">
 <p class="caption">変更前の\PDFSearch\Table::SEARCH定数</p>
-<pre class="emlist"><span style="color: #008000; font-weight: bold">SELECT</span> file, title, mroonga_snippet_html(content, :query) <span style="color: #008000; font-weight: bold">AS</span> snippets
-<span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span> <span style="color: #008000; font-weight: bold">WHERE</span> <span style="color: #008000; font-weight: bold">MATCH</span>(title, content) AGAINST(:query <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>);
+<pre class="emlist language-SQL">SELECT file, title, mroonga_snippet_html(content, :query) AS snippets
+FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE);
 </pre>
 </div>
 <div class="emlist-code">
 <p class="caption">変更前の\PDFSearch\Table::SEARCH定数</p>
-<pre class="emlist"><span style="color: #008000; font-weight: bold">SELECT</span> file, title, mroonga_snippet_html(content, :query) <span style="color: #008000; font-weight: bold">AS</span> snippets,
-<span style="color: #008000; font-weight: bold">MATCH</span>(title, content) AGAINST(:query <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>) <span style="color: #008000; font-weight: bold">AS</span> score
-<span style="color: #008000; font-weight: bold">FROM</span> <span style="color: #666666">`</span>pdfs<span style="color: #666666">`</span> <span style="color: #008000; font-weight: bold">WHERE</span> <span style="color: #008000; font-weight: bold">MATCH</span>(title, content) AGAINST(:query <span style="color: #008000; font-weight: bold">IN</span> <span style="color: #008000">BOOLEAN</span> <span style="color: #008000; font-weight: bold">MODE</span>)
-<span style="color: #008000; font-weight: bold">ORDER</span> <span style="color: #008000; font-weight: bold">BY</span> score <span style="color: #008000; font-weight: bold">DESC</span>;
+<pre class="emlist language-SQL">SELECT file, title, mroonga_snippet_html(content, :query) AS snippets,
+MATCH(title, content) AGAINST(:query IN BOOLEAN MODE) AS score
+FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE)
+ORDER BY score DESC;
 </pre>
 </div>
 <p>もう一つの基準は重みと呼ばれます。重みは、どのカラムをより重視するかという指標です。例えば、次のような二つのPDFが登録されているとします。</p>
@@ -267,42 +267,42 @@ EOS;
 <p>上の画像にある三つのPDFではどれも本文中に「すべて」という語が含まれますが、タイトルにも含まれる「mrubyのすべて」のスコアが、含まれない「APIデザインケーススタディ」「Dockerエキスパート養成読本」に比べ、非常に大きくなっていることが分かります。実際、タイトルの重視をやめると、「mrubyのすべて」と「APIデザインケーススタディ」の順位は逆転します。</p>
 <p>このように重み付けするには、<code class="inline-code tt">W</code>プラグマを使用します。</p>
 <div class="emlist-code">
-<pre class="emlist"><span style="color: #008000; font-weight: bold">MATCH</span>(title,content) AGAINST(<span style="color: #BA2121">&#39;*W1:100,2:1 API&#39;</span>)
+<pre class="emlist language-SQL">MATCH(title,content) AGAINST('*W1:100,2:1 API')
 </pre>
 </div>
 <p><code class="inline-code tt">W</code>が重み付けのためのプラグマ使用を指示し、その後はカラムごとの重み付けをカンマ区切りで指定します。「<code class="inline-code tt">1:100</code>」は「（<code class="inline-code tt">MATCH</code>で指定した）1カラム目の重みを100に」、「<code class="inline-code tt">2:1</code>」は「2カラム目の重みを1に」という命令になります。これにより、「検索語が1つタイトルに含まれていると、本文に100個含まれているのと同等のスコアになる」ということを実現しています（実際には100倍の差が付きさえすればいいので、2と200でも、10と1000でも構いません）。</p>
 <p>まとめると、実装は次のようになります。</p>
 <div class="caption-code">
 <p class="caption">リスト6.3: table.php</p>
-<pre class="list"><span style="color: #BC7A00">&lt;?php</span>
-<span style="color: #008000; font-weight: bold">namespace</span> PDFSearch;
+<pre class="list language-php">&lt;?php
+namespace PDFSearch;
 
-<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Table</span>
+class Table
 {
-    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">INSERT</span> <span style="color: #666666">=</span>
-        <span style="color: #BA2121">&quot;INSERT INTO `pdfs` (file, title, content)</span>
-<span style="color: #BA2121">         VALUES(:file, :title, :content);&quot;</span>;
-    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SELECT</span> <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;</span>;
-    <span style="color: #008000; font-weight: bold">const</span> <span style="color: #880000">SEARCH</span> <span style="color: #666666">=</span> <span style="color: #666666">&lt;&lt;&lt;</span>EOS
-SELECT <span style="color: #008000">file</span>, title, mroonga_snippet_html(content, <span style="color: #666666">:</span>query <span style="color: #008000; font-weight: bold">AS</span> query) <span style="color: #008000; font-weight: bold">AS</span> snippets,
-MATCH(title, content) AGAINST(<span style="color: #666666">:</span>query_with_pragma IN BOOLEAN MODE) <span style="color: #008000; font-weight: bold">AS</span> score
-FROM <span style="color: #BA2121">`pdfs`</span> WHERE MATCH(title, content) AGAINST(<span style="color: #666666">:</span>query_with_pragma IN BOOLEAN MODE)
+    const INSERT =
+        &quot;INSERT INTO `pdfs` (file, title, content)
+         VALUES(:file, :title, :content);&quot;;
+    const SELECT = &quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;;
+    const SEARCH = &lt;&lt;&lt;EOS
+SELECT file, title, mroonga_snippet_html(content, :query AS query) AS snippets,
+MATCH(title, content) AGAINST(:query_with_pragma IN BOOLEAN MODE) AS score
+FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query_with_pragma IN BOOLEAN MODE)
 ORDER BY score DESC;
 EOS;
-    <span style="color: #408080; font-style: italic">// :</span>
-    <span style="color: #408080; font-style: italic">// :</span>
-    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">function</span> <span style="color: #0000FF">search</span>(<span style="color: #19177C">$query</span>)
+    // :
+    // :
+    public function search($query)
     {
-        <span style="color: #19177C">$sth</span> <span style="color: #666666">=</span> <span style="color: #19177C">$this</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">pdo</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">prepare</span>(self<span style="color: #666666">::</span><span style="color: #7D9029">SEARCH</span>);
-        <span style="color: #19177C">$params</span> <span style="color: #666666">=</span> [
-          <span style="color: #BA2121">&#39;:query&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #19177C">$query</span>,
-          <span style="color: #BA2121">&#39;:query_with_pragma&#39;</span> <span style="color: #666666">=&gt;</span> <span style="color: #BA2121">&#39;*D+W1:100,2:1 &#39;</span> <span style="color: #666666">.</span> <span style="color: #19177C">$query</span>
+        $sth = $this-&gt;pdo-&gt;prepare(self::SEARCH);
+        $params = [
+          ':query' =&gt; $query,
+          ':query_with_pragma' =&gt; '*D+W1:100,2:1 ' . $query
         ];
-        <span style="color: #19177C">$isSucceeded</span> <span style="color: #666666">=</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">execute</span>(<span style="color: #19177C">$params</span>);
-        <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span> <span style="color: #19177C">$isSucceeded</span>) {
-            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> \RuntimeException(<span style="color: #008000">implode</span>(PHP_EOL, <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">errorInfo</span>()));
+        $isSucceeded = $sth-&gt;execute($params);
+        if (! $isSucceeded) {
+            throw new \RuntimeException(implode(PHP_EOL, $sth-&gt;errorInfo()));
         }
-        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">$sth</span><span style="color: #666666">-&gt;</span><span style="color: #7D9029">fetchAll</span>();
+        return $sth-&gt;fetchAll();
     }
 }
 </pre>
