@@ -35,6 +35,29 @@ Dockerを使用するには、必要なソフトウェアをインストール�
 
 //list[docker pull][Dockerイメージの取得]{
 % docker pull kitaitimakoto/grnbook-mroonga
+Using default tag: latest
+latest: Pulling from kitaitimakoto/grnbook-mroonga
+fdd5d7827f33: Pull complete
+a3ed95caeb02: Pull complete
+0f35d0fe50cc: Pull complete
+627b6479c8f7: Pull complete
+67c44324f4e3: Pull complete
+1429c50af3b7: Pull complete
+8207a1b09d34: Pull complete
+f4fd1f72cd2a: Pull complete
+8c4074b3c552: Pull complete
+d0e29d6de6ea: Pull complete
+07672a754971: Pull complete
+b0c92bbfd7a4: Pull complete
+a42300873aad: Pull complete
+2682e716a4cc: Pull complete
+dd4fb0863e03: Pull complete
+1cf726591e93: Pull complete
+9435561d81cb: Pull complete
+21da239ddc32: Pull complete
+a563b423501c: Pull complete
+Digest: sha256:b0c1a8cdde715ff679054eb8d22bf984fad29c285404d8365e135adf73d0bbd3
+Status: Downloaded newer image for kitaitimakoto/grnbook-mroonga:latest
 //}
 
 これにより、Docker HubというDockerイメージ登録サービスから、本書用のイメージをダウンロードします。1GiB以上あるので時間が掛かります。場合によってはネットワークを共有している同僚などに迷惑を掛けるかも知れませんので、周りの状況をよく見て実施しましょう。
@@ -51,9 +74,9 @@ Dockerを使用するには、必要なソフトウェアをインストール�
 69277eea1becda07e4d6314485b6bd48fcfee065b23fa3692ad015d43d5f5c6f
 //}
 
-コマンドを実行した結果表示されるのは、このコンテナのIDです。システム全体の中でそれぞれのコンテナを一意に特定するための物で、同じイメージから作成しても、別のコンテナには別のIDが割り振られます。今後、コンテナを操作する時にはこのIDを使用することができます。しかし、これを覚えるのは不可能ですし、一々確認のためのコマンドを実行するのも手間ですので、@<code>{name}オプションにより名前を付けました。以後はIDの代わりに、この名前（@<code>{pdfsearch}）を使用していきます。なお、この名前もシステム内で一意である必要があり、後から同じ名前のコンテナを作ろうとしても失敗します。
+コマンドを実行した結果表示される「@<tt>{69277eea1becda07e4d6314485b6bd48fcfee065b23fa3692ad015d43d5f5c6f}」という行は、このコンテナのIDです。システム全体の中でそれぞれのコンテナを一意に特定するための物で、同じイメージから作成しても、別のコンテナには別のIDが割り振られます。今後、コンテナを操作する時にはこのIDを使用することができます。しかし、これを覚えるのは不可能ですし、一々確認のためのコマンドを実行するのも手間ですので、@<code>{name}オプションにより名前を付けました。以後はIDの代わりに、この名前（@<code>{pdfsearch}）を使用していきます。なお、この名前もシステム内で一意である必要があり、後から同じ名前のコンテナを作ろうとしても失敗します。
 
-@<code>{publish}オプションではポート番号のマッピングを定義しています。コロンの左側にホスト側（Dockerを実行している皆さんのコンピューター、またはOS XやWindowsなどの場合は、Docker Machineで作成した仮想マシン）のポート番号を書き、右側にコンテナ内のポート番号を書きます。コンテナ内ではApacheが80番ポートをリッスンしますので、この場合はホスト側の8080番ポートにアクセスするとコンテナ内のApacheに接続できるようになっています。ホスト側のポート番号は他で使用している可能性もありますが、その場合には変更してください。
+@<code>{publish}オプションではポート番号のマッピングを定義しています。コロンの左側にホスト側（Dockerを実行している皆さんのコンピューター）のポート番号を書き、右側にコンテナ内のポート番号を書きます。コンテナ内ではApache HTTP Serverが80番ポートをリッスンしますので、この場合はホスト側の8080番ポートにアクセスするとコンテナ内のApacheに接続できるようになっています。ホスト側のポート番号は他で使用している可能性もありますが、その場合には、次のように@<code>{publish}オプションで変更してください。
 
 //list[change port][8000番ポートを公開する例]{
 % docker create \
@@ -69,6 +92,7 @@ Dockerを使用するには、必要なソフトウェアをインストール�
 
 //list[docker start][Dockerコンテナの起動]{
 % docker start pdfsearch
+pdfsearch
 //}
 
 実はここまでの@<code>{docker pull}、@<code>{create}、@<code>{start}をまとめて行う、@<code>{docker run}というコマンドがあります。
@@ -96,6 +120,7 @@ Dockerを使用するには、必要なソフトウェアをインストール�
 
 //list[docker stop][Dockerコンテナの停止]{
 % docker stop pdfsearch
+pdfsearch
 //}
 
 == 動作確認
