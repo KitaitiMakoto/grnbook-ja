@@ -16,6 +16,7 @@ function h($string, $flags = ENT_QUOTES, $encoding = 'UTF-8')
 
 // 検索処理
 $searchQuery = null;
+$searchResult = null;
 if ($_SERVER['REQUEST_METHOD'] === 'GET' &&
     array_key_exists('q', $_GET) && $_GET['q']) {
     $searchQuery = $_GET['q'];
