@@ -71,10 +71,12 @@ Dockerイメージの中には、既にPopplerとphp-popplerがインストー�
 #@maprange(ch04/extract/upload.php,head)
 #@end
     // :
+    // （省略）
     // :
 #@maprange(ch04/extract/upload.php,__construct)
 #@end
     // :
+    // （省略）
     // :
 #@maprange(ch04/extract/upload.php,newmethods)
 #@end
