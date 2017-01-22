@@ -111,7 +111,21 @@ require_once __DIR__ . '/upload.php';
 
 それでは、いよいよMroongaにデータを入力しましょう。と言っても、いつも通り@<code>{PDO}クラスで@<code>{INSERT}文を実行するだけです。Mroongaの方で自動的に検索用のインデックスを作成してくれます。Dockerイメージ内に既にMySQL用のアダプターはインストールされていますので、単にPHPから呼び出すだけで使用できます。
 
-データベースを扱う@<code>{\PDFSearch\Table}クラスを実装し、@<code>{index.php}でそのクラスを使うようにしたのが以下の内容です。@<code>{\PDFSearch\Upload}には変更がないため省略しています。
+データ挿入に必要なMySQLのデータベースとテーブルは、コンテナの中に既に作成してあります。構造は以下の通りです。
+
+//emlist[テーブル作成時の全文検索インデックスの作成][SQL]{
+CREATE TABLE `pdfs` (
+    id      INT PRIMARY KEY AUTO_INCREMENT,
+    file    VARCHAR(255),
+    title   VARCHAR(255),
+    content LONGTEXT,
+    FULLTEXT INDEX (title, content)
+) ENGINE = Mroonga DEFAULT CHARSET utf8;
+//}
+
+@<code>{FULLTEXT INDEX}や@<code>{ENGINE = Mroonga}については後述しますので、ここではカラム定義に注目してください。
+
+このテーブルを扱う@<code>{\PDFSearch\Table}クラスを実装し、@<code>{index.php}でそのクラスを使うようにしたのが以下の内容です。@<code>{\PDFSearch\Upload}には変更がないため省略しています。
 
 //list[ch04/insert/index.php][index.php][php]{
 #@mapfile(ch04/insert/index.php)
