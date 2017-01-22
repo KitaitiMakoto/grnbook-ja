@@ -114,6 +114,7 @@ class Upload
 </p>
 </div>
 <p>紙幅を減らすため、細かな検証は省略しています。実際に運用するアプリケーションでは安全性やエラーのチェックなどをしっかりと行ってください。</p>
+<p>また、エラーが表示されてしまった場合などPHPのでバッグが必要な場合は、本書末尾の「A.6 PHPのデバッグ」にデバッグ方法を記していますので、参考にされてください。</p>
 <div class="footnote" epub:type="footnote" id="fn-multi-select"><p class="footnote">[*1] ファイル選択ダイアログでCtrlキーを押しながらファイルをクリックしていくことで、選んだファイルを同時にアップロードできます。また、Shiftを押しながら最初のファイルと最後のファイルをクリックすることで、その間にあるファイルをすべて選択状態にできます。なお、PHPの設定により、合計で1GiBを超えるアップロードは失敗します。</p></div>
 
 <h2><a id="h4-2"></a><span class="secno">4.2　</span>PDFからの情報を抽出する</h2>
@@ -149,6 +150,7 @@ namespace PDFSearch;
 class Upload
 {
     // :
+    // （省略）
     // :
     public function __construct($name, $tmpName)
     {
@@ -161,6 +163,7 @@ class Upload
         );
     }
     // :
+    // （省略）
     // :
     public function getTitle()
     {
@@ -175,6 +178,24 @@ class Upload
 }
 </pre>
 </div>
+<p>これに合わせ、index.phpの方も少し変更します。</p>
+<div class="caption-code">
+<p class="caption">リスト4.4: index.php</p>
+<pre class="list language-php">&lt;?php
+// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む
+require_once 'vendor/autoload.php';
+require_once __DIR__ . '/upload.php';
+    // :
+    // （省略）
+    // :
+&lt;?php // getName()をgetTitle()に変更します。 ?&gt;
+&lt;p&gt;&lt;?php echo h($upload-&gt;getTitle()); ?&gt;(&lt;?php echo h($upload-&gt;getName()); ?&gt;)&lt;/p&gt;
+&lt;p&gt;&lt;?php echo h(mb_substr($upload-&gt;getContent(), 0, 120)); ?&gt;&amp;hellip;&amp;hellip;&lt;/p&gt;
+    // :
+    // （省略）
+    // :
+</pre>
+</div>
 <p>実際にPDFファイルをアップロードして、タイトルなどの情報が取得できているか確認しましょう。</p>
 <div id="extract" class="image">
 <img src="images/ch04/extract.png" alt="PDF内の情報を取得" />
@@ -186,9 +207,22 @@ class Upload
 
 <h2><a id="h4-3"></a><span class="secno">4.3　</span>データベースにデータを挿入する</h2>
 <p>それでは、いよいよMroongaにデータを入力しましょう。と言っても、いつも通り<code class="inline-code tt">PDO</code>クラスで<code class="inline-code tt">INSERT</code>文を実行するだけです。Mroongaの方で自動的に検索用のインデックスを作成してくれます。Dockerイメージ内に既にMySQL用のアダプターはインストールされていますので、単にPHPから呼び出すだけで使用できます。</p>
-<p>データベースを扱う<code class="inline-code tt">\PDFSearch\Table</code>クラスを実装し、<code class="inline-code tt">index.php</code>でそのクラスを使うようにしたのが以下の内容です。<code class="inline-code tt">\PDFSearch\Upload</code>には変更がないため省略しています。</p>
+<p>データ挿入に必要なMySQLのデータベースとテーブルは、コンテナの中に既に作成してあります。構造は以下の通りです。</p>
+<div class="emlist-code">
+<p class="caption">テーブル作成時の全文検索インデックスの作成</p>
+<pre class="emlist language-SQL">CREATE TABLE `pdfs` (
+    id      INT PRIMARY KEY AUTO_INCREMENT,
+    file    VARCHAR(255),
+    title   VARCHAR(255),
+    content LONGTEXT,
+    FULLTEXT INDEX (title, content)
+) ENGINE = Mroonga DEFAULT CHARSET utf8;
+</pre>
+</div>
+<p><code class="inline-code tt">FULLTEXT INDEX</code>や<code class="inline-code tt">ENGINE = Mroonga</code>については後述しますので、ここではカラム定義に注目してください。</p>
+<p>このテーブルデータベースを扱う<code class="inline-code tt">\PDFSearch\Table</code>クラスを実装し、<code class="inline-code tt">index.php</code>でそのクラスを使うようにしたのが以下の内容です。<code class="inline-code tt">\PDFSearch\Upload</code>には変更がないため省略しています。</p>
 <div class="caption-code">
-<p class="caption">リスト4.4: index.php</p>
+<p class="caption">リスト4.5: index.php</p>
 <pre class="list language-php">&lt;?php
 // Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む
 require_once 'vendor/autoload.php';
@@ -250,7 +284,7 @@ $records = $table-&gt;records();
 </pre>
 </div>
 <div class="caption-code">
-<p class="caption">リスト4.5: table.php</p>
+<p class="caption">リスト4.6: table.php</p>
 <pre class="list language-php">&lt;?php
 namespace PDFSearch;
 
