@@ -82,6 +82,24 @@ Dockerイメージの中には、既にPopplerとphp-popplerがインストー�
 #@end
 //}
 
+これに合わせ、index.phpの方も少し変更します。
+
+//list[ch04/extract/index.php][index.php][php]{
+<?php
+// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む
+require_once 'vendor/autoload.php';
+require_once __DIR__ . '/upload.php';
+    // :
+    // （省略）
+    // :
+<?php // getName()をgetTitle()に変更します。 ?>
+<p><?php echo h($upload->getTitle()); ?>(<?php echo h($upload->getName()); ?>)</p>
+<p><?php echo h(mb_substr($upload->getContent(), 0, 120)); ?>&hellip;&hellip;</p>
+    // :
+    // （省略）
+    // :
+//}
+
 実際にPDFファイルをアップロードして、タイトルなどの情報が取得できているか確認しましょう。
 
 //image[extract][PDF内の情報を取得]{
