@@ -3,16 +3,18 @@
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
     <dc:title id="title">Groongaではじめる全文検索</dc:title>
     <dc:language id="language">ja</dc:language>
-    <meta property="dcterms:modified">2017-01-26T09:21:35Z</meta>
+    <dc:date id="date">2017-02-09 初</dc:date>
+    <meta property="dcterms:modified">2017-02-09T12:49:53Z</meta>
     <dc:identifier id="BookId">https://github.com/KitaitiMakoto/grnbook-ja</dc:identifier>
     <dc:creator id="aut-0">北市真</dc:creator>
     <meta refines="#aut-0" property="role" scheme="marc:relators">aut</meta>
-    <dc:contributor id="edt-0">須藤功平</dc:contributor>
-    <meta refines="#edt-0" property="role" scheme="marc:relators">edt</meta>
+    <dc:contributor id="ths-0">須藤功平</dc:contributor>
+    <meta refines="#ths-0" property="role" scheme="marc:relators">ths</meta>
   </metadata>
   <manifest>
     <item properties="nav" id="grnbook-ja-toc.html" href="grnbook-ja-toc.html" media-type="application/xhtml+xml"/>
-    <item id="grnbook-ja" href="grnbook-ja.html" media-type="application/xhtml+xml"/>
+    <item id="grnbook-ja" href="cover.html" media-type="application/xhtml+xml"/>
+    <item properties="cover-image" id="cover-images-cover-png" href="images/cover.png" media-type="image/png"/>
     <item id="main-css" href="main.css" media-type="text/css"/>
     <item id="titlepage-html" href="titlepage.html" media-type="application/xhtml+xml"/>
     <item id="intro-html" href="intro.html" media-type="application/xhtml+xml"/>
@@ -44,7 +46,7 @@
     <itemref idref="appendix-html"/>
   </spine>
   <guide>
-    <reference type="cover" title="表紙" href="grnbook-ja.html"/>
+    <reference type="cover" title="表紙" href="cover.html"/>
     <reference type="title-page" title="大扉" href="titlepage.html"/>
     <reference type="toc" title="目次" href="grnbook-ja-toc.html"/>
   </guide>
