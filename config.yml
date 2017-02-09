@@ -6,6 +6,7 @@ edt: 須藤功平
 language: ja
 date: 2017-02-09 初
 epubversion: 3
+coverimage: cover.png
 highlight:
   html: pygments
   latex: listings
