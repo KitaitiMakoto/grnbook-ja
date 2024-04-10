@@ -4,7 +4,7 @@
     <dc:title id="title">Groongaではじめる全文検索</dc:title>
     <dc:language id="language">ja</dc:language>
     <dc:date id="date">2017-02-09 初</dc:date>
-    <meta property="dcterms:modified">2024-04-11T08:46:09Z</meta>
+    <meta property="dcterms:modified">2024-04-11T08:46:44Z</meta>
     <dc:identifier id="BookId">https://github.com/KitaitiMakoto/grnbook-ja</dc:identifier>
     <dc:creator id="aut-0">北市真</dc:creator>
     <meta refines="#aut-0" property="role" scheme="marc:relators">aut</meta>
