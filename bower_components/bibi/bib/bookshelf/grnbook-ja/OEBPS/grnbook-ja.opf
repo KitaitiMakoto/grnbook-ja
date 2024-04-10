@@ -4,16 +4,16 @@
     <dc:title id="title">Groongaではじめる全文検索</dc:title>
     <dc:language id="language">ja</dc:language>
     <dc:date id="date">2017-02-09 初</dc:date>
-    <meta property="dcterms:modified">2017-02-09T15:43:00Z</meta>
+    <meta property="dcterms:modified">2024-04-11T08:46:09Z</meta>
     <dc:identifier id="BookId">https://github.com/KitaitiMakoto/grnbook-ja</dc:identifier>
     <dc:creator id="aut-0">北市真</dc:creator>
     <meta refines="#aut-0" property="role" scheme="marc:relators">aut</meta>
-    <dc:contributor id="ths-0">須藤功平</dc:contributor>
-    <meta refines="#ths-0" property="role" scheme="marc:relators">ths</meta>
+    <dc:contributor id="edt-0">須藤功平</dc:contributor>
+    <meta refines="#edt-0" property="role" scheme="marc:relators">edt</meta>
   </metadata>
   <manifest>
     <item properties="nav" id="grnbook-ja-toc.html" href="grnbook-ja-toc.html" media-type="application/xhtml+xml"/>
-    <item id="grnbook-ja" href="cover.html" media-type="application/xhtml+xml"/>
+    <item id="grnbook-ja" href="grnbook-ja.html" media-type="application/xhtml+xml"/>
     <item properties="cover-image" id="cover-images-cover-png" href="images/cover.png" media-type="image/png"/>
     <item id="main-css" href="main.css" media-type="text/css"/>
     <item id="titlepage-html" href="titlepage.html" media-type="application/xhtml+xml"/>
@@ -25,13 +25,13 @@
     <item id="ch05-html" href="ch05.html" media-type="application/xhtml+xml"/>
     <item id="ch06-html" href="ch06.html" media-type="application/xhtml+xml"/>
     <item id="appendix-html" href="appendix.html" media-type="application/xhtml+xml"/>
-    <item id="images-ch02-phpinfo-png" href="images/ch02/phpinfo.png" media-type="image/png"/>
-    <item id="images-ch04-extract-png" href="images/ch04/extract.png" media-type="image/png"/>
-    <item id="images-ch04-insert-png" href="images/ch04/insert.png" media-type="image/png"/>
-    <item id="images-ch04-upload-png" href="images/ch04/upload.png" media-type="image/png"/>
-    <item id="images-ch05-search-png" href="images/ch05/search.png" media-type="image/png"/>
     <item id="images-ch06-highlight-png" href="images/ch06/highlight.png" media-type="image/png"/>
     <item id="images-ch06-weight-png" href="images/ch06/weight.png" media-type="image/png"/>
+    <item id="images-ch04-insert-png" href="images/ch04/insert.png" media-type="image/png"/>
+    <item id="images-ch04-extract-png" href="images/ch04/extract.png" media-type="image/png"/>
+    <item id="images-ch04-upload-png" href="images/ch04/upload.png" media-type="image/png"/>
+    <item id="images-ch02-phpinfo-png" href="images/ch02/phpinfo.png" media-type="image/png"/>
+    <item id="images-ch05-search-png" href="images/ch05/search.png" media-type="image/png"/>
   </manifest>
   <spine page-progression-direction="ltr">
     <itemref idref="grnbook-ja" linear="no"/>
@@ -46,7 +46,7 @@
     <itemref idref="appendix-html"/>
   </spine>
   <guide>
-    <reference type="cover" title="表紙" href="cover.html"/>
+    <reference type="cover" title="表紙" href="grnbook-ja.html"/>
     <reference type="title-page" title="大扉" href="titlepage.html"/>
     <reference type="toc" title="目次" href="grnbook-ja-toc.html"/>
   </guide>

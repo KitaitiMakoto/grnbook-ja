@@ -30,9 +30,9 @@
 <p>Dockerを使用するには、必要なソフトウェアをインストールし、起動時の動作を定義した「イメージ」が必要です。イメージを取得した後に、そのイメージを雛形としてアプリケーションの動作環境となるコンテナを作ります。一つのイメージからは複数のコンテナを作成して使用することができます。</p>
 <p>本書用に必要なソフトウェアをインストールしたDockerイメージを作成してあります。これを元に皆さんのコンテナを作成し、その中でPHPを実行して全文検索システムを作っていきます。</p>
 <p>まずはイメージを取得します。ターミナルで以下のコマンドを実行してください。</p>
-<div class="caption-code">
+<div id="id_docker-pull" class="caption-code">
 <p class="caption">リスト2.1: Dockerイメージの取得</p>
-<pre class="list">% docker pull kitaitimakoto/grnbook-mroonga
+<pre class="list highlight">% docker pull kitaitimakoto/grnbook-mroonga
 Using default tag: latest
 latest: Pulling from kitaitimakoto/grnbook-mroonga
 fdd5d7827f33: Pull complete
@@ -60,9 +60,9 @@ Status: Downloaded newer image for kitaitimakoto/grnbook-mroonga:latest
 </div>
 <p>これにより、Docker HubというDockerイメージ登録サービスから、本書用のイメージをダウンロードします。1GiB以上あるので時間が掛かります。場合によってはネットワークを共有している同僚などに迷惑を掛けるかも知れませんので、周りの状況をよく見て実施しましょう。</p>
 <p>次に、このイメージを元に、あなたのアプリケーションを作成し実施するための仮想環境「コンテナ」を作成します。本書サンプル用の適当なディレクトリーに移動し、以下のコマンドを実行します。</p>
-<div class="caption-code">
+<div id="id_docker-create" class="caption-code">
 <p class="caption">リスト2.2: Dockerコンテナの作成</p>
-<pre class="list">% cd path/to/project
+<pre class="list highlight">% cd path/to/project
 % docker create \
     --name=pdfsearch \
     --publish=8080:80 \
@@ -73,9 +73,9 @@ Status: Downloaded newer image for kitaitimakoto/grnbook-mroonga:latest
 </div>
 <p>コマンドを実行した結果表示される「<code class="tt">69277eea1becda07e4d6314485b6bd48fcfee065b23fa3692ad015d43d5f5c6f</code>」という行は、このコンテナのIDです。システム全体の中でそれぞれのコンテナを一意に特定するための物で、同じイメージから作成しても、別のコンテナには別のIDが割り振られます。今後、コンテナを操作する時にはこのIDを使用することができます。しかし、これを覚えるのは不可能ですし、一々確認のためのコマンドを実行するのも手間ですので、<code class="inline-code tt">name</code>オプションにより名前を付けました。以後はIDの代わりに、この名前（<code class="inline-code tt">pdfsearch</code>）を使用していきます。なお、この名前もシステム内で一意である必要があり、後から同じ名前のコンテナを作ろうとしても失敗します。</p>
 <p><code class="inline-code tt">publish</code>オプションではポート番号のマッピングを定義しています。コロンの左側にホスト側（Dockerを実行している皆さんのコンピューター）のポート番号を書き、右側にコンテナ内のポート番号を書きます。コンテナ内ではApache HTTP Serverが80番ポートをリッスンしますので、この場合はホスト側の8080番ポートにアクセスするとコンテナ内のApacheに接続できるようになっています。ホスト側のポート番号は他で使用している可能性もありますが、その場合には、次のように<code class="inline-code tt">publish</code>オプションで変更してください。</p>
-<div class="caption-code">
+<div id="id_change-port" class="caption-code">
 <p class="caption">リスト2.3: 8000番ポートを公開する例</p>
-<pre class="list">% docker create \
+<pre class="list highlight">% docker create \
     --name=pdfsearch \
     --publish=8000:80 \
     --volume=$PWD:/var/lib/pdfsearch \
@@ -84,16 +84,16 @@ Status: Downloaded newer image for kitaitimakoto/grnbook-mroonga:latest
 </div>
 <p>また<code class="inline-code tt">volume</code>オプションによって、ホスト側とコンテナ内との共有ディレクトリーを指定しています。ここでもコロンの左側（<code class="inline-code tt">$PWD</code>）がホスト側のディレクトリー、右側（<code class="inline-code tt">/var/lib/pdfsearch</code>）がコンテナ内のディレクトリーです。ここで指定したディレクトリー以外は、原則としてホスト側とは共有されません<a id="fnb-share-volume" href="#fn-share-volume" class="noteref" epub:type="noteref">*2</a>。右側は、このディレクトリーがApacheのドキュメントルートとなるよう設定しているので、変更しないでください。</p>
 <p>最後に、このコンテナを起動しましょう。<code class="inline-code tt">docker start</code>コマンドを使用します。</p>
-<div class="caption-code">
+<div id="id_docker-start" class="caption-code">
 <p class="caption">リスト2.4: Dockerコンテナの起動</p>
-<pre class="list">% docker start pdfsearch
+<pre class="list highlight">% docker start pdfsearch
 pdfsearch
 </pre>
 </div>
 <p>実はここまでの<code class="inline-code tt">docker pull</code>、<code class="inline-code tt">create</code>、<code class="inline-code tt">start</code>をまとめて行う、<code class="inline-code tt">docker run</code>というコマンドがあります。</p>
-<div class="caption-code">
+<div id="id_docker-run" class="caption-code">
 <p class="caption">リスト2.5: Dockerイメージの取得とコンテナの起動</p>
-<pre class="list">% docker run \
+<pre class="list highlight">% docker run \
     --detach \
     --name=pdfsearch \
     --publish=8080:80 \
@@ -110,9 +110,9 @@ pdfsearch
 <p>先に説明した通り、<code class="inline-code tt">name</code>オプションを指定している場合は、複数回実行すると名前の重複によりコンテナの作成に失敗します。もし指定しなかった場合は、実行の度に新しいコンテナが作成・起動されます。コンテナを起動する二度目以降は<code class="inline-code tt">docker start</code>を使ってください。</p>
 <p>行っていることの説明のため三つのステップで説明しましたが、実際には<code class="inline-code tt">docker run</code>コマンドを実行するのが簡単でしょう。</p>
 <p>起動したコンテナを停止するには<code class="inline-code tt">docker stop</code>コマンドを実行します。</p>
-<div class="caption-code">
+<div id="id_docker-stop" class="caption-code">
 <p class="caption">リスト2.6: Dockerコンテナの停止</p>
-<pre class="list">% docker stop pdfsearch
+<pre class="list highlight">% docker stop pdfsearch
 pdfsearch
 </pre>
 </div>
@@ -120,9 +120,9 @@ pdfsearch
 <h2><a id="h2-3"></a><span class="secno">2.3　</span>動作確認</h2>
 <p>Dockerコンテナが実際に動作していることを確認しましょう。Dockerコンテナを停止している場合には、<code class="inline-code tt">docker start pdfsearch</code>で再度起動してください。</p>
 <p>このイメージにはPHPが含まれているので、<code class="inline-code tt">docker run</code>または<code class="inline-code tt">create</code>を実行したディレクトリーで以下のようなファイルを作成することで動作確認ができます。</p>
-<div class="caption-code">
+<div id="info.php" class="caption-code">
 <p class="caption">リスト2.7: info.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 phpinfo();
 
 </pre>
@@ -139,7 +139,7 @@ phpinfo();
 <p><code class="inline-code tt">docker run</code>をやり直すには、以下のコマンドを実行して一旦Dockerコンテナを停止し、削除する必要があります。</p>
 <div class="emlist-code">
 <p class="caption">Dockerコンテナの停止と削除</p>
-<pre class="emlist">% docker stop pdfsearch
+<pre class="emlist highlight">% docker stop pdfsearch
 pdfsearch
 % docker rm pdfsearch
 pdfsearch

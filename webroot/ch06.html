@@ -45,13 +45,13 @@
 <p><code class="inline-code tt">mroonga_snippet_html()</code>は以下のようにして使用します。</p>
 <div class="emlist-code">
 <p class="caption">mroonga_snippet_htmlの簡単な使い方</p>
-<pre class="emlist language-SQL">SELECT mroonga_snippet_html(content, 'きのこ') FROM `pdfs`;
+<pre class="emlist language-SQL highlight">SELECT mroonga_snippet_html(content, 'きのこ') FROM `pdfs`;
 </pre>
 </div>
 <p>結果は、例えば次のようになります<a id="fnb-linebreak" href="#fn-linebreak" class="noteref" epub:type="noteref">*2</a>。</p>
 <div class="emlist-code">
 <p class="caption">mroonga_snippet_html()の結果例</p>
-<pre class="emlist language-HTML">&lt;div class=&quot;snippet&quot;&gt;ットとするつもりだったのに間違えて git add * と打ち込んでし
+<pre class="emlist language-HTML highlight">&lt;div class=&quot;snippet&quot;&gt;ットとするつもりだったのに間違えて git add * と打ち込んでし
 まったと&lt;span class=&quot;keyword&quot;&gt;きのこ&lt;/span&gt;とを考えましょう。 ファイルが両方ともステージされて
 しまいました&lt;/div&gt;&lt;div class=&quot;snippet&quot;&gt;細は、“何が変わるのかの把握” を参照ください
 もうひとつお気づ&lt;span class=&quot;keyword&quot;&gt;きのこ&lt;/span&gt;とがあることでしょう。 GitHub は、このプル
@@ -60,9 +60,9 @@
 </div>
 <p>ここでは、本書のアプリケーションに必要なことのみ説明しているので、詳細については公式ドキュメント（<a href="http://mroonga.org/ja/docs/reference/udf/mroonga_snippet_html.html" class="link">5.5.5. mroonga_snippet_html()</a>）を参照してください。</p>
 <p>現在の実装では検索でヒットした時に<code class="inline-code tt">content</code>カラムの抜粋を表示していますが、<code class="inline-code tt">mroonga_snippet_html()</code>の戻り値で置き換えてみましょう。<code class="inline-code tt">PDFSearch\Table::search()</code>で使用しているSQL（<code class="inline-code tt">PDFSearch\Table::SEARCH</code>定数）を変更します。<code class="inline-code tt">mroonga_snippet_html()</code>も<code class="inline-code tt">COUNT()</code>などと同様の関数なので、<code class="inline-code tt">AS</code>句を使って別名を付けることができます。</p>
-<div class="caption-code">
+<div id="id_ch06_2Fhighlight_2Ftable.php" class="caption-code">
 <p class="caption">リスト6.1: table.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 namespace PDFSearch;
 
 class Table
@@ -121,9 +121,9 @@ EOS;
 </pre>
 </div>
 <p>HTML中で<code class="inline-code tt">content</code>カラムを表示していた所を、<code class="inline-code tt">snippets</code>に置き換えます。</p>
-<div class="caption-code">
+<div id="id_ch06_2Fhighlight_2Findex.php" class="caption-code">
 <p class="caption">リスト6.2: index.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 // Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む
 require_once 'vendor/autoload.php';
 require_once __DIR__ . '/upload.php';
@@ -236,11 +236,11 @@ $records = $table-&gt;records();
 <p>Mroongaが使っているスコアの値は、<code class="inline-code tt">WHERE</code>句に指定している<code class="inline-code tt">MATH()</code>...<code class="inline-code tt">AGAINST()</code>の戻り値として取得できます。<code class="inline-code tt">AS</code>で別名を付けると使いやすいでしょう。</p>
 <div class="emlist-code">
 <p class="caption">スコアの取得</p>
-<pre class="emlist language-SQL">SELECT MATCH(title, content) AGAINST('cat' IN BOOLEAN MODE) as score FROM `pdfs`;
+<pre class="emlist language-SQL highlight">SELECT MATCH(title, content) AGAINST('cat' IN BOOLEAN MODE) as score FROM `pdfs`;
 </pre>
 </div>
 <div class="emlist-code">
-<pre class="emlist">+-------+
+<pre class="emlist highlight">+-------+
 | score |
 +-------+
 |   315 |
@@ -257,13 +257,13 @@ $records = $table-&gt;records();
 <p>以下の用に<code class="inline-code tt">PDFSearch\Table::SEARCH</code>のSQLにちょっとした変更を加えるだけで、多くの場合、期待される検索結果になるでしょう。</p>
 <div class="emlist-code">
 <p class="caption">変更前の\PDFSearch\Table::SEARCH定数</p>
-<pre class="emlist language-SQL">SELECT file, title, mroonga_snippet_html(content, :query) AS snippets
+<pre class="emlist language-SQL highlight">SELECT file, title, mroonga_snippet_html(content, :query) AS snippets
 FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE);
 </pre>
 </div>
 <div class="emlist-code">
 <p class="caption">変更前の\PDFSearch\Table::SEARCH定数</p>
-<pre class="emlist language-SQL">SELECT file, title, mroonga_snippet_html(content, :query) AS snippets,
+<pre class="emlist language-SQL highlight">SELECT file, title, mroonga_snippet_html(content, :query) AS snippets,
 MATCH(title, content) AGAINST(:query IN BOOLEAN MODE) AS score
 FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE)
 ORDER BY score DESC;
@@ -288,14 +288,14 @@ ORDER BY score DESC;
 <p>上の画像にある三つのPDFではどれも本文中に「すべて」という語が含まれますが、タイトルにも含まれる「mrubyのすべて」のスコアが、含まれない「APIデザインケーススタディ」「Dockerエキスパート養成読本」に比べ、非常に大きくなっていることが分かります。実際、タイトルの重視をやめると、「mrubyのすべて」と「APIデザインケーススタディ」の順位は逆転します。</p>
 <p>このように重み付けするには、<code class="inline-code tt">W</code>プラグマを使用します。</p>
 <div class="emlist-code">
-<pre class="emlist language-SQL">MATCH(title,content) AGAINST('*W1:100,2:1 API')
+<pre class="emlist language-SQL highlight">MATCH(title,content) AGAINST('*W1:100,2:1 API')
 </pre>
 </div>
 <p><code class="inline-code tt">W</code>が重み付けのためのプラグマ使用を指示し、その後はカラムごとの重み付けをカンマ区切りで指定します。「<code class="inline-code tt">1:100</code>」は「（<code class="inline-code tt">MATCH</code>で指定した）1カラム目の重みを100に」、「<code class="inline-code tt">2:1</code>」は「2カラム目の重みを1に」という命令になります。これにより、「検索語が1つタイトルに含まれていると、本文に100個含まれているのと同等のスコアになる」ということを実現しています（実際には100倍の差が付きさえすればいいので、2と200でも、10と1000でも構いません）。</p>
 <p>まとめると、実装は次のようになります。</p>
-<div class="caption-code">
+<div id="id_ch06_2Fsort_2Ftable.php" class="caption-code">
 <p class="caption">リスト6.3: table.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 namespace PDFSearch;
 
 class Table

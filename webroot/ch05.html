@@ -35,9 +35,9 @@
 
 <h2><a id="h5-1"></a><span class="secno">5.1　</span>一検索語用の実装</h2>
 <p>今の「登録済みPDF一覧」の上に検索フォームを作成し、検索を実行した場合にはフォームの下に検索結果を表示するようにしてみましょう。そのために、<code class="inline-code tt">\PDFSearch\Table</code>クラスに検索用のメンバー関数を追加します。</p>
-<div class="caption-code">
+<div id="id_ch05_2Fsearch_2Ftable.php" class="caption-code">
 <p class="caption">リスト5.1: table.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 namespace PDFSearch;
 
 class Table
@@ -68,9 +68,9 @@ EOS;
 </div>
 <p><code class="inline-code tt">SEARCH</code>定数と<code class="inline-code tt">search</code>メンバー関数を追加しています。</p>
 <p>先ほど言ったような検索フォームと結果のエリアを追加すると、index.phpはこうなります。</p>
-<div class="caption-code">
+<div id="id_ch05_2Fsearch_2Findex.php" class="caption-code">
 <p class="caption">リスト5.2: index.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 // :
 // :
 // 検索処理
@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' &amp;&amp;
 <p>もう一つは、SQLのクエリーを実行するタイミングで、クエリー内容の解釈を変更させる「<b class="kw">プラグマ</b><!-- IDX:プラグマ -->」というMroonga特有の命令を使う方法です。プラグマは<code class="inline-code tt">AGAINST()</code>句内で使用し、次のようになります。</p>
 <div class="emlist-code">
 <p class="caption">プラグマを追加したクエリー</p>
-<pre class="emlist language-SQL">AGAINST('*D+ Commons ライセンス' IN BOOLEAN MODE)
+<pre class="emlist language-SQL highlight">AGAINST('*D+ Commons ライセンス' IN BOOLEAN MODE)
 </pre>
 </div>
 <p>検索語の先頭に追加されたのがプラグマです。以下のような構文になっています。</p>
@@ -138,9 +138,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' &amp;&amp;
 <p>検索をAND検索にするには「<code class="inline-code tt">D+</code>」というプラグマを使用します。「<code class="inline-code tt">D</code>」によって「複数の検索語をANDで扱うのかORなのかNOTなのか」という検索語の扱いを指定する、と宣言し、「<code class="inline-code tt">+</code>」を使うことで「AND検索として扱う」ということを指定します。「<code class="inline-code tt">+</code>」の部分を「<code class="inline-code tt">-</code>」など他のキーワードに変えることで別の指定もできますが、ここでは扱いません。</p>
 <p>本書の範囲を外れる詳細については、Mroongaの<a href="http://mroonga.org/ja/docs/reference/full_text_search/boolean_mode.html" class="link">ブーリアンモード</a>のマニュアルページを参照してください。</p>
 <p>それでは実際に、これを使ってAND検索を実装しましょう。<code class="inline-code tt">\PDFSearch\Table\SEARCH</code>定数のSQLと、その中のパラメーターをバインドする変数を変更します。</p>
-<div class="caption-code">
+<div id="id_ch05_2Fpragma_2Ftable.php" class="caption-code">
 <p class="caption">リスト5.3: table.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 namespace PDFSearch;
 
 class Table

@@ -20,9 +20,9 @@
 <h2><a id="h4-1"></a><span class="secno">4.1　</span>PDFのアップロード機能を作る</h2>
 <p>まずはPDFのアップロード機能を作りましょう。PDFファイルその物は後で使うことはないので、一時ディレクトリーに置いたままで構いません。</p>
 <p>ユーザーが表示させる起点の画面をindex.php、そのファイルから呼び出すアップロード機能の部分をupload.phpとして実装することにします。</p>
-<div class="caption-code">
+<div id="id_ch04_2Fupload_2Findex.php" class="caption-code">
 <p class="caption">リスト4.1: index.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 require_once __DIR__ . '/upload.php';
 
 function h($string, $flags = ENT_QUOTES, $encoding = 'UTF-8')
@@ -51,9 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' &amp;&amp; array_key_exists('pdf', $_F
 &lt;/form&gt;
 </pre>
 </div>
-<div class="caption-code">
+<div id="id_ch04_2Fupload_2Fupload.php" class="caption-code">
 <p class="caption">リスト4.2: upload.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 namespace PDFSearch;
 
 class Upload
@@ -102,7 +102,7 @@ class Upload
 <p>php-popplerは<code class="inline-code tt">Poppler</code>名前空間にいくつかのクラスを定義しており、以下のようにして使います。</p>
 <div class="emlist-code">
 <p class="caption">php-popplerの基本的な使い方</p>
-<pre class="emlist language-php">&lt;?php
+<pre class="emlist language-php highlight">&lt;?php
 
 // pdfinfoコマンドのラッパー
 $pdfinfo = \Poppler\Driver\Pdfinfo::create();
@@ -122,9 +122,9 @@ echo $pdf-&gt;toText('path/to/document.pdf');
 <p>HTML関連の機能を使わないとしても、<code class="inline-code tt">\Poppler\Processer\Pdffile</code>のコンストラクターには<code class="inline-code tt">\Poppler\Driver\Pdftohtml</code>のインスタンスを渡す必要があるので注意してください。</p>
 <p>Dockerイメージの中には、既にPopplerとphp-popplerがインストール済みです。php-popplerはComposerでインストールしているので、<code class="inline-code tt">vendor/autoload.php</code>を読み込むことで、オートロードが有効になります。</p>
 <p>これを使って、先ほど作った<code class="inline-code tt">\PDFSearch\Upload</code>クラスにPDF関連の機能を追加します。</p>
-<div class="caption-code">
+<div id="id_ch04_2Fextract_2Fupload.php" class="caption-code">
 <p class="caption">リスト4.3: upload.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 namespace PDFSearch;
 
 class Upload
@@ -159,9 +159,9 @@ class Upload
 </pre>
 </div>
 <p>これに合わせ、index.phpの方も少し変更します。</p>
-<div class="caption-code">
+<div id="id_ch04_2Fextract_2Findex.php" class="caption-code">
 <p class="caption">リスト4.4: index.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 // Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む
 require_once 'vendor/autoload.php';
 require_once __DIR__ . '/upload.php';
@@ -190,7 +190,7 @@ require_once __DIR__ . '/upload.php';
 <p>データ挿入に必要なMySQLのデータベースとテーブルは、コンテナの中に既に作成してあります。構造は以下の通りです。</p>
 <div class="emlist-code">
 <p class="caption">テーブル作成時の全文検索インデックスの作成</p>
-<pre class="emlist language-SQL">CREATE TABLE `pdfs` (
+<pre class="emlist language-SQL highlight">CREATE TABLE `pdfs` (
     id      INT PRIMARY KEY AUTO_INCREMENT,
     file    VARCHAR(255),
     title   VARCHAR(255),
@@ -201,9 +201,9 @@ require_once __DIR__ . '/upload.php';
 </div>
 <p><code class="inline-code tt">FULLTEXT INDEX</code>や<code class="inline-code tt">ENGINE = Mroonga</code>については後述しますので、ここではカラム定義に注目してください。</p>
 <p>このテーブルを扱う<code class="inline-code tt">\PDFSearch\Table</code>クラスを実装し、<code class="inline-code tt">index.php</code>でそのクラスを使うようにしたのが以下の内容です。<code class="inline-code tt">\PDFSearch\Upload</code>には変更がないため省略しています。</p>
-<div class="caption-code">
+<div id="id_ch04_2Finsert_2Findex.php" class="caption-code">
 <p class="caption">リスト4.5: index.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 // Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む
 require_once 'vendor/autoload.php';
 require_once __DIR__ . '/upload.php';
@@ -263,9 +263,9 @@ $records = $table-&gt;records();
 &lt;/form&gt;
 </pre>
 </div>
-<div class="caption-code">
+<div id="id_ch04_2Finsert_2Ftable.php" class="caption-code">
 <p class="caption">リスト4.6: table.php</p>
-<pre class="list language-php">&lt;?php
+<pre class="list language-php highlight">&lt;?php
 namespace PDFSearch;
 
 class Table
