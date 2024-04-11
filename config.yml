@@ -8,7 +8,7 @@ date: 2017-02-09 初
 epubversion: 3
 coverimage: cover.png
 highlight:
-  html: pygments
+  html: rouge
   latex: listings
 stylesheet: main.css
 texstyle: samplemacro
