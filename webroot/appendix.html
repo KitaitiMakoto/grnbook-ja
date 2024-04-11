@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="stylesheet" type="text/css" href="main.css" />
-<link rel="prev" title="Mroongaならではの機能の作成" href="ch06.html">  <meta name="generator" content="Re:VIEW" />
+<link rel="prev" title="Mroongaならではの機能の作成" href="ch06.html" />  <meta name="generator" content="Re:VIEW" />
   <title>付録 | Groongaではじめる全文検索</title>
 </head>
 <body>
@@ -13,14 +13,14 @@
       <h1>Groongaではじめる全文検索</h1>
       <ul class="book-toc">
 <li><a href="index.html">TOP</a></li>
-<li><a href="./intro.html">MySQLで作る全文検索システム</a></li>
-<li><a href="./ch01.html">1 Mroongaの概要</a></li>
-<li><a href="./ch02.html">2 Mroongaの環境の準備</a></li>
-<li><a href="./ch03.html">3 作成する全文検索システムの概要</a></li>
-<li><a href="./ch04.html">4 データ入力機能の作成</a></li>
-<li><a href="./ch05.html">5 全文検索機能の作成</a></li>
-<li><a href="./ch06.html">6 Mroongaならではの機能の作成</a></li>
-<li><a href="./appendix.html">付録</a></li>
+<li><a href="intro.html">MySQLで作る全文検索システム</a></li>
+<li><a href="ch01.html">第1章　Mroongaの概要</a></li>
+<li><a href="ch02.html">第2章　Mroongaの環境の準備</a></li>
+<li><a href="ch03.html">第3章　作成する全文検索システムの概要</a></li>
+<li><a href="ch04.html">第4章　データ入力機能の作成</a></li>
+<li><a href="ch05.html">第5章　全文検索機能の作成</a></li>
+<li><a href="ch06.html">第6章　Mroongaならではの機能の作成</a></li>
+<li><a href="appendix.html">付録A　付録</a></li>
 </ul>
       <p class="review-signature">powered by <a href="http://reviewml.org/">Re:VIEW</a></p>
     </nav>
@@ -80,7 +80,7 @@ deb-src http://packages.groonga.org/debian/ jessie main
 </pre>
 </div>
 <p>これで、 ホスト側の/tmp/mroonga以下にMySQLのデータファイルが作成されるようになります。</p>
-<p>Mroongaを使ったテーブルの作成については、「A.2 データベースとテーブルの作成」を参照してください。</p>
+<p>Mroongaを使ったテーブルの作成については、<a href="appendix.html#hA-2">「A.2 データベースとテーブルの作成」</a>を参照してください。</p>
 <p>また、MroongaのDockerイメージは、MySQLとMroongaそれぞれのバージョンの組み合わせごとに多数のイメージが作られています。入手可能な組み合わせはDocker HubのMroongaのページで確認できます。</p>
 <p><a href="https://hub.docker.com/r/groonga/mroonga/" class="link">https://hub.docker.com/r/groonga/mroonga/</a></p>
 
@@ -144,7 +144,7 @@ deb-src http://packages.groonga.org/debian/ jessie main
 
 <h2><a id="hA-5"></a><span class="secno">A.5　</span>phpMyAdminによるデータの確認・操作</h2>
 <p>本書のDockerイメージにはphpMyAdminもインストールされており、<code class="inline-code tt">http://localhost:8080/phpmyadmin</code>でアクセスできます。名前が<code class="inline-code tt">root</code>、パスワードはなし、というユーザーが登録されており、全権限を所有しています（PHPで使用しているユーザーと同じです）。</p>
-<p>これを使って実際に入っているデータを確認・削除したり、コンテナはそのままでデータベースやテーブルの再作成を行ったりできます。テーブル作成時はストレージエンジンにMroongaを指定することを忘れないようにしてください。詳細は「A.2 データベースとテーブルの作成」で解説しています。</p>
+<p>これを使って実際に入っているデータを確認・削除したり、コンテナはそのままでデータベースやテーブルの再作成を行ったりできます。テーブル作成時はストレージエンジンにMroongaを指定することを忘れないようにしてください。詳細は<a href="appendix.html#hA-2">「A.2 データベースとテーブルの作成」</a>で解説しています。</p>
 
 <h2><a id="hA-6"></a><span class="secno">A.6　</span>PHPのデバッグ</h2>
 <p>本書サンプルで作成するDockerコンテナの中ではApacheのmod_phpモジュールを使ってPHP 5.6が動作しています。もし、PHPスクリプトがうまく動作しない場合は、Apacheのエラーログを確認するといいでしょう。</p>
@@ -173,5 +173,5 @@ deb-src http://packages.groonga.org/debian/ jessie main
   </div>
   <footer>
       </footer>
-  </body>
+</body>
 </html>

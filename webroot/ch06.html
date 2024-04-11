@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="stylesheet" type="text/css" href="main.css" />
-<link rel="next" title="付録" href="appendix.html"><link rel="prev" title="全文検索機能の作成" href="ch05.html">  <meta name="generator" content="Re:VIEW" />
+<link rel="next" title="付録" href="appendix.html" /><link rel="prev" title="全文検索機能の作成" href="ch05.html" />  <meta name="generator" content="Re:VIEW" />
   <title>Mroongaならではの機能の作成 | Groongaではじめる全文検索</title>
 </head>
 <body>
@@ -13,14 +13,14 @@
       <h1>Groongaではじめる全文検索</h1>
       <ul class="book-toc">
 <li><a href="index.html">TOP</a></li>
-<li><a href="./intro.html">MySQLで作る全文検索システム</a></li>
-<li><a href="./ch01.html">1 Mroongaの概要</a></li>
-<li><a href="./ch02.html">2 Mroongaの環境の準備</a></li>
-<li><a href="./ch03.html">3 作成する全文検索システムの概要</a></li>
-<li><a href="./ch04.html">4 データ入力機能の作成</a></li>
-<li><a href="./ch05.html">5 全文検索機能の作成</a></li>
-<li><a href="./ch06.html">6 Mroongaならではの機能の作成</a></li>
-<li><a href="./appendix.html">付録</a></li>
+<li><a href="intro.html">MySQLで作る全文検索システム</a></li>
+<li><a href="ch01.html">第1章　Mroongaの概要</a></li>
+<li><a href="ch02.html">第2章　Mroongaの環境の準備</a></li>
+<li><a href="ch03.html">第3章　作成する全文検索システムの概要</a></li>
+<li><a href="ch04.html">第4章　データ入力機能の作成</a></li>
+<li><a href="ch05.html">第5章　全文検索機能の作成</a></li>
+<li><a href="ch06.html">第6章　Mroongaならではの機能の作成</a></li>
+<li><a href="appendix.html">付録A　付録</a></li>
 </ul>
       <p class="review-signature">powered by <a href="http://reviewml.org/">Re:VIEW</a></p>
     </nav>
@@ -51,176 +51,176 @@
 <p>結果は、例えば次のようになります<a id="fnb-linebreak" href="#fn-linebreak" class="noteref" epub:type="noteref">*2</a>。</p>
 <div class="emlist-code">
 <p class="caption">mroonga_snippet_html()の結果例</p>
-<pre class="emlist language-HTML highlight">&lt;div class=&quot;snippet&quot;&gt;ットとするつもりだったのに間違えて git add * と打ち込んでし
-まったと&lt;span class=&quot;keyword&quot;&gt;きのこ&lt;/span&gt;とを考えましょう。 ファイルが両方ともステージされて
-しまいました&lt;/div&gt;&lt;div class=&quot;snippet&quot;&gt;細は、“何が変わるのかの把握” を参照ください
-もうひとつお気づ&lt;span class=&quot;keyword&quot;&gt;きのこ&lt;/span&gt;とがあることでしょう。 GitHub は、このプル
-リクエストが問題なくマー&lt;/div&gt;
+<pre class="emlist language-HTML highlight"><div class="snippet">ットとするつもりだったのに間違えて git add * と打ち込んでし
+まったと<span class="keyword">きのこ</span>とを考えましょう。 ファイルが両方ともステージされて
+しまいました</div><div class="snippet">細は、“何が変わるのかの把握” を参照ください
+もうひとつお気づ<span class="keyword">きのこ</span>とがあることでしょう。 GitHub は、このプル
+リクエストが問題なくマー</div>
 </pre>
 </div>
 <p>ここでは、本書のアプリケーションに必要なことのみ説明しているので、詳細については公式ドキュメント（<a href="http://mroonga.org/ja/docs/reference/udf/mroonga_snippet_html.html" class="link">5.5.5. mroonga_snippet_html()</a>）を参照してください。</p>
 <p>現在の実装では検索でヒットした時に<code class="inline-code tt">content</code>カラムの抜粋を表示していますが、<code class="inline-code tt">mroonga_snippet_html()</code>の戻り値で置き換えてみましょう。<code class="inline-code tt">PDFSearch\Table::search()</code>で使用しているSQL（<code class="inline-code tt">PDFSearch\Table::SEARCH</code>定数）を変更します。<code class="inline-code tt">mroonga_snippet_html()</code>も<code class="inline-code tt">COUNT()</code>などと同様の関数なので、<code class="inline-code tt">AS</code>句を使って別名を付けることができます。</p>
 <div id="id_ch06_2Fhighlight_2Ftable.php" class="caption-code">
 <p class="caption">リスト6.1: table.php</p>
-<pre class="list language-php highlight">&lt;?php
-namespace PDFSearch;
+<pre class="list language-php highlight"><span class="cp">&lt;?php</span>
+<span class="kn">namespace</span> <span class="nn">PDFSearch</span><span class="p">;</span>
 
-class Table
-{
-    const INSERT =
-        &quot;INSERT INTO `pdfs` (file, title, content)
-         VALUES(:file, :title, :content);&quot;;
-    const SELECT = &quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;;
-    const SEARCH = &lt;&lt;&lt;EOS
+<span class="kd">class</span> <span class="nc">Table</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">INSERT</span> <span class="o">=</span>
+        <span class="s2">"INSERT INTO `pdfs` (file, title, content)
+         VALUES(:file, :title, :content);"</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">SELECT</span> <span class="o">=</span> <span class="s2">"SELECT * FROM `pdfs` ORDER BY `id`;"</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">SEARCH</span> <span class="o">=</span> <span class="sh">&lt;&lt;&lt;EOS
 SELECT file, title, mroonga_snippet_html(content, :query AS query) AS snippets
 FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE);
-EOS;
+EOS;</span>
 
-    protected $pdo;
+    <span class="k">protected</span> <span class="nv">$pdo</span><span class="p">;</span>
 
-    public function __construct($dsn, $username, $password)
-    {
-        $this-&gt;pdo = new \PDO($dsn, $username, $password);
-    }
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span> <span class="nv">$username</span><span class="p">,</span> <span class="nv">$password</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">\PDO</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span> <span class="nv">$username</span><span class="p">,</span> <span class="nv">$password</span><span class="p">);</span>
+    <span class="p">}</span>
 
-    public function insert(Upload $upload)
-    {
-        $params = [
-            ':file'    =&gt; $upload-&gt;getName(),
-            ':title'   =&gt; $upload-&gt;getTitle(),
-            ':content' =&gt; $upload-&gt;getContent()
-        ];
-        $sth = $this-&gt;pdo-&gt;prepare(self::INSERT);
-        $isSucceeded = $sth-&gt;execute($params);
-        if (! $isSucceeded) {
-            throw new \RuntimeException(implode(PHP_EOL, $sth-&gt;errorInfo()));
-        }
-    }
+    <span class="k">public</span> <span class="k">function</span> <span class="n">insert</span><span class="p">(</span><span class="kt">Upload</span> <span class="nv">$upload</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$params</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">':file'</span>    <span class="o">=&gt;</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="nf">getName</span><span class="p">(),</span>
+            <span class="s1">':title'</span>   <span class="o">=&gt;</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="nf">getTitle</span><span class="p">(),</span>
+            <span class="s1">':content'</span> <span class="o">=&gt;</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="nf">getContent</span><span class="p">()</span>
+        <span class="p">];</span>
+        <span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdo</span><span class="o">-&gt;</span><span class="nf">prepare</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">INSERT</span><span class="p">);</span>
+        <span class="nv">$isSucceeded</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">execute</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nv">$isSucceeded</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nc">\RuntimeException</span><span class="p">(</span><span class="nb">implode</span><span class="p">(</span><span class="kc">PHP_EOL</span><span class="p">,</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">errorInfo</span><span class="p">()));</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
 
-    public function records()
-    {
-        $sth = $this-&gt;pdo-&gt;prepare(self::SELECT);
-        $isSucceeded = $sth-&gt;execute();
-        if (! $isSucceeded) {
-            throw new \RuntimeException(implode(PHP_EOL, $sth-&gt;errorInfo()));
-        }
-        return $sth-&gt;fetchAll();
-    }
+    <span class="k">public</span> <span class="k">function</span> <span class="n">records</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdo</span><span class="o">-&gt;</span><span class="nf">prepare</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">SELECT</span><span class="p">);</span>
+        <span class="nv">$isSucceeded</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">execute</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nv">$isSucceeded</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nc">\RuntimeException</span><span class="p">(</span><span class="nb">implode</span><span class="p">(</span><span class="kc">PHP_EOL</span><span class="p">,</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">errorInfo</span><span class="p">()));</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">fetchAll</span><span class="p">();</span>
+    <span class="p">}</span>
 
-    public function search($query)
-    {
-        $sth = $this-&gt;pdo-&gt;prepare(self::SEARCH);
-        $params = [':query' =&gt; $query];
-        $isSucceeded = $sth-&gt;execute($params);
-        if (! $isSucceeded) {
-            throw new \RuntimeException(implode(PHP_EOL, $sth-&gt;errorInfo()));
-        }
-        return $sth-&gt;fetchAll();
-    }
-}
+    <span class="k">public</span> <span class="k">function</span> <span class="n">search</span><span class="p">(</span><span class="nv">$query</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdo</span><span class="o">-&gt;</span><span class="nf">prepare</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">SEARCH</span><span class="p">);</span>
+        <span class="nv">$params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">':query'</span> <span class="o">=&gt;</span> <span class="nv">$query</span><span class="p">];</span>
+        <span class="nv">$isSucceeded</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">execute</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nv">$isSucceeded</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nc">\RuntimeException</span><span class="p">(</span><span class="nb">implode</span><span class="p">(</span><span class="kc">PHP_EOL</span><span class="p">,</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">errorInfo</span><span class="p">()));</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">fetchAll</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre>
 </div>
 <p>HTML中で<code class="inline-code tt">content</code>カラムを表示していた所を、<code class="inline-code tt">snippets</code>に置き換えます。</p>
 <div id="id_ch06_2Fhighlight_2Findex.php" class="caption-code">
 <p class="caption">リスト6.2: index.php</p>
-<pre class="list language-php highlight">&lt;?php
-// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む
-require_once 'vendor/autoload.php';
-require_once __DIR__ . '/upload.php';
-require_once __DIR__ . '/table.php';
+<pre class="list language-php highlight"><span class="cp">&lt;?php</span>
+<span class="c1">// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む</span>
+<span class="k">require_once</span> <span class="s1">'vendor/autoload.php'</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="k">__DIR__</span> <span class="mf">.</span> <span class="s1">'/upload.php'</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="k">__DIR__</span> <span class="mf">.</span> <span class="s1">'/table.php'</span><span class="p">;</span>
 
-define('DBNAME', 'pdfsearch');
+<span class="nb">define</span><span class="p">(</span><span class="s1">'DBNAME'</span><span class="p">,</span> <span class="s1">'pdfsearch'</span><span class="p">);</span>
 
-$dsn = 'mysql:host=localhost;dbname=' . DBNAME . ';charset=utf8';
-$table = new \PDFSearch\Table($dsn, 'root', '');
+<span class="nv">$dsn</span> <span class="o">=</span> <span class="s1">'mysql:host=localhost;dbname='</span> <span class="mf">.</span> <span class="no">DBNAME</span> <span class="mf">.</span> <span class="s1">';charset=utf8'</span><span class="p">;</span>
+<span class="nv">$table</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">\PDFSearch\Table</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span> <span class="s1">'root'</span><span class="p">,</span> <span class="s1">''</span><span class="p">);</span>
 
-function h($string, $flags = ENT_QUOTES, $encoding = 'UTF-8')
-{
-    return htmlspecialchars($string, $flags, $encoding);
-}
+<span class="k">function</span> <span class="n">h</span><span class="p">(</span><span class="nv">$string</span><span class="p">,</span> <span class="nv">$flags</span> <span class="o">=</span> <span class="no">ENT_QUOTES</span><span class="p">,</span> <span class="nv">$encoding</span> <span class="o">=</span> <span class="s1">'UTF-8'</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$string</span><span class="p">,</span> <span class="nv">$flags</span><span class="p">,</span> <span class="nv">$encoding</span><span class="p">);</span>
+<span class="p">}</span>
 
-// 検索処理
-$searchQuery = null;
-$searchResult = null;
-if ($_SERVER['REQUEST_METHOD'] === 'GET' &amp;&amp;
-    array_key_exists('q', $_GET) &amp;&amp; $_GET['q']) {
-    $searchQuery = $_GET['q'];
-    $searchResult = $table-&gt;search($searchQuery);
-}
+<span class="c1">// 検索処理</span>
+<span class="nv">$searchQuery</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="nv">$searchResult</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_METHOD'</span><span class="p">]</span> <span class="o">===</span> <span class="s1">'GET'</span> <span class="o">&amp;&amp;</span>
+    <span class="nb">array_key_exists</span><span class="p">(</span><span class="s1">'q'</span><span class="p">,</span> <span class="nv">$_GET</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'q'</span><span class="p">])</span> <span class="p">{</span>
+    <span class="nv">$searchQuery</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'q'</span><span class="p">];</span>
+    <span class="nv">$searchResult</span> <span class="o">=</span> <span class="nv">$table</span><span class="o">-&gt;</span><span class="nf">search</span><span class="p">(</span><span class="nv">$searchQuery</span><span class="p">);</span>
+<span class="p">}</span>
 
-// ファイルアップロード処理
-if ($_SERVER['REQUEST_METHOD'] === 'POST' &amp;&amp;
-    array_key_exists('pdf', $_FILES)) {
-    $uploads = \PDFSearch\Upload::fromFilesInfo($_FILES['pdf']);
-    try {
-        foreach ($uploads as $upload) {
-            $table-&gt;insert($upload);
-        }
-        header('Location: .');
-    } catch (\RuntimeException $e) {
-        header('HTTP', true, 500);
-        header('content-type: text/plain');
-        echo $e;
-    }
-    exit;
-}
+<span class="c1">// ファイルアップロード処理</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_METHOD'</span><span class="p">]</span> <span class="o">===</span> <span class="s1">'POST'</span> <span class="o">&amp;&amp;</span>
+    <span class="nb">array_key_exists</span><span class="p">(</span><span class="s1">'pdf'</span><span class="p">,</span> <span class="nv">$_FILES</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$uploads</span> <span class="o">=</span> <span class="nc">\PDFSearch\Upload</span><span class="o">::</span><span class="nf">fromFilesInfo</span><span class="p">(</span><span class="nv">$_FILES</span><span class="p">[</span><span class="s1">'pdf'</span><span class="p">]);</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$uploads</span> <span class="k">as</span> <span class="nv">$upload</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$table</span><span class="o">-&gt;</span><span class="nf">insert</span><span class="p">(</span><span class="nv">$upload</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="nb">header</span><span class="p">(</span><span class="s1">'Location: .'</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nc">\RuntimeException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">header</span><span class="p">(</span><span class="s1">'HTTP'</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="mi">500</span><span class="p">);</span>
+        <span class="nb">header</span><span class="p">(</span><span class="s1">'content-type: text/plain'</span><span class="p">);</span>
+        <span class="k">echo</span> <span class="nv">$e</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">exit</span><span class="p">;</span>
+<span class="p">}</span>
 
-$records = $table-&gt;records();
+<span class="nv">$records</span> <span class="o">=</span> <span class="nv">$table</span><span class="o">-&gt;</span><span class="nf">records</span><span class="p">();</span>
 
-?&gt;&lt;!doctype html&gt;
-&lt;title&gt;PDF Search&lt;/title&gt;
-&lt;style&gt;
-  .keyword {
-    font-weight: bold;
-    color: red;
-  }
-&lt;/style&gt;
-&lt;h1&gt;PDF Search&lt;/h1&gt;
+<span class="cp">?&gt;&lt;!doctype html&gt;</span>
+<span class="nt">&lt;title&gt;</span>PDF Search<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;style&gt;</span>
+  <span class="nc">.keyword</span> <span class="p">{</span>
+    <span class="nl">font-weight</span><span class="p">:</span> <span class="nb">bold</span><span class="p">;</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="nt">&lt;/style&gt;</span>
+<span class="nt">&lt;h1&gt;</span>PDF Search<span class="nt">&lt;/h1&gt;</span>
 
-&lt;h2&gt;検索&lt;/h2&gt;
-&lt;form method=&quot;get&quot;&gt;
-  &lt;input name=&quot;q&quot; type=&quot;search&quot; value=&quot;&lt;?php echo h($searchQuery); ?&gt;&quot;&gt;
-  &lt;input type=&quot;submit&quot; value=&quot;検索&quot;&gt;
-&lt;/form&gt;
+<span class="nt">&lt;h2&gt;</span>検索<span class="nt">&lt;/h2&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">method=</span><span class="s">"get"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">"q"</span> <span class="na">type=</span><span class="s">"search"</span> <span class="na">value=</span><span class="s">"</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$searchQuery</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="s">"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">value=</span><span class="s">"検索"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
 
-&lt;?php if ($searchResult &amp;&amp; count($searchResult) &gt; 0): ?&gt;
-&lt;h2&gt;「&lt;?php echo h($searchQuery); ?&gt;」を含むPDF&lt;/h2&gt;
-&lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;ファイル名&lt;/th&gt;
-    &lt;th&gt;タイトル&lt;/th&gt;
-    &lt;th&gt;内容&lt;/th&gt;
-  &lt;/tr&gt;
-  &lt;?php foreach ($searchResult as $record): ?&gt;
-    &lt;tr&gt;
-      &lt;td&gt;&lt;?php echo h($record['file']); ?&gt;&lt;/td&gt;
-      &lt;td&gt;&lt;?php echo h($record['title']); ?&gt;&lt;/td&gt;
-      &lt;td&gt;&lt;?php echo $record['snippets']; ?&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;?php endforeach; ?&gt;
-&lt;/table&gt;
-&lt;?php endif; ?&gt;
+<span class="cp">&lt;?php</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$searchResult</span> <span class="o">&amp;&amp;</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$searchResult</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span>
+<span class="nt">&lt;h2&gt;</span>「<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$searchQuery</span><span class="p">);</span> <span class="cp">?&gt;</span>」を含むPDF<span class="nt">&lt;/h2&gt;</span>
+<span class="nt">&lt;table&gt;</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;th&gt;</span>ファイル名<span class="nt">&lt;/th&gt;</span>
+    <span class="nt">&lt;th&gt;</span>タイトル<span class="nt">&lt;/th&gt;</span>
+    <span class="nt">&lt;th&gt;</span>内容<span class="nt">&lt;/th&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+  <span class="cp">&lt;?php</span> <span class="k">foreach</span> <span class="p">(</span><span class="nv">$searchResult</span> <span class="k">as</span> <span class="nv">$record</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span>
+    <span class="nt">&lt;tr&gt;</span>
+      <span class="nt">&lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$record</span><span class="p">[</span><span class="s1">'file'</span><span class="p">]);</span> <span class="cp">?&gt;</span><span class="nt">&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$record</span><span class="p">[</span><span class="s1">'title'</span><span class="p">]);</span> <span class="cp">?&gt;</span><span class="nt">&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$record</span><span class="p">[</span><span class="s1">'snippets'</span><span class="p">];</span> <span class="cp">?&gt;</span><span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;/tr&gt;</span>
+  <span class="cp">&lt;?php</span> <span class="k">endforeach</span><span class="p">;</span> <span class="cp">?&gt;</span>
+<span class="nt">&lt;/table&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span>
 
-&lt;h2&gt;登録済みPDF一覧&lt;/h2&gt;
-&lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;ファイル名&lt;/th&gt;
-    &lt;th&gt;タイトル&lt;/th&gt;
-    &lt;th&gt;内容&lt;/th&gt;
-  &lt;/tr&gt;
-  &lt;?php foreach ($records as $record): ?&gt;
-    &lt;tr&gt;
-      &lt;td&gt;&lt;?php echo h($record['file']); ?&gt;&lt;/td&gt;
-      &lt;td&gt;&lt;?php echo h($record['title']); ?&gt;&lt;/td&gt;
-      &lt;td&gt;&lt;?php echo h(mb_substr($record['content'], 0, 120)); ?&gt;&amp;hellip;&amp;hellip;&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;?php endforeach; ?&gt;
-&lt;/table&gt;
+<span class="nt">&lt;h2&gt;</span>登録済みPDF一覧<span class="nt">&lt;/h2&gt;</span>
+<span class="nt">&lt;table&gt;</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;th&gt;</span>ファイル名<span class="nt">&lt;/th&gt;</span>
+    <span class="nt">&lt;th&gt;</span>タイトル<span class="nt">&lt;/th&gt;</span>
+    <span class="nt">&lt;th&gt;</span>内容<span class="nt">&lt;/th&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+  <span class="cp">&lt;?php</span> <span class="k">foreach</span> <span class="p">(</span><span class="nv">$records</span> <span class="k">as</span> <span class="nv">$record</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span>
+    <span class="nt">&lt;tr&gt;</span>
+      <span class="nt">&lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$record</span><span class="p">[</span><span class="s1">'file'</span><span class="p">]);</span> <span class="cp">?&gt;</span><span class="nt">&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$record</span><span class="p">[</span><span class="s1">'title'</span><span class="p">]);</span> <span class="cp">?&gt;</span><span class="nt">&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nb">mb_substr</span><span class="p">(</span><span class="nv">$record</span><span class="p">[</span><span class="s1">'content'</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">120</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="ni">&amp;hellip;&amp;hellip;</span><span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;/tr&gt;</span>
+  <span class="cp">&lt;?php</span> <span class="k">endforeach</span><span class="p">;</span> <span class="cp">?&gt;</span>
+<span class="nt">&lt;/table&gt;</span>
 
-&lt;form enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
-  &lt;input name=&quot;pdf[]&quot; type=&quot;file&quot; multiple&gt;
-  &lt;input type=&quot;submit&quot;&gt;
-&lt;/form&gt;
+<span class="nt">&lt;form</span> <span class="na">enctype=</span><span class="s">"multipart/form-data"</span> <span class="na">method=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">"pdf[]"</span> <span class="na">type=</span><span class="s">"file"</span> <span class="na">multiple</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
 </pre>
 </div>
 <p><code class="inline-code tt">snippets</code>の表示ではHTMLエスケープをしていないことに気が付いたでしょうか。<code class="inline-code tt">mroonga_snippet_html()</code>にHTMLタグが含まれているため、ここでHTMLエスケープしてしまうと、タグとしての役を果たさなくなってしまいます。そのため、直接出力しています。</p>
@@ -295,37 +295,37 @@ ORDER BY score DESC;
 <p>まとめると、実装は次のようになります。</p>
 <div id="id_ch06_2Fsort_2Ftable.php" class="caption-code">
 <p class="caption">リスト6.3: table.php</p>
-<pre class="list language-php highlight">&lt;?php
-namespace PDFSearch;
+<pre class="list language-php highlight"><span class="cp">&lt;?php</span>
+<span class="kn">namespace</span> <span class="nn">PDFSearch</span><span class="p">;</span>
 
-class Table
-{
-    const INSERT =
-        &quot;INSERT INTO `pdfs` (file, title, content)
-         VALUES(:file, :title, :content);&quot;;
-    const SELECT = &quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;;
-    const SEARCH = &lt;&lt;&lt;EOS
+<span class="kd">class</span> <span class="nc">Table</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">INSERT</span> <span class="o">=</span>
+        <span class="s2">"INSERT INTO `pdfs` (file, title, content)
+         VALUES(:file, :title, :content);"</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">SELECT</span> <span class="o">=</span> <span class="s2">"SELECT * FROM `pdfs` ORDER BY `id`;"</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">SEARCH</span> <span class="o">=</span> <span class="sh">&lt;&lt;&lt;EOS
 SELECT file, title, mroonga_snippet_html(content, :query AS query) AS snippets,
 MATCH(title, content) AGAINST(:query_with_pragma IN BOOLEAN MODE) AS score
 FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query_with_pragma IN BOOLEAN MODE)
 ORDER BY score DESC;
-EOS;
-    // :
-    // :
-    public function search($query)
-    {
-        $sth = $this-&gt;pdo-&gt;prepare(self::SEARCH);
-        $params = [
-          ':query' =&gt; $query,
-          ':query_with_pragma' =&gt; '*D+W1:100,2:1 ' . $query
-        ];
-        $isSucceeded = $sth-&gt;execute($params);
-        if (! $isSucceeded) {
-            throw new \RuntimeException(implode(PHP_EOL, $sth-&gt;errorInfo()));
-        }
-        return $sth-&gt;fetchAll();
-    }
-}
+EOS;</span>
+    <span class="c1">// :</span>
+    <span class="c1">// :</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">search</span><span class="p">(</span><span class="nv">$query</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdo</span><span class="o">-&gt;</span><span class="nf">prepare</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">SEARCH</span><span class="p">);</span>
+        <span class="nv">$params</span> <span class="o">=</span> <span class="p">[</span>
+          <span class="s1">':query'</span> <span class="o">=&gt;</span> <span class="nv">$query</span><span class="p">,</span>
+          <span class="s1">':query_with_pragma'</span> <span class="o">=&gt;</span> <span class="s1">'*D+W1:100,2:1 '</span> <span class="mf">.</span> <span class="nv">$query</span>
+        <span class="p">];</span>
+        <span class="nv">$isSucceeded</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">execute</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nv">$isSucceeded</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nc">\RuntimeException</span><span class="p">(</span><span class="nb">implode</span><span class="p">(</span><span class="kc">PHP_EOL</span><span class="p">,</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">errorInfo</span><span class="p">()));</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">fetchAll</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre>
 </div>
 <p><code class="inline-code tt">W</code>プラグマを色々な値に変えて試してみてください。本書のようなチュートリアルではなく、実際の全文検索システムに置いてもスコアリングは非常に大切なポイントです。重み付けを使いこなしたスコアリングができると、いかにも全文検索システムを作っているという実感が出て、楽しいと思います。</p>
@@ -344,5 +344,5 @@ EOS;
   </div>
   <footer>
       </footer>
-  </body>
+</body>
 </html>

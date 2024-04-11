@@ -22,68 +22,68 @@
 <p>ユーザーが表示させる起点の画面をindex.php、そのファイルから呼び出すアップロード機能の部分をupload.phpとして実装することにします。</p>
 <div id="id_ch04_2Fupload_2Findex.php" class="caption-code">
 <p class="caption">リスト4.1: index.php</p>
-<pre class="list language-php highlight">&lt;?php
-require_once __DIR__ . '/upload.php';
+<pre class="list language-php highlight"><span class="cp">&lt;?php</span>
+<span class="k">require_once</span> <span class="k">__DIR__</span> <span class="mf">.</span> <span class="s1">'/upload.php'</span><span class="p">;</span>
 
-function h($string, $flags = ENT_QUOTES, $encoding = 'UTF-8')
-{
-    return htmlspecialchars($string, $flags, $encoding);
-}
+<span class="k">function</span> <span class="n">h</span><span class="p">(</span><span class="nv">$string</span><span class="p">,</span> <span class="nv">$flags</span> <span class="o">=</span> <span class="no">ENT_QUOTES</span><span class="p">,</span> <span class="nv">$encoding</span> <span class="o">=</span> <span class="s1">'UTF-8'</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$string</span><span class="p">,</span> <span class="nv">$flags</span><span class="p">,</span> <span class="nv">$encoding</span><span class="p">);</span>
+<span class="p">}</span>
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' &amp;&amp; array_key_exists('pdf', $_FILES)) {
-    $uploads = \PDFSearch\Upload::fromFilesInfo($_FILES['pdf']);
-}
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_METHOD'</span><span class="p">]</span> <span class="o">===</span> <span class="s1">'POST'</span> <span class="o">&amp;&amp;</span> <span class="nb">array_key_exists</span><span class="p">(</span><span class="s1">'pdf'</span><span class="p">,</span> <span class="nv">$_FILES</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$uploads</span> <span class="o">=</span> <span class="nc">\PDFSearch\Upload</span><span class="o">::</span><span class="nf">fromFilesInfo</span><span class="p">(</span><span class="nv">$_FILES</span><span class="p">[</span><span class="s1">'pdf'</span><span class="p">]);</span>
+<span class="p">}</span>
 
-?&gt;&lt;!doctype html&gt;
-&lt;title&gt;PDF Search&lt;/title&gt;
-&lt;h1&gt;PDF Search&lt;/h1&gt;
+<span class="cp">?&gt;&lt;!doctype html&gt;</span>
+<span class="nt">&lt;title&gt;</span>PDF Search<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;h1&gt;</span>PDF Search<span class="nt">&lt;/h1&gt;</span>
 
-&lt;h2&gt;アップロードされたファイル&lt;/h2&gt;
-&lt;?php if (! empty($uploads)): ?&gt;
-&lt;?php foreach ($uploads as $upload): ?&gt;
-&lt;p&gt;&lt;?php echo h($upload-&gt;getName()); ?&gt;&lt;/p&gt;
-&lt;?php endforeach; ?&gt;
-&lt;?php endif; ?&gt;
+<span class="nt">&lt;h2&gt;</span>アップロードされたファイル<span class="nt">&lt;/h2&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="k">empty</span><span class="p">(</span><span class="nv">$uploads</span><span class="p">))</span><span class="o">:</span> <span class="cp">?&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">foreach</span> <span class="p">(</span><span class="nv">$uploads</span> <span class="k">as</span> <span class="nv">$upload</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span>
+<span class="nt">&lt;p&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$upload</span><span class="o">-&gt;</span><span class="nf">getName</span><span class="p">());</span> <span class="cp">?&gt;</span><span class="nt">&lt;/p&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endforeach</span><span class="p">;</span> <span class="cp">?&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span>
 
-&lt;form enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
-  &lt;input name=&quot;pdf[]&quot; type=&quot;file&quot; multiple&gt;
-  &lt;input type=&quot;submit&quot;&gt;
-&lt;/form&gt;
+<span class="nt">&lt;form</span> <span class="na">enctype=</span><span class="s">"multipart/form-data"</span> <span class="na">method=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">"pdf[]"</span> <span class="na">type=</span><span class="s">"file"</span> <span class="na">multiple</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
 </pre>
 </div>
 <div id="id_ch04_2Fupload_2Fupload.php" class="caption-code">
 <p class="caption">リスト4.2: upload.php</p>
-<pre class="list language-php highlight">&lt;?php
-namespace PDFSearch;
+<pre class="list language-php highlight"><span class="cp">&lt;?php</span>
+<span class="kn">namespace</span> <span class="nn">PDFSearch</span><span class="p">;</span>
 
-class Upload
-{
-    protected $name;
-    protected $tmpName;
+<span class="kd">class</span> <span class="nc">Upload</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$name</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$tmpName</span><span class="p">;</span>
 
-    public static function fromFilesInfo(array $info)
-    {
-        $uploads = array();
-        $fileCount = count($info['name']);
-        for ($i = 0; $i &lt; $fileCount; $i++) {
-            $name = $info['name'][$i];
-            $tmpName = $info['tmp_name'][$i];
-            $uploads[] = new Upload($name, $tmpName);
-        }
-        return $uploads;
-    }
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="n">fromFilesInfo</span><span class="p">(</span><span class="kt">array</span> <span class="nv">$info</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$uploads</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+        <span class="nv">$fileCount</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$info</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nv">$fileCount</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$name</span> <span class="o">=</span> <span class="nv">$info</span><span class="p">[</span><span class="s1">'name'</span><span class="p">][</span><span class="nv">$i</span><span class="p">];</span>
+            <span class="nv">$tmpName</span> <span class="o">=</span> <span class="nv">$info</span><span class="p">[</span><span class="s1">'tmp_name'</span><span class="p">][</span><span class="nv">$i</span><span class="p">];</span>
+            <span class="nv">$uploads</span><span class="p">[]</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Upload</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$tmpName</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$uploads</span><span class="p">;</span>
+    <span class="p">}</span>
 
-    public function __construct($name, $tmpName)
-    {
-        $this-&gt;name = $name;
-        $this-&gt;tmpName = $tmpName;
-    }
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$tmpName</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">tmpName</span> <span class="o">=</span> <span class="nv">$tmpName</span><span class="p">;</span>
+    <span class="p">}</span>
 
-    public function getName()
-    {
-        return $this-&gt;name;
-    }
-}
+    <span class="k">public</span> <span class="k">function</span> <span class="n">getName</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre>
 </div>
 <p>今の所、単にアップロードされたファイルの名前を表示しているだけです。後でその他の機能を実装していきます。複数のファイルをアップロードすると<a id="fnb-multi-select" href="#fn-multi-select" class="noteref" epub:type="noteref">*1</a>、全てが表示されることも確認してみてください。</p>
@@ -94,7 +94,7 @@ class Upload
 </p>
 </div>
 <p>紙幅を減らすため、細かな検証は省略しています。実際に運用するアプリケーションでは安全性やエラーのチェックなどをしっかりと行ってください。</p>
-<p>また、エラーが表示されてしまった場合などPHPのでバッグが必要な場合は、本書末尾の「A.6 PHPのデバッグ」にデバッグ方法を記していますので、参考にされてください。</p>
+<p>また、エラーが表示されてしまった場合などPHPのでバッグが必要な場合は、本書末尾の<a href="appendix.html#hA-6">「A.6 PHPのデバッグ」</a>にデバッグ方法を記していますので、参考にされてください。</p>
 <div class="footnote" epub:type="footnote" id="fn-multi-select"><p class="footnote">[*1] ファイル選択ダイアログでCtrlキーを押しながらファイルをクリックしていくことで、選んだファイルを同時にアップロードできます。また、Shiftを押しながら最初のファイルと最後のファイルをクリックすることで、その間にあるファイルをすべて選択状態にできます。なお、PHPの設定により、合計で1GiBを超えるアップロードは失敗します。</p></div>
 
 <h2><a id="h4-2"></a><span class="secno">4.2　</span>PDFからの情報を抽出する</h2>
@@ -102,21 +102,21 @@ class Upload
 <p>php-popplerは<code class="inline-code tt">Poppler</code>名前空間にいくつかのクラスを定義しており、以下のようにして使います。</p>
 <div class="emlist-code">
 <p class="caption">php-popplerの基本的な使い方</p>
-<pre class="emlist language-php highlight">&lt;?php
+<pre class="emlist language-php highlight"><span class="cp">&lt;?php</span>
 
-// pdfinfoコマンドのラッパー
-$pdfinfo = \Poppler\Driver\Pdfinfo::create();
-// pdftotextコマンドのラッパー
-$pdftotext = \Poppler\Driver\Pdftotext::create();
-// pdftohtmlコマンドのラッパー
-$pdftohtml = \Poppler\Driver\Pdftohtml::create();
+<span class="c1">// pdfinfoコマンドのラッパー</span>
+<span class="nv">$pdfinfo</span> <span class="o">=</span> <span class="nc">\Poppler\Driver\Pdfinfo</span><span class="o">::</span><span class="nf">create</span><span class="p">();</span>
+<span class="c1">// pdftotextコマンドのラッパー</span>
+<span class="nv">$pdftotext</span> <span class="o">=</span> <span class="nc">\Poppler\Driver\Pdftotext</span><span class="o">::</span><span class="nf">create</span><span class="p">();</span>
+<span class="c1">// pdftohtmlコマンドのラッパー</span>
+<span class="nv">$pdftohtml</span> <span class="o">=</span> <span class="nc">\Poppler\Driver\Pdftohtml</span><span class="o">::</span><span class="nf">create</span><span class="p">();</span>
 
-$pdf = new \Poppler\Processer\Pdffile($pdfinfo, $pdftotet, $peftohtml);
+<span class="nv">$pdf</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">\Poppler\Processer\Pdffile</span><span class="p">(</span><span class="nv">$pdfinfo</span><span class="p">,</span> <span class="nv">$pdftotet</span><span class="p">,</span> <span class="nv">$peftohtml</span><span class="p">);</span>
 
-// PDFからタイトルや著者、作成日時などの情報を連想配列として抜き出す
-echo $pdf-&gt;getInfo('path/to/document.pdf');
-// PDFから本文テキストを抜き出す
-echo $pdf-&gt;toText('path/to/document.pdf');
+<span class="c1">// PDFからタイトルや著者、作成日時などの情報を連想配列として抜き出す</span>
+<span class="k">echo</span> <span class="nv">$pdf</span><span class="o">-&gt;</span><span class="nf">getInfo</span><span class="p">(</span><span class="s1">'path/to/document.pdf'</span><span class="p">);</span>
+<span class="c1">// PDFから本文テキストを抜き出す</span>
+<span class="k">echo</span> <span class="nv">$pdf</span><span class="o">-&gt;</span><span class="nf">toText</span><span class="p">(</span><span class="s1">'path/to/document.pdf'</span><span class="p">);</span>
 </pre>
 </div>
 <p>HTML関連の機能を使わないとしても、<code class="inline-code tt">\Poppler\Processer\Pdffile</code>のコンストラクターには<code class="inline-code tt">\Poppler\Driver\Pdftohtml</code>のインスタンスを渡す必要があるので注意してください。</p>
@@ -124,53 +124,53 @@ echo $pdf-&gt;toText('path/to/document.pdf');
 <p>これを使って、先ほど作った<code class="inline-code tt">\PDFSearch\Upload</code>クラスにPDF関連の機能を追加します。</p>
 <div id="id_ch04_2Fextract_2Fupload.php" class="caption-code">
 <p class="caption">リスト4.3: upload.php</p>
-<pre class="list language-php highlight">&lt;?php
-namespace PDFSearch;
+<pre class="list language-php highlight"><span class="cp">&lt;?php</span>
+<span class="kn">namespace</span> <span class="nn">PDFSearch</span><span class="p">;</span>
 
-class Upload
-{
-    // :
-    // （省略）
-    // :
-    public function __construct($name, $tmpName)
-    {
-        $this-&gt;name = $name;
-        $this-&gt;tmpName = $tmpName;
-        $this-&gt;pdf = new \Poppler\Processor\PdfFile(
-          \Poppler\Driver\Pdfinfo::create(),
-          \Poppler\Driver\Pdftotext::create(),
-          \Poppler\Driver\Pdftohtml::create()
-        );
-    }
-    // :
-    // （省略）
-    // :
-    public function getTitle()
-    {
-        $info = $this-&gt;pdf-&gt;getInfo($this-&gt;tmpName);
-        return $info['Title'];
-    }
+<span class="kd">class</span> <span class="nc">Upload</span>
+<span class="p">{</span>
+    <span class="c1">// :</span>
+    <span class="c1">// （省略）</span>
+    <span class="c1">// :</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$tmpName</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">tmpName</span> <span class="o">=</span> <span class="nv">$tmpName</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdf</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">\Poppler\Processor\PdfFile</span><span class="p">(</span>
+          <span class="nc">\Poppler\Driver\Pdfinfo</span><span class="o">::</span><span class="nf">create</span><span class="p">(),</span>
+          <span class="nc">\Poppler\Driver\Pdftotext</span><span class="o">::</span><span class="nf">create</span><span class="p">(),</span>
+          <span class="nc">\Poppler\Driver\Pdftohtml</span><span class="o">::</span><span class="nf">create</span><span class="p">()</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="c1">// :</span>
+    <span class="c1">// （省略）</span>
+    <span class="c1">// :</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">getTitle</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$info</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdf</span><span class="o">-&gt;</span><span class="nf">getInfo</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">tmpName</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nv">$info</span><span class="p">[</span><span class="s1">'Title'</span><span class="p">];</span>
+    <span class="p">}</span>
 
-    public function getContent()
-    {
-        return $this-&gt;pdf-&gt;toText($this-&gt;tmpName);
-    }
-}
+    <span class="k">public</span> <span class="k">function</span> <span class="n">getContent</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdf</span><span class="o">-&gt;</span><span class="nf">toText</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">tmpName</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre>
 </div>
 <p>これに合わせ、index.phpの方も少し変更します。</p>
 <div id="id_ch04_2Fextract_2Findex.php" class="caption-code">
 <p class="caption">リスト4.4: index.php</p>
-<pre class="list language-php highlight">&lt;?php
-// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む
-require_once 'vendor/autoload.php';
-require_once __DIR__ . '/upload.php';
-    // :
-    // （省略）
-    // :
-&lt;?php // getName()をgetTitle()に変更します。 ?&gt;
-&lt;p&gt;&lt;?php echo h($upload-&gt;getTitle()); ?&gt;(&lt;?php echo h($upload-&gt;getName()); ?&gt;)&lt;/p&gt;
-&lt;p&gt;&lt;?php echo h(mb_substr($upload-&gt;getContent(), 0, 120)); ?&gt;&amp;hellip;&amp;hellip;&lt;/p&gt;
+<pre class="list language-php highlight"><span class="cp">&lt;?php</span>
+<span class="c1">// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む</span>
+<span class="k">require_once</span> <span class="s1">'vendor/autoload.php'</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="k">__DIR__</span> <span class="mf">.</span> <span class="s1">'/upload.php'</span><span class="p">;</span>
+    <span class="c1">// :</span>
+    <span class="c1">// （省略）</span>
+    <span class="c1">// :</span>
+<span class="o">&lt;?</span><span class="n">php</span> <span class="c1">// getName()をgetTitle()に変更します。 ?&gt;</span>
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;&lt;?</span><span class="n">php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$upload</span><span class="o">-&gt;</span><span class="nf">getTitle</span><span class="p">());</span> <span class="cp">?&gt;</span>(<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$upload</span><span class="o">-&gt;</span><span class="nf">getName</span><span class="p">());</span> <span class="cp">?&gt;</span>)<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;p&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nb">mb_substr</span><span class="p">(</span><span class="nv">$upload</span><span class="o">-&gt;</span><span class="nf">getContent</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">120</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="ni">&amp;hellip;&amp;hellip;</span><span class="nt">&lt;/p&gt;</span>
     // :
     // （省略）
     // :
@@ -203,109 +203,109 @@ require_once __DIR__ . '/upload.php';
 <p>このテーブルを扱う<code class="inline-code tt">\PDFSearch\Table</code>クラスを実装し、<code class="inline-code tt">index.php</code>でそのクラスを使うようにしたのが以下の内容です。<code class="inline-code tt">\PDFSearch\Upload</code>には変更がないため省略しています。</p>
 <div id="id_ch04_2Finsert_2Findex.php" class="caption-code">
 <p class="caption">リスト4.5: index.php</p>
-<pre class="list language-php highlight">&lt;?php
-// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む
-require_once 'vendor/autoload.php';
-require_once __DIR__ . '/upload.php';
-require_once __DIR__ . '/table.php';
+<pre class="list language-php highlight"><span class="cp">&lt;?php</span>
+<span class="c1">// Dockerイメージ内にComposerでインストール済みのライブラリーを読み込む</span>
+<span class="k">require_once</span> <span class="s1">'vendor/autoload.php'</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="k">__DIR__</span> <span class="mf">.</span> <span class="s1">'/upload.php'</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="k">__DIR__</span> <span class="mf">.</span> <span class="s1">'/table.php'</span><span class="p">;</span>
 
-define('DBNAME', 'pdfsearch');
+<span class="nb">define</span><span class="p">(</span><span class="s1">'DBNAME'</span><span class="p">,</span> <span class="s1">'pdfsearch'</span><span class="p">);</span>
 
-$dsn = 'mysql:host=localhost;dbname=' . DBNAME . ';charset=utf8';
-$table = new \PDFSearch\Table($dsn, 'root', '');
+<span class="nv">$dsn</span> <span class="o">=</span> <span class="s1">'mysql:host=localhost;dbname='</span> <span class="mf">.</span> <span class="no">DBNAME</span> <span class="mf">.</span> <span class="s1">';charset=utf8'</span><span class="p">;</span>
+<span class="nv">$table</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">\PDFSearch\Table</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span> <span class="s1">'root'</span><span class="p">,</span> <span class="s1">''</span><span class="p">);</span>
 
-function h($string, $flags = ENT_QUOTES, $encoding = 'UTF-8')
-{
-    return htmlspecialchars($string, $flags, $encoding);
-}
+<span class="k">function</span> <span class="n">h</span><span class="p">(</span><span class="nv">$string</span><span class="p">,</span> <span class="nv">$flags</span> <span class="o">=</span> <span class="no">ENT_QUOTES</span><span class="p">,</span> <span class="nv">$encoding</span> <span class="o">=</span> <span class="s1">'UTF-8'</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$string</span><span class="p">,</span> <span class="nv">$flags</span><span class="p">,</span> <span class="nv">$encoding</span><span class="p">);</span>
+<span class="p">}</span>
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' &amp;&amp;
-    array_key_exists('pdf', $_FILES)) {
-    $uploads = \PDFSearch\Upload::fromFilesInfo($_FILES['pdf']);
-    try {
-        foreach ($uploads as $upload) {
-            $table-&gt;insert($upload);
-        }
-        header('Location: .');
-    } catch (\RuntimeException $e) {
-        header('HTTP', true, 500);
-        header('content-type: text/plain');
-        echo $e;
-    }
-    exit;
-}
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_METHOD'</span><span class="p">]</span> <span class="o">===</span> <span class="s1">'POST'</span> <span class="o">&amp;&amp;</span>
+    <span class="nb">array_key_exists</span><span class="p">(</span><span class="s1">'pdf'</span><span class="p">,</span> <span class="nv">$_FILES</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$uploads</span> <span class="o">=</span> <span class="nc">\PDFSearch\Upload</span><span class="o">::</span><span class="nf">fromFilesInfo</span><span class="p">(</span><span class="nv">$_FILES</span><span class="p">[</span><span class="s1">'pdf'</span><span class="p">]);</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$uploads</span> <span class="k">as</span> <span class="nv">$upload</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$table</span><span class="o">-&gt;</span><span class="nf">insert</span><span class="p">(</span><span class="nv">$upload</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="nb">header</span><span class="p">(</span><span class="s1">'Location: .'</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nc">\RuntimeException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">header</span><span class="p">(</span><span class="s1">'HTTP'</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="mi">500</span><span class="p">);</span>
+        <span class="nb">header</span><span class="p">(</span><span class="s1">'content-type: text/plain'</span><span class="p">);</span>
+        <span class="k">echo</span> <span class="nv">$e</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">exit</span><span class="p">;</span>
+<span class="p">}</span>
 
-$records = $table-&gt;records();
+<span class="nv">$records</span> <span class="o">=</span> <span class="nv">$table</span><span class="o">-&gt;</span><span class="nf">records</span><span class="p">();</span>
 
-?&gt;&lt;!doctype html&gt;
-&lt;title&gt;PDF Search&lt;/title&gt;
-&lt;h1&gt;PDF Search&lt;/h1&gt;
+<span class="cp">?&gt;&lt;!doctype html&gt;</span>
+<span class="nt">&lt;title&gt;</span>PDF Search<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;h1&gt;</span>PDF Search<span class="nt">&lt;/h1&gt;</span>
 
-&lt;h2&gt;登録済みPDF一覧&lt;/h2&gt;
-&lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;ファイル名&lt;/th&gt;
-    &lt;th&gt;タイトル&lt;/th&gt;
-    &lt;th&gt;内容&lt;/th&gt;
-  &lt;/tr&gt;
-  &lt;?php foreach ($records as $record): ?&gt;
-    &lt;tr&gt;
-      &lt;td&gt;&lt;?php echo h($record['file']); ?&gt;&lt;/td&gt;
-      &lt;td&gt;&lt;?php echo h($record['title']); ?&gt;&lt;/td&gt;
-      &lt;td&gt;&lt;?php echo h(mb_substr($record['content'], 0, 120)); ?&gt;&amp;hellip;&amp;hellip;&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;?php endforeach; ?&gt;
-&lt;/table&gt;
+<span class="nt">&lt;h2&gt;</span>登録済みPDF一覧<span class="nt">&lt;/h2&gt;</span>
+<span class="nt">&lt;table&gt;</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;th&gt;</span>ファイル名<span class="nt">&lt;/th&gt;</span>
+    <span class="nt">&lt;th&gt;</span>タイトル<span class="nt">&lt;/th&gt;</span>
+    <span class="nt">&lt;th&gt;</span>内容<span class="nt">&lt;/th&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+  <span class="cp">&lt;?php</span> <span class="k">foreach</span> <span class="p">(</span><span class="nv">$records</span> <span class="k">as</span> <span class="nv">$record</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span>
+    <span class="nt">&lt;tr&gt;</span>
+      <span class="nt">&lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$record</span><span class="p">[</span><span class="s1">'file'</span><span class="p">]);</span> <span class="cp">?&gt;</span><span class="nt">&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$record</span><span class="p">[</span><span class="s1">'title'</span><span class="p">]);</span> <span class="cp">?&gt;</span><span class="nt">&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nb">mb_substr</span><span class="p">(</span><span class="nv">$record</span><span class="p">[</span><span class="s1">'content'</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">120</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="ni">&amp;hellip;&amp;hellip;</span><span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;/tr&gt;</span>
+  <span class="cp">&lt;?php</span> <span class="k">endforeach</span><span class="p">;</span> <span class="cp">?&gt;</span>
+<span class="nt">&lt;/table&gt;</span>
 
-&lt;form enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
-  &lt;input name=&quot;pdf[]&quot; type=&quot;file&quot; multiple&gt;
-  &lt;input type=&quot;submit&quot;&gt;
-&lt;/form&gt;
+<span class="nt">&lt;form</span> <span class="na">enctype=</span><span class="s">"multipart/form-data"</span> <span class="na">method=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">"pdf[]"</span> <span class="na">type=</span><span class="s">"file"</span> <span class="na">multiple</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
 </pre>
 </div>
 <div id="id_ch04_2Finsert_2Ftable.php" class="caption-code">
 <p class="caption">リスト4.6: table.php</p>
-<pre class="list language-php highlight">&lt;?php
-namespace PDFSearch;
+<pre class="list language-php highlight"><span class="cp">&lt;?php</span>
+<span class="kn">namespace</span> <span class="nn">PDFSearch</span><span class="p">;</span>
 
-class Table
-{
-    const INSERT =
-        &quot;INSERT INTO `pdfs` (file, title, content)
-         VALUES(:file, :title, :content);&quot;;
-    const SELECT = &quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;;
+<span class="kd">class</span> <span class="nc">Table</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">INSERT</span> <span class="o">=</span>
+        <span class="s2">"INSERT INTO `pdfs` (file, title, content)
+         VALUES(:file, :title, :content);"</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">SELECT</span> <span class="o">=</span> <span class="s2">"SELECT * FROM `pdfs` ORDER BY `id`;"</span><span class="p">;</span>
 
-    protected $pdo;
+    <span class="k">protected</span> <span class="nv">$pdo</span><span class="p">;</span>
 
-    public function __construct($dsn, $username, $password)
-    {
-        $this-&gt;pdo = new \PDO($dsn, $username, $password);
-    }
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span> <span class="nv">$username</span><span class="p">,</span> <span class="nv">$password</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">\PDO</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span> <span class="nv">$username</span><span class="p">,</span> <span class="nv">$password</span><span class="p">);</span>
+    <span class="p">}</span>
 
-    public function insert(Upload $upload)
-    {
-        $params = [
-            ':file'    =&gt; $upload-&gt;getName(),
-            ':title'   =&gt; $upload-&gt;getTitle(),
-            ':content' =&gt; $upload-&gt;getContent()
-        ];
-        $sth = $this-&gt;pdo-&gt;prepare(self::INSERT);
-        $isSucceeded = $sth-&gt;execute($params);
-        if (! $isSucceeded) {
-            throw new \RuntimeException(implode(PHP_EOL, $sth-&gt;errorInfo()));
-        }
-    }
+    <span class="k">public</span> <span class="k">function</span> <span class="n">insert</span><span class="p">(</span><span class="kt">Upload</span> <span class="nv">$upload</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$params</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">':file'</span>    <span class="o">=&gt;</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="nf">getName</span><span class="p">(),</span>
+            <span class="s1">':title'</span>   <span class="o">=&gt;</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="nf">getTitle</span><span class="p">(),</span>
+            <span class="s1">':content'</span> <span class="o">=&gt;</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="nf">getContent</span><span class="p">()</span>
+        <span class="p">];</span>
+        <span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdo</span><span class="o">-&gt;</span><span class="nf">prepare</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">INSERT</span><span class="p">);</span>
+        <span class="nv">$isSucceeded</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">execute</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nv">$isSucceeded</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nc">\RuntimeException</span><span class="p">(</span><span class="nb">implode</span><span class="p">(</span><span class="kc">PHP_EOL</span><span class="p">,</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">errorInfo</span><span class="p">()));</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
 
-    public function records()
-    {
-        $sth = $this-&gt;pdo-&gt;prepare(self::SELECT);
-        $isSucceeded = $sth-&gt;execute();
-        if (! $isSucceeded) {
-            throw new \RuntimeException(implode(PHP_EOL, $sth-&gt;errorInfo()));
-        }
-        return $sth-&gt;fetchAll();
-    }
-}
+    <span class="k">public</span> <span class="k">function</span> <span class="n">records</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdo</span><span class="o">-&gt;</span><span class="nf">prepare</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">SELECT</span><span class="p">);</span>
+        <span class="nv">$isSucceeded</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">execute</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nv">$isSucceeded</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nc">\RuntimeException</span><span class="p">(</span><span class="nb">implode</span><span class="p">(</span><span class="kc">PHP_EOL</span><span class="p">,</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">errorInfo</span><span class="p">()));</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">fetchAll</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre>
 </div>
 <p>ウェブブラウザーでアクセスして、データベースの中身を表示してみましょう。</p>

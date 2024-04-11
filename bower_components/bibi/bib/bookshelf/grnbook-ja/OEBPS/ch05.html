@@ -17,75 +17,75 @@
 <p>今の「登録済みPDF一覧」の上に検索フォームを作成し、検索を実行した場合にはフォームの下に検索結果を表示するようにしてみましょう。そのために、<code class="inline-code tt">\PDFSearch\Table</code>クラスに検索用のメンバー関数を追加します。</p>
 <div id="id_ch05_2Fsearch_2Ftable.php" class="caption-code">
 <p class="caption">リスト5.1: table.php</p>
-<pre class="list language-php highlight">&lt;?php
-namespace PDFSearch;
+<pre class="list language-php highlight"><span class="cp">&lt;?php</span>
+<span class="kn">namespace</span> <span class="nn">PDFSearch</span><span class="p">;</span>
 
-class Table
-{
-    const INSERT =
-        &quot;INSERT INTO `pdfs` (file, title, content)
-         VALUES(:file, :title, :content);&quot;;
-    const SELECT = &quot;SELECT * FROM `pdfs` ORDER BY `id`;&quot;;
-    const SEARCH = &lt;&lt;&lt;EOS
+<span class="kd">class</span> <span class="nc">Table</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">INSERT</span> <span class="o">=</span>
+        <span class="s2">"INSERT INTO `pdfs` (file, title, content)
+         VALUES(:file, :title, :content);"</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">SELECT</span> <span class="o">=</span> <span class="s2">"SELECT * FROM `pdfs` ORDER BY `id`;"</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">SEARCH</span> <span class="o">=</span> <span class="sh">&lt;&lt;&lt;EOS
 SELECT * FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query IN BOOLEAN MODE);
-EOS;
+EOS;</span>
 
-    protected $pdo;
-    // :
-    // :
-    public function search($query)
-    {
-        $sth = $this-&gt;pdo-&gt;prepare(self::SEARCH);
-        $params = [':query' =&gt; $query];
-        $isSucceeded = $sth-&gt;execute($params);
-        if (! $isSucceeded) {
-            throw new \RuntimeException(implode(PHP_EOL, $sth-&gt;errorInfo()));
-        }
-        return $sth-&gt;fetchAll();
-    }
-}
+    <span class="k">protected</span> <span class="nv">$pdo</span><span class="p">;</span>
+    <span class="c1">// :</span>
+    <span class="c1">// :</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">search</span><span class="p">(</span><span class="nv">$query</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdo</span><span class="o">-&gt;</span><span class="nf">prepare</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">SEARCH</span><span class="p">);</span>
+        <span class="nv">$params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">':query'</span> <span class="o">=&gt;</span> <span class="nv">$query</span><span class="p">];</span>
+        <span class="nv">$isSucceeded</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">execute</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nv">$isSucceeded</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nc">\RuntimeException</span><span class="p">(</span><span class="nb">implode</span><span class="p">(</span><span class="kc">PHP_EOL</span><span class="p">,</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">errorInfo</span><span class="p">()));</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="nf">fetchAll</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre>
 </div>
 <p><code class="inline-code tt">SEARCH</code>定数と<code class="inline-code tt">search</code>メンバー関数を追加しています。</p>
 <p>先ほど言ったような検索フォームと結果のエリアを追加すると、index.phpはこうなります。</p>
 <div id="id_ch05_2Fsearch_2Findex.php" class="caption-code">
 <p class="caption">リスト5.2: index.php</p>
-<pre class="list language-php highlight">&lt;?php
-// :
-// :
-// 検索処理
-$searchQuery = null;
-$searchResult = null;
-if ($_SERVER['REQUEST_METHOD'] === 'GET' &amp;&amp;
-    array_key_exists('q', $_GET) &amp;&amp; $_GET['q']) {
-    $searchQuery = $_GET['q'];
-    $searchResult = $table-&gt;search($searchQuery);
-}
-// :
-// :
-&lt;h2&gt;検索&lt;/h2&gt;
-&lt;form method=&quot;get&quot;&gt;
-  &lt;input name=&quot;q&quot; type=&quot;search&quot; value=&quot;&lt;?php echo h($searchQuery); ?&gt;&quot;&gt;
-  &lt;input type=&quot;submit&quot; value=&quot;検索&quot;&gt;
-&lt;/form&gt;
+<pre class="list language-php highlight"><span class="cp">&lt;?php</span>
+<span class="c1">// :</span>
+<span class="c1">// :</span>
+<span class="c1">// 検索処理</span>
+<span class="nv">$searchQuery</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="nv">$searchResult</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_METHOD'</span><span class="p">]</span> <span class="o">===</span> <span class="s1">'GET'</span> <span class="o">&amp;&amp;</span>
+    <span class="nb">array_key_exists</span><span class="p">(</span><span class="s1">'q'</span><span class="p">,</span> <span class="nv">$_GET</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'q'</span><span class="p">])</span> <span class="p">{</span>
+    <span class="nv">$searchQuery</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'q'</span><span class="p">];</span>
+    <span class="nv">$searchResult</span> <span class="o">=</span> <span class="nv">$table</span><span class="o">-&gt;</span><span class="nf">search</span><span class="p">(</span><span class="nv">$searchQuery</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="c1">// :</span>
+<span class="c1">// :</span>
+<span class="o">&lt;</span><span class="n">h2</span><span class="o">&gt;</span><span class="n">検索</span><span class="o">&lt;/</span><span class="n">h2</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">form</span> <span class="n">method</span><span class="o">=</span><span class="s2">"get"</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">input</span> <span class="n">name</span><span class="o">=</span><span class="s2">"q"</span> <span class="n">type</span><span class="o">=</span><span class="s2">"search"</span> <span class="n">value</span><span class="o">=</span><span class="s2">"&lt;?php echo h(</span><span class="nv">$searchQuery</span><span class="s2">); ?&gt;"</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">input</span> <span class="n">type</span><span class="o">=</span><span class="s2">"submit"</span> <span class="n">value</span><span class="o">=</span><span class="s2">"検索"</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">form</span><span class="o">&gt;</span>
 
-&lt;?php if ($searchResult &amp;&amp; count($searchResult) &gt; 0): ?&gt;
-&lt;h2&gt;「&lt;?php echo h($searchQuery); ?&gt;」を含むPDF&lt;/h2&gt;
-&lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;ファイル名&lt;/th&gt;
-    &lt;th&gt;タイトル&lt;/th&gt;
-    &lt;th&gt;内容&lt;/th&gt;
-  &lt;/tr&gt;
-  &lt;?php foreach ($searchResult as $record): ?&gt;
-    &lt;tr&gt;
-      &lt;td&gt;&lt;?php echo h($record['file']); ?&gt;&lt;/td&gt;
-      &lt;td&gt;&lt;?php echo h($record['title']); ?&gt;&lt;/td&gt;
-      &lt;td&gt;&lt;?php echo h(mb_substr($record['content'], 0, 120)); ?&gt;&amp;hellip;&amp;hellip;&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;?php endforeach; ?&gt;
-&lt;/table&gt;
-&lt;?php endif; ?&gt;
+<span class="o">&lt;?</span><span class="n">php</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$searchResult</span> <span class="o">&amp;&amp;</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$searchResult</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span>
+<span class="nt">&lt;h2&gt;</span>「<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$searchQuery</span><span class="p">);</span> <span class="cp">?&gt;</span>」を含むPDF<span class="nt">&lt;/h2&gt;</span>
+<span class="nt">&lt;table&gt;</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;th&gt;</span>ファイル名<span class="nt">&lt;/th&gt;</span>
+    <span class="nt">&lt;th&gt;</span>タイトル<span class="nt">&lt;/th&gt;</span>
+    <span class="nt">&lt;th&gt;</span>内容<span class="nt">&lt;/th&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+  <span class="cp">&lt;?php</span> <span class="k">foreach</span> <span class="p">(</span><span class="nv">$searchResult</span> <span class="k">as</span> <span class="nv">$record</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span>
+    <span class="nt">&lt;tr&gt;</span>
+      <span class="nt">&lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$record</span><span class="p">[</span><span class="s1">'file'</span><span class="p">]);</span> <span class="cp">?&gt;</span><span class="nt">&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nv">$record</span><span class="p">[</span><span class="s1">'title'</span><span class="p">]);</span> <span class="cp">?&gt;</span><span class="nt">&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nf">h</span><span class="p">(</span><span class="nb">mb_substr</span><span class="p">(</span><span class="nv">$record</span><span class="p">[</span><span class="s1">'content'</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">120</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="ni">&amp;hellip;&amp;hellip;</span><span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;/tr&gt;</span>
+  <span class="cp">&lt;?php</span> <span class="k">endforeach</span><span class="p">;</span> <span class="cp">?&gt;</span>
+<span class="nt">&lt;/table&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span>
 
 </pre>
 </div>
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' &amp;&amp;
 <h2><a id="h5-2"></a><span class="secno">5.2　</span>AND検索の実装</h2>
 <p>一単語で検索している間は気になりませんが、検索フォームに二単語入れると、検索結果に違和感を覚えるかも知れません。例えば「Commons ライセンス」で検索した場合に、「『Commons』は含んでいるが、『ライセンス』は含んでいない」という文書もヒットする（OR検索になっている）ためです。こういう結果が望ましい場面もありますが、Google検索はこうではなく「Commons ライセンス」で検索した場合には「『Commons』も『ライセンス』も両方とも含んでいるページ」が検索結果上位に登場するようになっています（AND検索になっている）。Google検索には非常にたくさんの人が馴染んでいるため、どちらの挙動でもいい場合には合わせておくのがいいでしょう。</p>
 <p>Mroongaでこのような挙動になっているのは、MySQLのブーリアンモードによる全文検索が、デフォルトでこのようになっているためです。AND検索になるよう、何らかの処理を追加する必要があります。</p>
-<p>方法は二つあり、一つは、PHPでクエリーパラメーター（<code class="inline-code tt">$_GET['q']</code>）を単語に分割し、それぞれにAND検索用の命令を追加していく方法です。Mroongaに限らずMySQLの全文検索でも使える汎用的な方法ですが、SQLインジェクション脆弱性などを作り込まずにPHPを書いていく必要があり、本書のスコープ外になるためここでは採用しません。</p>
+<p>方法は二つあり、一つは、PHPでクエリーパラメーター（<code class="inline-code tt">$_GET[&#39;q&#39;]</code>）を単語に分割し、それぞれにAND検索用の命令を追加していく方法です。Mroongaに限らずMySQLの全文検索でも使える汎用的な方法ですが、SQLインジェクション脆弱性などを作り込まずにPHPを書いていく必要があり、本書のスコープ外になるためここでは採用しません。</p>
 <p>もう一つは、SQLのクエリーを実行するタイミングで、クエリー内容の解釈を変更させる「<b class="kw">プラグマ</b><!-- IDX:プラグマ -->」というMroonga特有の命令を使う方法です。プラグマは<code class="inline-code tt">AGAINST()</code>句内で使用し、次のようになります。</p>
 <div class="emlist-code">
 <p class="caption">プラグマを追加したクエリー</p>
@@ -120,24 +120,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' &amp;&amp;
 <p>それでは実際に、これを使ってAND検索を実装しましょう。<code class="inline-code tt">\PDFSearch\Table\SEARCH</code>定数のSQLと、その中のパラメーターをバインドする変数を変更します。</p>
 <div id="id_ch05_2Fpragma_2Ftable.php" class="caption-code">
 <p class="caption">リスト5.3: table.php</p>
-<pre class="list language-php highlight">&lt;?php
-namespace PDFSearch;
+<pre class="list language-php highlight"><span class="cp">&lt;?php</span>
+<span class="kn">namespace</span> <span class="nn">PDFSearch</span><span class="p">;</span>
 
-class Table
-{
-    // :
-    // :
-    const SEARCH = &lt;&lt;&lt;EOS
+<span class="kd">class</span> <span class="nc">Table</span>
+<span class="p">{</span>
+    <span class="c1">// :</span>
+    <span class="c1">// :</span>
+    <span class="k">const</span> <span class="no">SEARCH</span> <span class="o">=</span> <span class="sh">&lt;&lt;&lt;EOS
 SELECT * FROM `pdfs` WHERE MATCH(title, content) AGAINST(:query_with_pragma IN BOOLEAN MODE);
-EOS;
-    // :
-    // :
-    public function search($query)
-    {
-        $sth = $this-&gt;pdo-&gt;prepare(self::SEARCH);
-        $params = [':query_with_pragma' =&gt; '*D+' . $query];
-    // :
-    // :
+EOS;</span>
+    <span class="c1">// :</span>
+    <span class="c1">// :</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">search</span><span class="p">(</span><span class="nv">$query</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pdo</span><span class="o">-&gt;</span><span class="nf">prepare</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">SEARCH</span><span class="p">);</span>
+        <span class="nv">$params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">':query_with_pragma'</span> <span class="o">=&gt;</span> <span class="s1">'*D+'</span> <span class="mf">.</span> <span class="nv">$query</span><span class="p">];</span>
+    <span class="c1">// :</span>
+    <span class="c1">// :</span>
 </pre>
 </div>
 <p>これで「Commons ライセンス」と検索した場合に、両方を含む文書しかヒットしないようになります。</p>
